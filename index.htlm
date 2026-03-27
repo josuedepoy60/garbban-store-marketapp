@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GARBAN STORE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #050a12;
+      --bg-secondary: #0a1628;
+      --fg: #e8f1ff;
+      --muted: #6b7d99;
+      --accent: #22c55e;
+      --accent-glow: rgba(34, 197, 94, 0.5);
+      --warning: #ffb800;
+      --card: rgba(15, 30, 55, 0.7);
+      --border: rgba(100, 140, 180, 0.15);
+      --device-dark: #0f172a;
+      --device-border: #1e293b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .grid-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(34, 197, 94, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 197, 94, 0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: 0;
+      pointer-events: none;
+      animation: float 25s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, transparent 70%);
+      top: -200px;
+      right: -200px;
+    }
+
+    .orb-2 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+      bottom: -150px;
+      left: -150px;
+      animation-delay: -12s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, -40px) scale(1.05); }
+      66% { transform: translate(-30px, 30px) scale(0.95); }
+    }
+
+    .main-content {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* FLOATING DEVICES SECTION */
+    .devices-showcase {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      height: 180px;
+      margin-bottom: 1rem;
+    }
+
+    .floating-device {
+      position: absolute;
+      animation: deviceFloat 6s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(34, 197, 94, 0.3));
+      transition: transform 0.3s ease, filter 0.3s ease;
+      cursor: default;
+    }
+
+    .floating-device:hover {
+      filter: drop-shadow(0 0 30px rgba(34, 197, 94, 0.6));
+      transform: scale(1.1) !important;
+    }
+
+    .device-phone {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: 0s;
+      z-index: 3;
+    }
+
+    .device-tablet {
+      left: 15%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -2s;
+      z-index: 2;
+    }
+
+    .device-laptop {
+      right: 10%;
+      top: 50%;
+      transform: translate(50%, -50%);
+      animation-delay: -4s;
+      z-index: 1;
+    }
+
+    @keyframes deviceFloat {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+      50% { transform: translate(-50%, -50%) translateY(-15px); }
+    }
+
+    .device-tablet {
+      animation-name: deviceFloatTablet;
+    }
+
+    @keyframes deviceFloatTablet {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+      50% { transform: translate(-50%, -50%) translateY(-12px); }
+    }
+
+    .device-laptop {
+      animation-name: deviceFloatLaptop;
+    }
+
+    @keyframes deviceFloatLaptop {
+      0%, 100% { transform: translate(50%, -50%) translateY(0px); }
+      50% { transform: translate(50%, -50%) translateY(-10px); }
+    }
+
+    .device-svg {
+      width: auto;
+      height: auto;
+    }
+
+    .device-body {
+      fill: var(--device-dark);
+      stroke: var(--device-border);
+      stroke-width: 2;
+    }
+
+    .device-screen {
+      fill: var(--bg);
+      stroke: var(--accent);
+      stroke-width: 1;
+    }
+
+    .device-screen-glow {
+      fill: url(#screenGlow);
+    }
+
+    .device-button {
+      fill: var(--accent);
+    }
+
+    .device-camera {
+      fill: #1e293b;
+      stroke: #334155;
+    }
+
+    .device-glow {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, rgba(34, 197, 94, 0.2) 0%, transparent 70%);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: -1;
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+
+    .device-phone .device-glow { animation-delay: 0s; }
+    .device-tablet .device-glow { animation-delay: -1s; }
+    .device-laptop .device-glow { animation-delay: -2s; }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    }
+
+    /* LOGO SECTION */
+    .logo-container {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .logo-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: pulse-ring 3s ease-in-out infinite;
+    }
+
+    .logo-ring:nth-child(1) { width: 160px; height: 160px; }
+    .logo-ring:nth-child(2) { width: 200px; height: 200px; animation-delay: 0.5s; }
+    .logo-ring:nth-child(3) { width: 240px; height: 240px; animation-delay: 1s; }
+
+    @keyframes pulse-ring {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+      50% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.1; }
+    }
+
+    .logo-icon {
+      width: 110px;
+      height: 110px;
+      border-radius: 22px;
+      overflow: hidden;
+      position: relative;
+      z-index: 2;
+      box-shadow: 
+        0 20px 60px -15px var(--accent-glow),
+        0 0 0 1px rgba(34, 197, 94, 0.3);
+      animation: logo-enter 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      transform: scale(0.5) rotate(-10deg);
+      background: var(--accent);
+    }
+
+    .logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @keyframes logo-enter {
+      to { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+
+    .title {
+      font-size: clamp(2.2rem, 7vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--fg) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .subtitle {
+      font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+      animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    @keyframes fade-up {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .download-card {
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      animation: card-enter 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+      opacity: 0;
+      transform: translateY(40px) scale(0.95);
+    }
+
+    @keyframes card-enter {
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(34, 197, 94, 0.06);
+      border: 1px solid rgba(34, 197, 94, 0.12);
+      border-radius: 12px;
+      margin-bottom: 1.25rem;
+    }
+
+    .file-icon {
+      width: 46px;
+      height: 46px;
+      background: linear-gradient(135deg, var(--accent) 0%, #16a34a 100%);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .file-icon svg {
+      width: 22px;
+      height: 22px;
+      color: white;
+    }
+
+    .file-details {
+      text-align: left;
+    }
+
+    .file-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--fg);
+    }
+
+    .file-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .download-btn {
+      width: 100%;
+      padding: 1.1rem 2rem;
+      background: linear-gradient(135deg, var(--accent) 0%, #16a34a 100%);
+      color: white;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .download-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .download-btn:hover::before {
+      left: 100%;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px -10px var(--accent-glow);
+    }
+
+    .download-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .download-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .download-btn svg {
+      transition: transform 0.3s ease;
+    }
+
+    .download-btn:hover svg {
+      transform: translateY(3px);
+    }
+
+    .warning-box {
+      margin-top: 1.25rem;
+      padding: 0.9rem;
+      background: rgba(255, 184, 0, 0.06);
+      border: 1px solid rgba(255, 184, 0, 0.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      text-align: left;
+    }
+
+    .warning-icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      color: var(--warning);
+    }
+
+    .warning-text {
+      font-size: 0.8rem;
+      color: rgba(255, 184, 0, 0.85);
+      line-height: 1.45;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+      margin-top: 1.75rem;
+      animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    @media (max-width: 640px) {
+      .features {
+        grid-template-columns: 1fr;
+      }
+      .devices-showcase {
+        height: 140px;
+      }
+      .device-phone svg { width: 45px; height: 80px; }
+      .device-tablet svg { width: 55px; height: 75px; }
+      .device-laptop svg { width: 75px; height: 55px; }
+    }
+
+    .feature {
+      padding: 1rem;
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .feature:hover {
+      transform: translateY(-4px);
+      border-color: rgba(34, 197, 94, 0.25);
+      background: rgba(15, 30, 55, 0.9);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(34, 197, 94, 0.12);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.6rem;
+      color: var(--accent);
+    }
+
+    .feature-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .feature-desc {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .footer {
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+      opacity: 0;
+    }
+
+    .footer-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .version-badge {
+      display: inline-block;
+      padding: 0.2rem 0.65rem;
+      background: rgba(34, 197, 94, 0.12);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 15px;
+      font-size: 0.7rem;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 0.4rem;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="grid-overlay"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- SVG Definitions -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="screenGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:rgba(34,197,94,0.15)" />
+        <stop offset="50%" style="stop-color:rgba(34,197,94,0.05)" />
+        <stop offset="100%" style="stop-color:rgba(34,197,94,0.1)" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <main class="main-content">
+    
+    <!-- Floating Devices Icons -->
+    <div class="devices-showcase">
+      <!-- Tablet (Left) -->
+      <div class="floating-device device-tablet">
+        <div class="device-glow"></div>
+        <svg width="65" height="90" viewBox="0 0 65 90" class="device-svg">
+          <rect class="device-body" x="2" y="2" width="61" height="86" rx="8" ry="8"/>
+          <rect class="device-screen" x="6" y="8" width="53" height="70" rx="2" ry="2"/>
+          <rect class="device-screen-glow" x="6" y="8" width="53" height="70" rx="2" ry="2"/>
+          <circle class="device-button" cx="32.5" cy="83" r="3"/>
+        </svg>
+      </div>
+
+      <!-- Phone (Center) -->
+      <div class="floating-device device-phone">
+        <div class="device-glow"></div>
+        <svg width="52" height="95" viewBox="0 0 52 95" class="device-svg">
+          <rect class="device-body" x="2" y="2" width="48" height="91" rx="10" ry="10"/>
+          <rect class="device-screen" x="5" y="10" width="42" height="75" rx="3" ry="3"/>
+          <rect class="device-screen-glow" x="5" y="10" width="42" height="75" rx="3" ry="3"/>
+          <circle class="device-camera" cx="26" cy="6" r="2"/>
+          <rect class="device-button" x="20" y="87" width="12" height="3" rx="1.5"/>
+        </svg>
+      </div>
+
+      <!-- Laptop (Right) -->
+      <div class="floating-device device-laptop">
+        <div class="device-glow"></div>
+        <svg width="90" height="65" viewBox="0 0 90 65" class="device-svg">
+          <path class="device-body" d="M5 5 L5 50 L85 50 L85 5 Q85 2 82 2 L8 2 Q5 2 5 5 Z"/>
+          <rect class="device-screen" x="9" y="6" width="72" height="40" rx="2" ry="2"/>
+          <rect class="device-screen-glow" x="9" y="6" width="72" height="40" rx="2" ry="2"/>
+          <circle class="device-camera" cx="45" cy="4" r="1.5"/>
+          <path class="device-body" d="M2 52 L0 60 Q0 63 3 63 L87 63 Q90 63 90 60 L88 52 Z"/>
+          <ellipse class="device-button" cx="45" cy="57.5" rx="12" ry="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Logo Section -->
+    <div class="logo-container">
+      <div class="logo-ring"></div>
+      <div class="logo-ring"></div>
+      <div class="logo-ring"></div>
+      <div class="logo-icon">
+        <img src="https://z-cdn-media.chatglm.cn/files/7bc26ef6-9045-48cb-828c-a9a4763b8b16.jpg?auth_key=1874622071-3db87f5683d3466db14cbb6a12d0758f-0-ef3519a17a1d078aacb0f9229b120e49" alt="GARBBAN STORE MARKET Logo">
+      </div>
+    </div>
+
+    <h1 class="title">GARBAN STORE</h1>
+    <p class="subtitle">Telecharge l'application officielle</p>
+
+    <div class="download-card">
+      <div class="file-info">
+        <div class="file-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <div class="file-details">
+          <div class="file-name">app.apk</div>
+          <div class="file-meta">Android Package • v2.1.0</div>
+        </div>
+      </div>
+
+      <button class="download-btn" onclick="startDownload()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Telecharger APK
+      </button>
+
+      <div class="warning-box">
+        <svg class="warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span class="warning-text">Active "Sources inconnues" dans les parametres de securite pour installer l'application.</span>
+      </div>
+    </div>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="feature-title">Securise</div>
+        <div class="feature-desc">Application verifiee</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+        <div class="feature-title">Rapide</div>
+        <div class="feature-desc">Performance optimisee</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="feature-title">Mis a jour</div>
+        <div class="feature-desc">Derniere version</div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <p class="footer-text">GARBAN STORE - Votre store de confiance</p>
+      <span class="version-badge">v2.1.0</span>
+    </footer>
+  </main>
+
+  <script>
+    // Initialize variables first
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animationId = null;
+    let mouseX = 0;
+    let mouseY = 0;
+
+    function initCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      createParticles();
+    }
+
+    function createParticles() {
+      particles = [];
+      const count = Math.min(60, Math.floor((canvas.width * canvas.height) / 18000));
+      
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.max(1, Math.random() * 2),
+          speedX: (Math.random() - 0.5) * 0.25,
+          speedY: (Math.random() - 0.5) * 0.25,
+          opacity: Math.random() * 0.4 + 0.15
+        });
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let index = 0; index < particles.length; index++) {
+        const p = particles[index];
+        
+        const dx = mouseX - p.x;
+        const dy = mouseY - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < 120) {
+          p.x -= dx * 0.008;
+          p.y -= dy * 0.008;
+        }
+
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        const safeSize = Math.max(0.5, p.size);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, safeSize, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(34, 197, 94, ' + p.opacity + ')';
+        ctx.fill();
+
+        for (let j = index + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const d = Math.sqrt((p.x - p2.x) ** 2 + (p.y - p2.y) ** 2);
+          if (d < 100) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = 'rgba(34, 197, 94, ' + (0.08 * (1 - d / 100)) + ')';
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+
+      animationId = requestAnimationFrame(animateParticles);
+    }
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!prefersReducedMotion) {
+      initCanvas();
+      animateParticles();
+      window.addEventListener('resize', initCanvas);
+      window.addEventListener('mousemove', function(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+    }
+
+    // Download function - Direct download
+    function startDownload() {
+      window.location.href = "app.apk";
+    }
+  </script>
+</body>
+</html>
