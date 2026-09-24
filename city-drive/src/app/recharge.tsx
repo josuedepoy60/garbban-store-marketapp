@@ -6,11 +6,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText, Dot, Icon, Pill, Touchable } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts, shadows } from '@/constants/theme';
-import { formatAmount } from '@/data/mock';
+import { formatAmount, user } from '@/data/mock';
 import { OPERATORS, bonusOf, useWallet } from '@/data/wallet';
 
 const EXPIRY_SECONDS = 299;
-const MASKED_PHONE = '+225 07 •• •• 89 24';
+
 
 type Step = 'idle' | 'redirect' | 'authorizing' | 'done';
 
@@ -57,10 +57,14 @@ export default function RechargeConfirmScreen() {
       const id = setTimeout(() => {
         recharge(amount, bonus, op.name);
         setStep('done');
+        router.replace({
+          pathname: '/recu',
+          params: { amount: String(amount), operator: op.id, ref: reference, old: String(startBalance) },
+        });
       }, 1500);
       return () => clearTimeout(id);
     }
-  }, [step, amount, bonus, op.name, recharge]);
+  }, [step, amount, bonus, op.name, op.id, recharge, reference, startBalance]);
 
   const mm = String(Math.floor(remaining / 60)).padStart(2, '0');
   const ss = String(remaining % 60).padStart(2, '0');
@@ -176,7 +180,7 @@ export default function RechargeConfirmScreen() {
             <View style={[styles.row, { gap: 8 }]}>
               <Icon name="phone-iphone" size={18} color={colors.onSurfaceVariant} />
               <AppText variant="headlineSm" style={{ letterSpacing: 1, fontFamily: fonts.dm700 }}>
-                {MASKED_PHONE}
+                {user.maskedPhone}
               </AppText>
             </View>
             <Icon name="check-circle" size={18} color={colors.secondary} />

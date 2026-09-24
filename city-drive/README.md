@@ -24,6 +24,9 @@ npm run typecheck
 | `/navigation` | Navigation GPS en mode sombre : guidage virage par virage, vocal, compteur de vitesse, SOS |
 | `/portefeuille` (onglet) | Carte Pass, recharge Mobile Money (Wave, Orange, MTN, Moov), pass domicile-travail, historique filtrable, sécurité |
 | `/recharge` | Confirmation de recharge Mobile Money : minuteur, récapitulatif, bonus, redirection opérateur |
+| `/recu` | Reçu de recharge : célébration, nouveau solde, reçu détachable, partage |
+| `/appel` | Appel en course chiffré : minuteur, micro, haut-parleur, SOS, raccrocher |
+| `/chat` | Messagerie en course : réponses rapides, message vocal transcrit, envoi |
 | `/compte` | Provisoire, en attente de maquette |
 
 ## Organisation

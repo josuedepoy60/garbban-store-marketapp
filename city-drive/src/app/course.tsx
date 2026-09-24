@@ -23,7 +23,7 @@ export default function ActiveRideScreen() {
   const { balance, pay } = useWallet();
 
   const confirm = () => {
-    if (method === 'wallet' && !pay(price, 'Plateau ➔ Marcory Zone 4', 'Chauffeur Koffi A.')) {
+    if (method === 'wallet' && !pay(price, 'Plateau ➔ Marcory Zone 4', 'Chauffeur Koffi T.')) {
       setRefused(true);
       return;
     }
@@ -135,7 +135,7 @@ export default function ActiveRideScreen() {
                 <View style={{ flex: 1 }}>
                   <View style={styles.row}>
                     <AppText variant="headlineSm" color={colors.ink} style={{ fontFamily: fonts.sora700, fontSize: 16 }}>
-                      Koffi A.
+                      Koffi T.
                     </AppText>
                     <Icon name="verified" size={15} color={colors.primaryContainer} />
                   </View>
@@ -151,10 +151,10 @@ export default function ActiveRideScreen() {
                 </View>
               </View>
               <View style={styles.row}>
-                <Touchable style={styles.squareBtn} accessibilityLabel="Appeler le chauffeur">
+                <Touchable style={styles.squareBtn} accessibilityLabel="Appeler le chauffeur" onPress={() => router.push('/appel')}>
                   <Icon name="call" size={20} color={colors.primaryContainer} />
                 </Touchable>
-                <Touchable style={styles.squareBtn} accessibilityLabel="Envoyer un message">
+                <Touchable style={styles.squareBtn} accessibilityLabel="Envoyer un message" onPress={() => router.push('/chat')}>
                   <Icon name="chat" size={20} color={colors.primaryContainer} />
                 </Touchable>
               </View>

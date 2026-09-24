@@ -21,12 +21,16 @@ export const photos = {
 };
 
 export const user = {
+  email: 'k****@gmail.com',
+  maskedPhone: '+225 07 •• •• 89 24',
   balance: 15750,
   location: 'Cocody, Riviera 2',
 };
 
 export const favoriteDriver = {
   name: 'Koffi T.',
+  fullName: 'Koffi Traoré',
+  shortCar: 'Toyota Yaris Blanche',
   rating: '4,9',
   trips: '850+',
   car: 'Toyota Yaris Sedan · Blanche',

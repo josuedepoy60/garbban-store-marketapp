@@ -24,6 +24,9 @@ export default function RootLayout() {
         <Stack.Screen name="programmer" options={{ presentation: 'modal' }} />
         <Stack.Screen name="course" />
         <Stack.Screen name="recharge" />
+        <Stack.Screen name="recu" options={{ gestureEnabled: false }} />
+        <Stack.Screen name="appel" />
+        <Stack.Screen name="chat" />
         <Stack.Screen name="navigation" options={{ contentStyle: { backgroundColor: '#131316' } }} />
       </Stack>
       </WalletProvider>
