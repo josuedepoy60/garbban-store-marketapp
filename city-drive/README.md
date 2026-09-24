@@ -28,12 +28,13 @@ npm run typecheck
 | `/appel` | Appel en course chiffré : minuteur, micro, haut-parleur, SOS, raccrocher |
 | `/chat` | Messagerie en course : réponses rapides, message vocal transcrit, envoi |
 | `/evaluation` | Fin de course : note étoilée, compliments, pourboire débité du portefeuille, chauffeur favori, message |
-| `/compte` | Provisoire, en attente de maquette |
+| `/compte` (onglet) | Profil, Pass Gold Club, solde, lieux favoris (ajout/suppression), préférences, sécurité, assistance, déconnexion |
 
 ## Organisation
 
 - `src/app/` — routes (un fichier = un écran)
 - `src/components/` — composants partagés (`ui.tsx`, `CityMap.tsx` carte illustrée SVG, en-têtes…)
+- `src/data/wallet.tsx` — solde et historique partagés entre les écrans (recharges, courses, pourboires)
 - `src/constants/theme.ts` — couleurs, typographies (Sora / DM Sans), ombres
 - `src/constants/brand.ts` — nom de l'app et de la monnaie, à modifier en un seul endroit
 - `src/data/mock.ts` — données de démonstration (à remplacer par l'API)

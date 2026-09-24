@@ -3,6 +3,9 @@
 const img = (id: string) => `https://lh3.googleusercontent.com/aida-public/${id}`;
 
 export const photos = {
+  profile: img(
+    'AB6AXuDjo5gKRh6ZtWr1VG1_RP1yINl8rOBrKfJyH2w0VpsgXT6GOl7EjLVLJLSoUFUkOTmh0vXhHIneC_U44eYqmKAyTXMmARZM3x55VP9KwNZSQUPhn1Amj3zHCfZlnqicuKl5025JGVuH4Zm7LBanh31NVq2Dtsx33ydTiiwtgVlUIuJYVfWtjvmkLLH5dHpc5IAlubr3CLRQGR1BWNVau4aqVnVMP5L_46x-gHTmLZk9u4fanjufd73D',
+  ),
   user: img(
     'AB6AXuAyS-D64MAnvm9qmo8OX8AgEndvZ0z1-26li-sWyVRymK6LI1Da_wu0pxoiEHsVhDKj2x9PZXgtlvbOo14RlwAa7tqwRKNPcN5jgwL53t4at-CxaNHrEXoqvOjCeMx1u7AQ70LPSZLxXt0vD54bUmjZFV3mOU7CU76-XhHjVN03Vv7J10lpzZTqOXgOZ2keylTLMb0jf5NjVrhnwr-HkA7lOjx509eWJ-UjhNILvTtKp9p3ebvsT2gl',
   ),
@@ -21,8 +24,12 @@ export const photos = {
 };
 
 export const user = {
-  email: 'k****@gmail.com',
+  name: 'Jean-Philippe Kouassi',
+  phone: '+225 07 48 92 89 24',
+  emailFull: 'j.kouassi@email.ci',
+  email: 'j.k****@email.ci',
   maskedPhone: '+225 07 •• •• 89 24',
+  loyaltyPoints: 1420,
   balance: 15750,
   location: 'Cocody, Riviera 2',
 };
