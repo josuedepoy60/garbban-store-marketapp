@@ -6,20 +6,22 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CityMap } from '@/components/CityMap';
 import { StackHeader } from '@/components/headers';
 import { RouteLayer } from '@/components/RouteLayer';
-import { AppText, Dot, Icon, Pill, Touchable, useLayout, type IconName } from '@/components/ui';
+import { OperatorBadge } from '@/components/OperatorBadge';
+import { AppText, Dot, Icon, Touchable, useLayout, type IconName } from '@/components/ui';
 import { VehicleIcon } from '@/components/VehicleIcon';
 import { brand } from '@/constants/brand';
 import { colors, shadows } from '@/constants/theme';
 import { formatAmount, vehicles } from '@/data/mock';
 import { useRide } from '@/data/ride';
-import { useWallet } from '@/data/wallet';
+import { OPERATORS, useWallet } from '@/data/wallet';
 import { shortName } from '@/logic/fleet';
-import { FREE_CANCEL_MIN, FREE_WAIT_MIN, WAIT_FEE_PER_MIN } from '@/logic/pricing';
+import { FREE_CANCEL_MIN, FREE_WAIT_MIN, MAJORATION, WAIT_FEE_PER_MIN } from '@/logic/pricing';
 import type { PaymentMethod } from '@/logic/ride';
 import { arrivalTime } from '@/logic/time';
 
 const PAYMENTS: { id: PaymentMethod; name: string; icon: IconName }[] = [
   { id: 'wallet', name: brand.walletName, icon: 'toll' },
+  { id: 'mobile_money', name: 'Mobile Money', icon: 'phone-iphone' },
   { id: 'cash', name: 'Espèces', icon: 'payments' },
 ];
 
@@ -43,12 +45,15 @@ export default function VehiclesScreen() {
     router.replace('/course');
   };
 
-  const breakdown: [string, number][] = [
-    ['Prise en charge', q.base],
-    [`Distance · ${route.km.toString().replace('.', ',')} km`, q.distance],
-    [`Durée estimée · ${route.minutes} min`, q.time],
-    ...(q.stops ? ([[`${stops.length} arrêt${stops.length > 1 ? 's' : ''}`, q.stops]] as [string, number][]) : []),
-    ...(q.toll ? ([[`Péage ${route.via}`, q.toll]] as [string, number][]) : []),
+  const pct = (n: number) => `×${n.toString().replace('.', ',')}`;
+  const breakdown: [string, string][] = [
+    ['Prise en charge', F(q.base)],
+    [`Distance · ${route.km.toString().replace('.', ',')} km`, F(q.distance)],
+    [`Durée estimée · ${route.minutes} min`, F(q.time)],
+    ...(q.coefficient !== 1 ? ([[`Catégorie ${vehicles.find((v) => v.id === q.category)?.name}`, pct(q.coefficient)]] as [string, string][]) : []),
+    ...(q.majoration > 1 ? ([[`Nuit ou heure de pointe`, `+${Math.round(MAJORATION * 100)} %`]] as [string, string][]) : []),
+    ...(q.stops ? ([[`${stops.length} arrêt${stops.length > 1 ? 's' : ''}`, F(q.stops)]] as [string, string][]) : []),
+    ...(q.toll ? ([[`Péage ${route.via}`, F(q.toll)]] as [string, string][]) : []),
   ];
 
   return (
@@ -148,14 +153,6 @@ export default function VehiclesScreen() {
                         {' '}F
                       </AppText>
                     </AppText>
-                    {o.surge > 1 && !none && (
-                      <Pill background="#FEF3C7" style={{ paddingHorizontal: 6, paddingVertical: 2, marginTop: 2 }}>
-                        <Icon name="trending-up" size={11} color="#92400E" />
-                        <AppText variant="labelSm" color="#92400E" style={{ fontSize: 10 }}>
-                          ×{o.surge.toString().replace('.', ',')}
-                        </AppText>
-                      </Pill>
-                    )}
                   </View>
                 </Touchable>
               );
@@ -175,16 +172,9 @@ export default function VehiclesScreen() {
                 <AppText variant="bodySm" color={colors.onSurfaceVariant} numberOfLines={1} style={{ flex: 1 }}>
                   {label}
                 </AppText>
-                <AppText variant="labelMd">{F(amount)}</AppText>
+                <AppText variant="labelMd">{amount}</AppText>
               </View>
             ))}
-            {q.surge > 1 && (
-              <View style={styles.between}>
-                <AppText variant="bodySm" color="#92400E" style={{ flex: 1 }}>
-                  Forte demande (×{q.surge.toString().replace('.', ',')} hors péage)
-                </AppText>
-              </View>
-            )}
             <View style={[styles.between, styles.totalRow]}>
               <AppText variant="labelLg">Total</AppText>
               <AppText variant="headlineSm">{F(q.total)}</AppText>
@@ -216,13 +206,39 @@ export default function VehiclesScreen() {
                         {m.name}
                       </AppText>
                       <AppText variant="labelSm" color={on ? colors.onPrimaryContainer : colors.onSurfaceVariant} numberOfLines={1} style={{ fontSize: 10 }}>
-                        {m.id === 'wallet' ? `${formatAmount(balance)} ${brand.walletUnit}` : 'Au chauffeur'}
+                        {m.id === 'wallet'
+                          ? `${formatAmount(balance)} ${brand.walletUnit}`
+                          : m.id === 'mobile_money'
+                            ? (OPERATORS.find((o) => o.id === draft.operator)?.label ?? 'Wave')
+                            : 'Au chauffeur'}
                       </AppText>
                     </View>
                   </Touchable>
                 );
               })}
             </View>
+
+            {draft.payment === 'mobile_money' && (
+              <View style={styles.operators}>
+                {OPERATORS.map((op) => {
+                  const on = draft.operator === op.id;
+                  return (
+                    <Touchable
+                      key={op.id}
+                      accessibilityRole="radio"
+                      accessibilityState={{ checked: on }}
+                      onPress={() => ride.setPayment('mobile_money', op.id)}
+                      style={[styles.operator, on && styles.operatorOn]}
+                    >
+                      <OperatorBadge id={op.id} size={28} />
+                      <AppText variant="labelSm" numberOfLines={1}>
+                        {op.label}
+                      </AppText>
+                    </Touchable>
+                  );
+                })}
+              </View>
+            )}
 
             {walletShort && (
               <Touchable style={styles.short} onPress={() => router.push('/portefeuille')}>
@@ -324,7 +340,10 @@ const styles = StyleSheet.create({
   notice: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 12, backgroundColor: colors.pinkSoft },
   breakdown: { backgroundColor: colors.surfaceLowest, padding: 16, borderRadius: 16, gap: 8, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   totalRow: { borderTopWidth: 1, borderTopColor: colors.surfaceHigh, paddingTop: 8, marginTop: 2 },
-  payRow: { flexDirection: 'row', gap: 8 },
+  payRow: { gap: 8 },
+  operators: { flexDirection: 'row', gap: 6 },
+  operator: { flex: 1, minWidth: 0, alignItems: 'center', gap: 4, paddingVertical: 8, borderRadius: 12, borderWidth: 2, borderColor: 'transparent', backgroundColor: colors.surfaceLow },
+  operatorOn: { borderColor: colors.primary, backgroundColor: colors.surfaceLowest },
   payOption: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 12, backgroundColor: colors.surfaceLow },
   payOn: { backgroundColor: colors.primary },
   short: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderRadius: 12, backgroundColor: '#FEF3F2' },

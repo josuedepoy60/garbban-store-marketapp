@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 
 // Préfixe versionné : changer la version invalide proprement les anciennes données.
-const PREFIX = 'citydrive:v1:';
+const PREFIX = 'citydrive:v2:';
 
 export async function loadJSON<T>(key: string): Promise<T | undefined> {
   try {

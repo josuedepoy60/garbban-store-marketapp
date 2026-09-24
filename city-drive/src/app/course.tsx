@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CityMap } from '@/components/CityMap';
@@ -10,8 +10,8 @@ import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
 import { formatAmount, vehicles } from '@/data/mock';
 import { useRide } from '@/data/ride';
-import { useWallet } from '@/data/wallet';
-import { shortName } from '@/logic/fleet';
+import { OPERATORS, useWallet } from '@/data/wallet';
+import { OFFER_TIMEOUT_S, shortName } from '@/logic/fleet';
 import { lerp } from '@/logic/geo';
 import { FREE_WAIT_MIN, waitingFee } from '@/logic/pricing';
 import { canCancel, cancelFeeNow, freeWaitLeft, isActive, type Ride, type RideStatus } from '@/logic/ride';
@@ -54,6 +54,7 @@ export default function ActiveRideScreen() {
   const { balance } = useWallet();
   const r = ride.current;
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [sos, setSos] = useState(false);
 
   const home = () => {
     ride.dismiss();
@@ -97,7 +98,9 @@ export default function ActiveRideScreen() {
 
   const subtitle =
     r.status === 'searching'
-      ? 'Nous contactons les chauffeurs les plus proches'
+      ? r.offer
+        ? `Offre envoyée à ${shortName(r.offer.driver)} (à ${r.offer.eta} min) · ${OFFER_TIMEOUT_S} s pour répondre`
+        : 'Nous contactons les chauffeurs à moins de 3 km'
       : r.status === 'accepted'
         ? `Rendez-vous à ${r.pickup.name}`
         : r.status === 'arrived'
@@ -260,6 +263,40 @@ export default function ActiveRideScreen() {
             <Notice icon="info-outline">Chauffeur non certifié : la course se règle en espèces.</Notice>
           )}
 
+          {/* Recherche : offres envoyées chauffeur par chauffeur */}
+          {r.status === 'searching' && r.declined.length > 0 && (
+            <Notice icon="info-outline">
+              {r.declined.length} chauffeur{r.declined.length > 1 ? 's' : ''} n’{r.declined.length > 1 ? 'ont' : 'a'} pas répondu : offre transmise au suivant.
+            </Notice>
+          )}
+
+          {/* Sécurité : partage du trajet et SOS */}
+          {(r.status === 'accepted' || r.status === 'arrived' || r.status === 'ongoing') && (
+            <View style={[styles.row, { gap: 8 }]}>
+              <Touchable style={[styles.half, { backgroundColor: colors.violetSoft, flexDirection: 'row', gap: 6 }]} onPress={() => shareTrip(r)}>
+                <Icon name="share" size={18} color={colors.primaryContainer} />
+                <AppText variant="labelMd" color={colors.primaryContainer}>
+                  Partager le trajet
+                </AppText>
+              </Touchable>
+              <Touchable
+                style={[styles.half, { backgroundColor: sos ? '#B42318' : '#FEF3F2', flexDirection: 'row', gap: 6 }]}
+                onPress={() => setSos(true)}
+                accessibilityLabel="Alerte SOS"
+              >
+                <Icon name="emergency" size={18} color={sos ? '#fff' : '#B42318'} />
+                <AppText variant="labelMd" color={sos ? '#fff' : '#B42318'}>
+                  {sos ? 'Alerte envoyée' : 'SOS'}
+                </AppText>
+              </Touchable>
+            </View>
+          )}
+          {sos && isActive(r) && (
+            <Notice icon="emergency" tone="warn">
+              L’équipe City Drive a reçu votre alerte et votre position ({r.status === 'ongoing' ? 'en course' : r.pickup.name}). Elle vous rappelle.
+            </Notice>
+          )}
+
           {/* Itinéraire + tarif */}
           <View style={[styles.between, styles.trip]}>
             <View style={{ flex: 1 }}>
@@ -294,16 +331,26 @@ export default function ActiveRideScreen() {
                 title={brand.walletName}
                 subtitle={`Solde : ${formatAmount(balance)} ${brand.walletUnit}${balance < r.quote.total ? ' · insuffisant' : ''}`}
               />
+              <PayOption
+                selected={r.payment === 'mobile_money'}
+                disabled={!!d && !d.certified}
+                onPress={() => ride.setPayment('mobile_money')}
+                icon="phone-iphone"
+                title="Mobile Money"
+                subtitle={`${OPERATORS.find((o) => o.id === (r.operator ?? ride.draft.operator))?.name ?? 'Wave Money'} · débité à l’arrivée`}
+              />
               <PayOption selected={r.payment === 'cash'} onPress={() => ride.setPayment('cash')} icon="payments" title="Espèces à bord" subtitle={`Prévoir l’appoint : ${F(r.quote.total)}`} />
             </View>
           )}
 
           {/* Règlement final */}
           {r.status === 'completed' && r.fare !== null && (
-            <Notice icon={r.paidWith === 'wallet' ? 'check-circle' : 'payments'} tone={r.paidWith === 'wallet' ? 'ok' : 'warn'}>
+            <Notice icon={r.paidWith === 'cash' ? 'payments' : 'check-circle'} tone={r.paidWith === 'cash' ? 'warn' : 'ok'}>
               {r.paidWith === 'wallet'
                 ? `${F(r.fare)} débités de votre ${brand.walletName}.`
-                : r.payment === 'wallet'
+                : r.paidWith === 'mobile_money'
+                  ? `${F(r.fare)} payés par ${OPERATORS.find((o) => o.id === r.operator)?.name ?? 'Mobile Money'}.`
+                  : r.payment === 'wallet'
                   ? `Solde insuffisant : réglez ${F(r.fare)} en espèces au chauffeur.`
                   : `Réglez ${F(r.fare)} en espèces au chauffeur.`}
             </Notice>
@@ -385,6 +432,19 @@ export default function ActiveRideScreen() {
       </ScrollView>
     </View>
   );
+}
+
+/** Partage du trajet avec un proche : chauffeur, plaque, itinéraire et arrivée prévue. */
+function shareTrip(r: Ride) {
+  const d = r.driver;
+  const message = [
+    `Je suis en course City Drive : ${r.pickup.name} → ${r.destination.name}.`,
+    d ? `Chauffeur ${d.fullName}, ${d.car}, plaque ${d.plate}.` : '',
+    r.status === 'ongoing' ? `Arrivée prévue vers ${arrivalTime(r.eta)}.` : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  Share.share({ message }).catch(() => {});
 }
 
 function Notice({ icon, children, tone = 'info' }: { icon: IconName; children: ReactNode; tone?: 'info' | 'ok' | 'warn' }) {

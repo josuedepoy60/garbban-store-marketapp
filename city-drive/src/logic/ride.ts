@@ -4,6 +4,8 @@
 //       │             │               │
 //       └─────────────┴───────────────┴──► annulée        recherche ──► aucun chauffeur
 //
+// Pendant la recherche, la mission est proposée au chauffeur le plus proche ; sans réponse
+// sous 20 s ou en cas de refus, elle passe au suivant (statuts de Vela : recherche, acceptee…).
 // Le temps avance par « ticks » d'une minute simulée, envoyés par le RideProvider.
 
 import type { Candidate, Driver } from './fleet.ts';
@@ -12,7 +14,7 @@ import { cancellationFee, FREE_WAIT_MIN, waitingFee, type Category, type Quote }
 import type { RouteOption } from './traffic.ts';
 
 export type RideStatus = 'searching' | 'accepted' | 'arrived' | 'ongoing' | 'completed' | 'cancelled' | 'no_driver';
-export type PaymentMethod = 'wallet' | 'cash';
+export type PaymentMethod = 'wallet' | 'mobile_money' | 'cash';
 
 export type Ride = {
   id: string;
@@ -24,10 +26,16 @@ export type Ride = {
   route: RouteOption;
   quote: Quote;
   payment: PaymentMethod;
+  /** Opérateur Mobile Money choisi (Wave, Orange, MTN, Moov). */
+  operator: string | null;
   /** Chauffeur demandé (favori, « Reprendre avec… ») : prioritaire s'il est assez proche. */
   preferredDriverId: string | null;
   status: RideStatus;
   driver: Driver | null;
+  /** Offre en attente de réponse (20 s), pendant la recherche. */
+  offer: Candidate | null;
+  /** Chauffeurs ayant refusé ou laissé expirer l'offre : on passe au suivant. */
+  declined: string[];
   /** Minutes simulées écoulées depuis la demande. */
   clock: number;
   acceptedAt: number | null;
@@ -46,17 +54,22 @@ export type Ride = {
   /** Moyen réellement utilisé une fois la course réglée. */
   paidWith: PaymentMethod | null;
   settled: boolean;
+  /** Commission Garbban, net chauffeur et dette espèces, fixés au règlement. */
+  commission: number;
+  driverNet: number;
+  driverDebt: number;
   rating: number | null;
   tip: number;
 };
 
 export type RideEvent =
   | { type: 'tick' }
-  | { type: 'assign'; candidate: Candidate | null }
+  | { type: 'offer'; candidate: Candidate | null }
+  | { type: 'respond'; accepted: boolean }
   | { type: 'board' }
   | { type: 'cancel' }
-  | { type: 'setPayment'; method: PaymentMethod }
-  | { type: 'settle'; paidWith: PaymentMethod }
+  | { type: 'setPayment'; method: PaymentMethod; operator?: string | null }
+  | { type: 'settle'; paidWith: PaymentMethod; commission?: number; driverNet?: number; driverDebt?: number }
   | { type: 'rate'; rating: number; tip: number };
 
 /** Le passager monte seul au bout de 2 min d'attente si personne n'appuie sur « Je suis à bord ». */
@@ -64,12 +77,19 @@ export const AUTO_BOARD_MIN = 2;
 
 export type NewRide = Pick<Ride, 'pickup' | 'stops' | 'destination' | 'category' | 'route' | 'quote' | 'payment'> & {
   preferredDriverId?: string | null;
+  operator?: string | null;
 };
 
 export function createRide(input: NewRide, now = new Date()): Ride {
   return {
     ...input,
     preferredDriverId: input.preferredDriverId ?? null,
+    operator: input.operator ?? null,
+    offer: null,
+    declined: [],
+    commission: 0,
+    driverNet: 0,
+    driverDebt: 0,
     id: `CD-${String(now.getTime()).slice(-6)}`,
     createdAt: now.toISOString(),
     status: 'searching',
@@ -125,13 +145,19 @@ export function transition(r: Ride, e: RideEvent): Ride {
       }
       return r.status === 'searching' ? { ...r, clock } : r;
     }
-    case 'assign': {
-      if (r.status !== 'searching') return r;
+    case 'offer': {
+      if (r.status !== 'searching' || r.offer) return r;
+      // Plus aucun chauffeur à solliciter dans le rayon : la recherche échoue.
       if (!e.candidate) return { ...r, status: 'no_driver', endedAt: r.clock };
-      const { driver, eta } = e.candidate;
-      // Chauffeur non certifié : seul le paiement en espèces est possible.
+      return { ...r, offer: e.candidate };
+    }
+    case 'respond': {
+      if (r.status !== 'searching' || !r.offer) return r;
+      if (!e.accepted) return { ...r, offer: null, declined: [...r.declined, r.offer.driver.id] };
+      const { driver, eta } = r.offer;
+      // Chauffeur non certifié : ni Vela Monnaie ni Mobile Money, seulement les espèces.
       const payment = driver.certified ? r.payment : 'cash';
-      return { ...r, status: 'accepted', driver, eta, approachTotal: eta, acceptedAt: r.clock, payment };
+      return { ...r, status: 'accepted', offer: null, driver, eta, approachTotal: eta, acceptedAt: r.clock, payment };
     }
     case 'board':
       if (r.status !== 'arrived') return r;
@@ -141,11 +167,11 @@ export function transition(r: Ride, e: RideEvent): Ride {
       return { ...r, status: 'cancelled', endedAt: r.clock, cancelFee: cancelFeeNow(r) };
     case 'setPayment':
       if (isFinished(r)) return r;
-      if (e.method === 'wallet' && r.driver && !r.driver.certified) return r;
-      return { ...r, payment: e.method };
+      if (e.method !== 'cash' && r.driver && !r.driver.certified) return r;
+      return { ...r, payment: e.method, operator: e.method === 'mobile_money' ? (e.operator ?? r.operator) : r.operator };
     case 'settle':
       if (r.settled || (r.status !== 'completed' && r.status !== 'cancelled')) return r;
-      return { ...r, settled: true, paidWith: e.paidWith };
+      return { ...r, settled: true, paidWith: e.paidWith, commission: e.commission ?? 0, driverNet: e.driverNet ?? 0, driverDebt: e.driverDebt ?? 0 };
     case 'rate':
       if (r.status !== 'completed') return r;
       return { ...r, rating: Math.min(5, Math.max(1, Math.round(e.rating))), tip: Math.max(0, Math.round(e.tip)) };

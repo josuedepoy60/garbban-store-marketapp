@@ -15,11 +15,11 @@ export type ScheduledRide = {
   preferredDriverId: string | null;
 };
 
-/** Réservation au moins 30 min à l'avance, au plus 7 jours. */
-export const MIN_LEAD_MIN = 30;
+/** Réservation au moins 1 h à l'avance, au plus 7 jours. */
+export const MIN_LEAD_MIN = 60;
 export const MAX_LEAD_DAYS = 7;
-/** La recherche du chauffeur démarre 15 min avant l'heure prévue. */
-export const DISPATCH_LEAD_MIN = 15;
+/** Chauffeur réservé confirmé ou remplacé au moins 30 min avant l'heure prévue. */
+export const DISPATCH_LEAD_MIN = 30;
 
 export function validateSchedule(at: Date, now = new Date()): string | null {
   const lead = (at.getTime() - now.getTime()) / 60_000;

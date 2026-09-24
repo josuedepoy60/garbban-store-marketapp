@@ -10,7 +10,7 @@ import { AppText, Avatar, Icon, Pill, SheetHandle, Touchable, useLayout } from '
 import { colors, fonts, shadows } from '@/constants/theme';
 import { formatAmount } from '@/data/mock';
 import { MAX_STOPS, useRide } from '@/data/ride';
-import { splitFare, STOP_FEE } from '@/logic/pricing';
+import { FREE_WAIT_MIN, splitFare, STOP_FEE } from '@/logic/pricing';
 
 const STOP_COLORS = [colors.blue, colors.tertiary, colors.green];
 
@@ -47,7 +47,7 @@ export default function StopsScreen() {
             <View style={{ flex: 1 }}>
               <AppText variant="headlineSm">Étapes du trajet</AppText>
               <AppText variant="bodySm" color={colors.onSurfaceVariant}>
-                Jusqu’à {MAX_STOPS} arrêts · {formatAmount(STOP_FEE)} F par arrêt
+                Jusqu’à {MAX_STOPS} arrêts · {formatAmount(STOP_FEE)} F et {FREE_WAIT_MIN} min d’attente offertes par arrêt
               </AppText>
             </View>
             <Pill background={colors.secondaryContainer}>

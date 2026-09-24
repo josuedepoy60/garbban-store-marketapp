@@ -4,9 +4,9 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import { haversineKm, toMap } from './geo.ts';
-import { availability, dispatch, INITIAL_FLEET, nextRating, shortName, updateDriver } from './fleet.ts';
+import { applyPayout, availability, dispatch, INITIAL_FLEET, nextRating, shortName, updateDriver } from './fleet.ts';
 import { getPlace, searchPlaces } from './places.ts';
-import { cancellationFee, quote, roundFare, splitFare, surgeFor, waitingFee } from './pricing.ts';
+import { cancellationFee, isMajorated, majorationAt, quote, roundFare, settlement, splitFare, waitingFee } from './pricing.ts';
 import { cancelFeeNow, createRide, transition, type Ride } from './ride.ts';
 import { dueScheduled, overlaps, validateSchedule } from './schedule.ts';
 import { bestRoute, periodOf, routeOptions } from './traffic.ts';
@@ -68,30 +68,35 @@ describe('trafic', () => {
   });
 });
 
-describe('tarifs', () => {
-  const route = { km: 10, minutes: 25, toll: 0 };
-  it('arrondit aux 50 F supérieurs', () => {
-    assert.equal(roundFare(1401), 1450);
+describe('tarifs (cahier des charges)', () => {
+  const route = { km: 8, minutes: 20, toll: 0 };
+  it('arrondit aux 10 F supérieurs', () => {
+    assert.equal(roundFare(1401), 1410);
     assert.equal(roundFare(1400), 1400);
   });
-  it('calcule un prix Eco réaliste', () => {
-    // 500 + 10 × 150 + 25 × 20 = 2 500
-    assert.equal(quote('eco', route).total, 2500);
+  it('retrouve les exemples 8 km / 20 min de chaque catégorie', () => {
+    // (500 + 8 × 150 + 20 × 25) × coefficient
+    const expected = { covoiturage: 1540, eco: 2200, confort: 3080, confort_plus: 3740, boss: 5500 } as const;
+    for (const [c, total] of Object.entries(expected)) assert.equal(quote(c as keyof typeof expected, route).total, total, c);
   });
-  it('applique le minimum de course', () => {
-    assert.equal(quote('confort', { km: 1, minutes: 3, toll: 0 }).total, 1500);
+  it('applique le prix minimum de 1 000 F', () => {
+    assert.equal(quote('covoiturage', { km: 1, minutes: 3, toll: 0 }).total, 1000);
   });
-  it('ajoute arrêts, réservation et péage (sauf moto)', () => {
+  it('majore de 20 % la nuit (22 h – 5 h) et aux heures de pointe', () => {
+    assert.equal(isMajorated(at(23)), true);
+    assert.equal(isMajorated(at(4)), true);
+    assert.equal(isMajorated(at(8)), true);
+    assert.equal(isMajorated(at(18)), true);
+    assert.equal(isMajorated(at(14)), false);
+    assert.equal(quote('eco', route, { majoration: majorationAt(at(23)) }).total, 2640); // 2 200 × 1,2
+  });
+  it('facture la livraison au tarif livraison', () => {
+    // 350 + 8 × 100 + 20 × 15 = 1 450
+    assert.equal(quote('eco', route, { type: 'livraison' }).total, 1450);
+  });
+  it('ajoute arrêts, réservation et péage', () => {
     const q = quote('eco', { ...route, toll: 500 }, { stops: 2, scheduled: true });
-    assert.equal(q.total, 2500 + 600 + 200 + 500);
-    assert.equal(quote('moto', { ...route, toll: 500 }).toll, 0);
-  });
-  it('majore quand les chauffeurs manquent, plafonné à ×1,5', () => {
-    assert.equal(surgeFor(5, 1), 1);
-    assert.equal(surgeFor(0, 1), 1.5);
-    const s = surgeFor(1, 1);
-    assert.ok(s > 1 && s < 1.5);
-    assert.equal(quote('eco', route, { surge: 3 }).surge, 1.5);
+    assert.equal(q.total, 2200 + 600 + 200 + 500);
   });
   it('facture l’attente après 3 min et l’annulation après 2 min', () => {
     assert.equal(waitingFee(3), 0);
@@ -100,6 +105,10 @@ describe('tarifs', () => {
     assert.equal(cancellationFee(1), 0);
     assert.equal(cancellationFee(2), 500);
   });
+  it('prélève 15 % de commission, hors péage', () => {
+    assert.deepEqual(settlement(3000, 0, false), { commission: 450, driverNet: 2550, driverDebt: 0 });
+    assert.deepEqual(settlement(3500, 500, true), { commission: 450, driverNet: 3050, driverDebt: 450 });
+  });
   it('partage le prix en covoiturage', () => {
     assert.equal(splitFare(4800, 3), 1600);
     assert.equal(splitFare(4800, 0), 4800);
@@ -107,23 +116,36 @@ describe('tarifs', () => {
 });
 
 describe('logistique', () => {
-  it('attribue le chauffeur libre le plus proche de la bonne catégorie', () => {
-    const c = dispatch(INITIAL_FLEET, riviera, 'confort', { date: at(14) });
-    assert.equal(c?.driver.id, 'serge');
+  it('propose la mission au chauffeur libre le plus proche de la bonne catégorie', () => {
+    assert.equal(dispatch(INITIAL_FLEET, riviera, 'confort', { date: at(14) })?.driver.id, 'serge');
+  });
+  it('ne cherche que dans un rayon de 3 km', () => {
+    const koumassi = getPlace('koumassi');
+    assert.equal(dispatch(INITIAL_FLEET, koumassi, 'boss'), null);
+    assert.equal(availability(INITIAL_FLEET, riviera, 'confort').count, 1);
+  });
+  it('passe au chauffeur suivant après un refus', () => {
+    const first = dispatch(INITIAL_FLEET, riviera, 'eco', { date: at(14) });
+    const next = dispatch(INITIAL_FLEET, riviera, 'eco', { date: at(14), exclude: [first!.driver.id] });
+    assert.ok(next && next.driver.id !== first!.driver.id);
   });
   it('privilégie le chauffeur favori s’il est assez proche', () => {
-    const c = dispatch(INITIAL_FLEET, riviera, 'eco', { preferredId: 'awa', date: at(14) });
-    assert.equal(c?.driver.id, 'awa');
+    assert.equal(dispatch(INITIAL_FLEET, riviera, 'eco', { preferredId: 'awa', date: at(14) })?.driver.id, 'awa');
   });
   it('ignore les chauffeurs occupés, hors ligne ou non certifiés si besoin', () => {
     const fleet = updateDriver(INITIAL_FLEET, 'koffi', { status: 'busy' });
     assert.notEqual(dispatch(fleet, riviera, 'eco')?.driver.id, 'koffi');
-    const c = dispatch(INITIAL_FLEET, plateau, 'eco', { requireCertified: true });
-    assert.equal(c?.driver.certified, true);
-    assert.equal(availability(INITIAL_FLEET, riviera, 'confort').count, 3);
+    // Au Plateau, seul Yao (non certifié) roule en Éco : pas de paiement numérique possible.
+    assert.equal(dispatch(INITIAL_FLEET, plateau, 'eco', { requireCertified: true }), null);
+    assert.equal(dispatch(INITIAL_FLEET, plateau, 'eco')?.driver.id, 'yao');
+    assert.equal(dispatch(INITIAL_FLEET, plateau, 'boss'), null); // Paul est hors ligne
   });
-  it('ne trouve personne trop loin', () => {
-    assert.equal(dispatch(INITIAL_FLEET, { lat: 5.6, lng: -4.3 }, 'eco'), null);
+  it('déduit la dette espèces du prochain paiement numérique', () => {
+    const d = applyPayout(INITIAL_FLEET[0], { commission: 450, driverNet: 2550, cash: true });
+    assert.equal(d.debt, 450);
+    const after = applyPayout(d, { commission: 300, driverNet: 1700, cash: false });
+    assert.equal(after.debt, 0);
+    assert.equal(after.earnings, 1250);
   });
   it('met à jour la note moyenne', () => {
     const d = { ...INITIAL_FLEET[0], rating: 4, trips: 3 };
@@ -141,9 +163,11 @@ describe('cycle de vie d’une course', () => {
     );
   const run = (r: Ride, n: number) => Array.from({ length: n }).reduce<Ride>((acc) => transition(acc, { type: 'tick' }), r);
   const koffi = INITIAL_FLEET[0];
+  const accept = (r: Ride, driver = koffi, eta = 2) =>
+    transition(transition(r, { type: 'offer', candidate: { driver, eta } }), { type: 'respond', accepted: true });
 
   it('va de la recherche jusqu’à l’arrivée', () => {
-    let r = transition(base(), { type: 'assign', candidate: { driver: koffi, eta: 2 } });
+    let r = accept(base());
     assert.equal(r.status, 'accepted');
     r = run(r, 2);
     assert.equal(r.status, 'arrived');
@@ -155,23 +179,32 @@ describe('cycle de vie d’une course', () => {
     assert.equal(r.status, 'completed');
     assert.equal(r.fare, r.quote.total);
   });
+  it('transmet l’offre au suivant quand un chauffeur refuse', () => {
+    let r = transition(base(), { type: 'offer', candidate: { driver: koffi, eta: 2 } });
+    assert.equal(r.offer?.driver.id, 'koffi');
+    r = transition(r, { type: 'respond', accepted: false });
+    assert.deepEqual(r.declined, ['koffi']);
+    assert.equal(r.status, 'searching');
+    assert.equal(transition(r, { type: 'offer', candidate: null }).status, 'no_driver');
+  });
   it('fait monter le passager tout seul après 2 min d’attente', () => {
-    const r = run(transition(base(), { type: 'assign', candidate: { driver: koffi, eta: 1 } }), 3);
-    assert.equal(r.status, 'ongoing');
+    assert.equal(run(accept(base(), koffi, 1), 3).status, 'ongoing');
   });
   it('passe en espèces si le chauffeur n’est pas certifié', () => {
-    const r = transition(base(), { type: 'assign', candidate: { driver: { ...koffi, certified: false }, eta: 3 } });
+    const r = accept({ ...base(), payment: 'mobile_money' }, { ...koffi, certified: false }, 3);
     assert.equal(r.payment, 'cash');
     assert.equal(transition(r, { type: 'setPayment', method: 'wallet' }).payment, 'cash');
   });
+  it('garde l’opérateur choisi pour le Mobile Money', () => {
+    const r = transition(accept(base()), { type: 'setPayment', method: 'mobile_money', operator: 'orange' });
+    assert.equal(r.payment, 'mobile_money');
+    assert.equal(r.operator, 'orange');
+  });
   it('facture l’annulation tardive seulement', () => {
     assert.equal(transition(base(), { type: 'cancel' }).cancelFee, 0);
-    const late = run(transition(base(), { type: 'assign', candidate: { driver: koffi, eta: 10 } }), 3);
+    const late = run(accept(base(), koffi, 10), 3);
     assert.equal(cancelFeeNow(late), 500);
     assert.equal(transition(late, { type: 'cancel' }).status, 'cancelled');
-  });
-  it('termine sans chauffeur disponible', () => {
-    assert.equal(transition(base(), { type: 'assign', candidate: null }).status, 'no_driver');
   });
   it('ne règle et ne note qu’une course terminée', () => {
     const r = base();
@@ -193,14 +226,14 @@ describe('courses programmées', () => {
     quote: quote('eco', { km: 10, minutes: 25, toll: 0 }),
     preferredDriverId: null,
   });
-  it('exige 30 min d’avance et au plus 7 jours', () => {
-    assert.match(validateSchedule(later(10), now) ?? '', /30 min/);
-    assert.equal(validateSchedule(later(45), now), null);
+  it('exige 1 h d’avance et au plus 7 jours', () => {
+    assert.match(validateSchedule(later(45), now) ?? '', /60 min/);
+    assert.equal(validateSchedule(later(90), now), null);
     assert.match(validateSchedule(later(8 * 24 * 60), now) ?? '', /7 jours/);
   });
-  it('lance la recherche 15 min avant l’heure prévue', () => {
+  it('confirme ou remplace le chauffeur 30 min avant l’heure prévue', () => {
     assert.equal(dueScheduled([item(60)], now), undefined);
-    assert.equal(dueScheduled([item(60, 'a'), item(10, 'b')], now)?.id, 'b');
+    assert.equal(dueScheduled([item(60, 'a'), item(25, 'b')], now)?.id, 'b');
   });
   it('détecte deux réservations trop proches', () => {
     assert.equal(overlaps([item(120)], later(150)), true);

@@ -43,13 +43,13 @@ export default function HomeScreen() {
 
   const [express] = routes;
   const jammed = routes.find((r) => r.jam);
-  const price = (r: RouteOption) => quote(draft.category, r, { stops: ride.stops.length, surge: offer.surge }).total;
+  const price = (r: RouteOption) => quote(draft.category, r, { stops: ride.stops.length, majoration: offer.quote.majoration }).total;
   const fastest = routes.reduce((a, b) => (b.minutes < a.minutes ? b : a));
   // Taxis libres autour du départ, dessinés à leur position réelle.
   const cars = fleet
-    .filter((d) => d.status === 'available' && d.category !== 'moto')
+    .filter((d) => d.status === 'available')
     .map((d, i) => ({ ...toMap(d.position), angle: (i * 67) % 180 - 90 }));
-  const open = ride.offers.filter((o) => o.available && o.category !== 'moto');
+  const open = ride.offers.filter((o) => o.available);
   const cheapest = open.length ? Math.min(...open.map((o) => o.quote.total)) : offer.quote.total;
   const favFirst = favoriteDriver.fullName.split(' ')[0];
   const favPrice = ride.quoteFor(favoriteDriver.category).total;

@@ -1,3 +1,5 @@
+import type { Category } from '@/logic/pricing';
+
 // Données de démonstration reprises des maquettes, en attendant le branchement d'un backend.
 
 export const user = {
@@ -31,25 +33,22 @@ export const quickPlaces = [
 
 export type VehicleKind = 'sedan' | 'suv' | 'van' | 'moto';
 
+/** Présentation des catégories Vela (ride_class_settings) ; les prix viennent de logic/pricing. */
 export const vehicles: {
-  id: string;
+  id: Category;
   name: string;
   kind: VehicleKind;
   seats: number;
   description: string;
-  eta: string;
-  fast: boolean;
-  price: number;
   airCon?: boolean;
-  recommended?: boolean;
 }[] = [
-  { id: 'eco', name: 'Eco', kind: 'sedan', seats: 4, description: 'Toyota Corolla ou équivalent', eta: 'Dans 2 min', fast: true, price: 4800, recommended: true },
-  { id: 'confort', name: 'Confort', kind: 'suv', seats: 4, description: 'Climatisation garantie · SUV', eta: 'Dans 4 min', fast: false, price: 6200, airCon: true },
-  { id: 'van', name: 'Van Familial', kind: 'van', seats: 7, description: 'Grand coffre · Minibus', eta: 'Dans 7 min', fast: false, price: 8500 },
-  { id: 'moto', name: 'Moto Express', kind: 'moto', seats: 1, description: 'Casque fourni · Anti-embouteillage', eta: 'Dans 1 min', fast: true, price: 2100 },
+  { id: 'covoiturage', name: 'Covoiturage', kind: 'sedan', seats: 1, description: 'Trajet partagé · jusqu’à 3 passagers' },
+  { id: 'eco', name: 'Éco', kind: 'sedan', seats: 4, description: 'Toyota Corolla ou équivalent' },
+  { id: 'confort', name: 'Confort', kind: 'sedan', seats: 4, description: 'Berline récente · climatisation', airCon: true },
+  { id: 'confort_plus', name: 'Confort Plus', kind: 'suv', seats: 4, description: 'SUV spacieux · climatisation', airCon: true },
+  { id: 'boss', name: 'Boss', kind: 'suv', seats: 4, description: 'Berline premium · service haut de gamme', airCon: true },
 ];
 
-export const carModels = ['Peu importe', 'Hyundai Tucson', 'Toyota RAV4', 'Kia Sportage', 'Mercedes Classe C'];
 
 export const departures = [
   {

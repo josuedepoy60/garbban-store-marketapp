@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
-import { availability, demandAt, dispatch, INITIAL_FLEET, nextRating, shortName, updateDriver, type Driver } from '@/logic/fleet';
+import { applyPayout, availability, dispatch, INITIAL_FLEET, nextRating, shortName, updateDriver, type Driver } from '@/logic/fleet';
 import { getPlace, placeById, type Place } from '@/logic/places';
-import { loyaltyPoints, quote, surgeFor, type Category, type Quote } from '@/logic/pricing';
+import { loyaltyPoints, majorationAt, MAX_STOPS, quote, settlement, type Category, type Quote } from '@/logic/pricing';
 import { createRide, isActive, transition, type PaymentMethod, type Ride, type RideEvent } from '@/logic/ride';
 import { dueScheduled, overlaps, validateSchedule, type ScheduledRide } from '@/logic/schedule';
 import { bestRoute, routeOptions, type RouteKind, type RouteOption } from '@/logic/traffic';
@@ -12,10 +12,9 @@ import { useWallet } from './wallet';
 
 /** Simulation : une minute de course passe en une seconde. */
 export const TICK_MS = 1000;
-/** Durée de la recherche de chauffeur avant attribution (minutes simulées). */
-const SEARCH_TICKS = 2;
 const MAX_HISTORY = 50;
-export const CATEGORIES: Category[] = ['eco', 'confort', 'van', 'moto'];
+export const CATEGORIES: Category[] = ['covoiturage', 'eco', 'confort', 'confort_plus', 'boss'];
+export { MAX_STOPS };
 
 export type Draft = {
   pickupId: string;
@@ -24,10 +23,12 @@ export type Draft = {
   category: Category;
   routeId: RouteKind | null; // null = itinéraire conseillé
   payment: PaymentMethod;
+  /** Opérateur Mobile Money (id de OPERATORS). */
+  operator: string;
   preferredDriverId: string | null;
 };
 
-export type Offer = { category: Category; available: number; eta: number | null; surge: number; quote: Quote };
+export type Offer = { category: Category; available: number; eta: number | null; quote: Quote };
 
 const INITIAL_DRAFT: Draft = {
   pickupId: 'riviera2',
@@ -36,10 +37,9 @@ const INITIAL_DRAFT: Draft = {
   category: 'eco',
   routeId: null,
   payment: 'wallet',
+  operator: 'wave',
   preferredDriverId: null,
 };
-
-export const MAX_STOPS = 3;
 
 type RideStore = {
   draft: Draft;
@@ -63,7 +63,7 @@ type RideStore = {
   moveStop: (id: string, dir: -1 | 1) => void;
   setCategory: (c: Category) => void;
   setRoute: (r: RouteKind) => void;
-  setPayment: (m: PaymentMethod) => void;
+  setPayment: (m: PaymentMethod, operator?: string) => void;
   preferDriver: (id: string | null) => void;
   /** Commande la course ; renvoie un message d'erreur si elle est refusée. */
   request: () => string | null;
@@ -109,32 +109,37 @@ export function RideProvider({ children }: { children: ReactNode }) {
   const routes = useMemo(() => routeOptions([pickup, ...stops, destination], now), [pickup, stops.map((s) => s.id).join(), destination, now]); // eslint-disable-line react-hooks/exhaustive-deps
   const route = (draft.routeId && routes.find((r) => r.id === draft.routeId)) || bestRoute(routes);
 
-  const quoteFor = (category: Category, opts: { scheduled?: boolean } = {}) => {
-    const a = availability(fleet, pickup, category, now);
-    return quote(category, route, { stops: stops.length, scheduled: opts.scheduled, surge: opts.scheduled ? 1 : surgeFor(a.count, demandAt(now)) });
-  };
+  // Majoration de 20 % la nuit et aux heures de pointe.
+  const quoteFor = (category: Category, opts: { scheduled?: boolean } = {}) =>
+    quote(category, route, { stops: stops.length, scheduled: opts.scheduled, majoration: majorationAt(now) });
 
   const offers: Offer[] = CATEGORIES.map((category) => {
     const a = availability(fleet, pickup, category, now);
-    return { category, available: a.count, eta: a.eta, surge: surgeFor(a.count, demandAt(now)), quote: quoteFor(category) };
+    return { category, available: a.count, eta: a.eta, quote: quoteFor(category) };
   });
   const offer = offers.find((o) => o.category === draft.category) ?? offers[0];
   const favoriteDriver = fleet.find((d) => d.id === favoriteId) ?? INITIAL_FLEET[0];
 
-  // Moteur de simulation : fait avancer la course active d'une minute par tick.
+  // Moteur de simulation. Pendant la recherche, chaque tick est une offre de 20 s envoyée au
+  // chauffeur le plus proche, qui accepte selon son taux d'acceptation ; ensuite, un tick = 1 min.
   useEffect(() => {
     if (!isActive(current)) return;
     const id = setInterval(() => {
       const { current: r, fleet: f, favoriteId: fav } = ref.current;
       if (!isActive(r)) return;
-      if (r.status === 'searching' && r.clock + 1 >= SEARCH_TICKS) {
-        const opts = { preferredId: r.preferredDriverId ?? fav };
-        // Paiement portefeuille : on cherche d'abord un chauffeur certifié.
+      if (r.status === 'searching' && !r.offer) {
+        const opts = { preferredId: r.preferredDriverId ?? fav, exclude: r.declined };
+        // Paiement numérique : on sollicite d'abord les chauffeurs certifiés.
         const cand =
-          (r.payment === 'wallet' && dispatch(f, r.pickup, r.category, { ...opts, requireCertified: true })) || dispatch(f, r.pickup, r.category, opts);
-        const next = transition(transition(r, { type: 'tick' }), { type: 'assign', candidate: cand || null });
-        if (cand) setFleet((fl) => updateDriver(fl, cand.driver.id, { status: 'busy' }));
-        setCurrent(next);
+          (r.payment !== 'cash' && dispatch(f, r.pickup, r.category, { ...opts, requireCertified: true })) || dispatch(f, r.pickup, r.category, opts);
+        setCurrent(transition(r, { type: 'offer', candidate: cand || null }));
+        return;
+      }
+      if (r.status === 'searching' && r.offer) {
+        const accepted = Math.random() < r.offer.driver.acceptRate;
+        const driverId = r.offer.driver.id;
+        if (accepted) setFleet((fl) => updateDriver(fl, driverId, { status: 'busy' }));
+        setCurrent(transition(r, { type: 'respond', accepted }));
         return;
       }
       setCurrent(transition(r, { type: 'tick' }));
@@ -149,18 +154,28 @@ export function RideProvider({ children }: { children: ReactNode }) {
     const trip = `${r.pickup.name} ➔ ${r.destination.name}`;
     const who = r.driver ? `Chauffeur ${shortName(r.driver)}` : 'Aucun chauffeur';
     let paidWith: PaymentMethod = 'cash';
-    if (r.status === 'completed' && r.fare && r.payment === 'wallet' && wallet.pay(r.fare, trip, who, 'course')) paidWith = 'wallet';
+    if (r.status === 'completed' && r.fare) {
+      // Mobile Money : paiement simulé comme accepté par l'opérateur. Portefeuille refusé → espèces.
+      if (r.payment === 'mobile_money') paidWith = 'mobile_money';
+      else if (r.payment === 'wallet' && wallet.pay(r.fare, trip, who, 'course')) paidWith = 'wallet';
+    }
     if (r.status === 'cancelled' && r.cancelFee > 0 && wallet.pay(r.cancelFee, 'Frais d’annulation', trip, 'annulation')) paidWith = 'wallet';
-    const settled = r.status === 'no_driver' ? { ...r, settled: true } : transition(r, { type: 'settle', paidWith });
+    const split = r.status === 'completed' && r.fare ? settlement(r.fare, r.quote.toll, paidWith === 'cash') : null;
+    const settled = r.status === 'no_driver' ? { ...r, settled: true } : transition(r, { type: 'settle', paidWith, ...split });
     if (r.driver) {
-      const d = r.driver;
+      const id = r.driver.id;
       setFleet((fl) =>
-        updateDriver(
-          fl,
-          d.id,
-          r.status === 'completed'
-            ? { status: 'available', position: { lat: r.destination.lat, lng: r.destination.lng }, trips: d.trips + 1 }
-            : { status: 'available' },
+        fl.map((d) =>
+          d.id !== id
+            ? d
+            : r.status === 'completed' && split
+              ? {
+                  ...applyPayout(d, { ...split, cash: paidWith === 'cash' }),
+                  status: 'available',
+                  position: { lat: r.destination.lat, lng: r.destination.lng },
+                  trips: d.trips + 1,
+                }
+              : { ...d, status: 'available' },
         ),
       );
     }
@@ -168,7 +183,7 @@ export function RideProvider({ children }: { children: ReactNode }) {
     setHistory((h) => [settled, ...h.filter((x) => x.id !== settled.id)].slice(0, MAX_HISTORY));
   }, [current?.status, current?.settled]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Réservations : la recherche démarre 15 min avant l'heure prévue.
+  // Réservations : chauffeur confirmé (ou remplacé) 30 min avant l'heure prévue.
   useEffect(() => {
     if (isActive(current)) return;
     const due = dueScheduled(scheduled, now);
@@ -226,9 +241,9 @@ export function RideProvider({ children }: { children: ReactNode }) {
     },
     setCategory: (category) => patch({ category }),
     setRoute: (routeId) => patch({ routeId }),
-    setPayment: (payment) => {
-      patch({ payment });
-      if (isActive(current)) setCurrent(transition(current, { type: 'setPayment', method: payment }));
+    setPayment: (payment, operator) => {
+      patch(operator ? { payment, operator } : { payment });
+      if (isActive(current)) setCurrent(transition(current, { type: 'setPayment', method: payment, operator: operator ?? draft.operator }));
     },
     preferDriver: (preferredDriverId) => patch({ preferredDriverId }),
     request: () => {
@@ -245,6 +260,7 @@ export function RideProvider({ children }: { children: ReactNode }) {
           route,
           quote: offer.quote,
           payment: draft.payment,
+          operator: draft.payment === 'mobile_money' ? draft.operator : null,
           preferredDriverId: draft.preferredDriverId,
         }),
       );
@@ -282,8 +298,12 @@ export function RideProvider({ children }: { children: ReactNode }) {
         stops,
         destination,
         category,
-        // Prix bloqué au trafic prévu à l'heure du départ, sans majoration de demande.
-        quote: quote(category, bestRoute(routeOptions([pickup, ...stops, destination], at)), { stops: stops.length, scheduled: true }),
+        // Prix bloqué au trafic et à la majoration prévus à l'heure du départ.
+        quote: quote(category, bestRoute(routeOptions([pickup, ...stops, destination], at)), {
+          stops: stops.length,
+          scheduled: true,
+          majoration: majorationAt(at),
+        }),
         preferredDriverId: preferFavorite ? favoriteId : null,
       };
       setScheduled((s) => [...s, item].sort((a, b) => a.at.localeCompare(b.at)));

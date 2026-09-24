@@ -9,10 +9,10 @@ import { colors, fonts, shadows } from '@/constants/theme';
 import { formatAmount, vehicles } from '@/data/mock';
 import { useRide } from '@/data/ride';
 import { shortName } from '@/logic/fleet';
-import { BOOKING_FEE, quote, type Category } from '@/logic/pricing';
+import { BOOKING_FEE, isMajorated, majorationAt, quote, type Category } from '@/logic/pricing';
 import { DISPATCH_LEAD_MIN, validateSchedule } from '@/logic/schedule';
 import { formatWhen } from '@/logic/time';
-import { bestRoute, periodOf, routeOptions } from '@/logic/traffic';
+import { bestRoute, routeOptions } from '@/logic/traffic';
 
 const WEEKDAYS = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'];
 const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
@@ -25,7 +25,7 @@ const SLOTS: { id: Slot; label: string; from: number }[] = [
 /** 12 créneaux de 30 min à partir de l'heure donnée. */
 const timesFrom = (h: number) => Array.from({ length: 12 }, (_, i) => `${String(h + Math.floor(i / 2)).padStart(2, '0')}:${i % 2 ? '30' : '00'}`);
 
-const CHOICES: Category[] = ['eco', 'confort', 'van'];
+const CHOICES: Category[] = ['eco', 'confort', 'confort_plus'];
 
 function nextDays(count: number) {
   const today = new Date();
@@ -61,7 +61,7 @@ export default function ScheduleScreen() {
 
   // Trafic et prix calculés pour l'heure choisie (pas pour maintenant).
   const route = bestRoute(routeOptions([pickup, ...stops, destination], when));
-  const price = quote(category, route, { stops: stops.length, scheduled: true });
+  const price = quote(category, route, { stops: stops.length, scheduled: true, majoration: majorationAt(when) });
   const together = history.filter((h) => h.status === 'completed' && h.driver?.id === favoriteDriver.id).length;
   const vehicle = vehicles.find((v) => v.id === category);
 
@@ -211,9 +211,9 @@ export default function ScheduleScreen() {
               );
             })}
           </View>
-          {periodOf(when) === 'pointe' && (
+          {isMajorated(when) && (
             <AppText variant="bodySm" color="#92400E">
-              Heure de pointe : trajet plus long, mais prix bloqué sans majoration.
+              Heure de pointe ou de nuit : majoration de 20 % incluse, prix bloqué à la réservation.
             </AppText>
           )}
         </View>

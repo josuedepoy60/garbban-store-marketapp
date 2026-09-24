@@ -112,7 +112,7 @@ function HistoryRow({ r }: { r: Ride }) {
         <AppText variant="bodySm" color={colors.onSurfaceVariant} numberOfLines={1}>
           {formatWhen(r.createdAt)}
           {r.driver ? ` · ${shortName(r.driver)}` : ''}
-          {r.status === 'completed' ? ` · ${r.paidWith === 'wallet' ? 'Portefeuille' : 'Espèces'}` : ''}
+          {r.status === 'completed' ? ` · ${r.paidWith === 'wallet' ? 'Portefeuille' : r.paidWith === 'mobile_money' ? 'Mobile Money' : 'Espèces'}` : ''}
         </AppText>
         <View style={[styles.row, { flexWrap: 'wrap' }]}>
           <Pill background={st.bg} style={{ paddingHorizontal: 6, paddingVertical: 1 }}>

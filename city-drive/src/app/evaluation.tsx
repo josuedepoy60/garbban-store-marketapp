@@ -147,7 +147,7 @@ export default function RatingScreen() {
               </AppText>
               <View style={styles.sep} />
               <AppText variant="labelSm" color={colors.primary}>
-                {r?.paidWith === 'wallet' ? `${formatAmount(price)} ${brand.walletUnit} prélevés` : `${formatAmount(price)} F en espèces`}
+                {r?.paidWith === 'wallet' ? `${formatAmount(price)} ${brand.walletUnit} prélevés` : r?.paidWith === 'mobile_money' ? `${formatAmount(price)} F par Mobile Money` : `${formatAmount(price)} F en espèces`}
               </AppText>
             </View>
           </View>
