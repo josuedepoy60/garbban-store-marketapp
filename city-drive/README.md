@@ -27,6 +27,7 @@ npm run typecheck
 | `/recu` | Reçu de recharge : célébration, nouveau solde, reçu détachable, partage |
 | `/appel` | Appel en course chiffré : minuteur, micro, haut-parleur, SOS, raccrocher |
 | `/chat` | Messagerie en course : réponses rapides, message vocal transcrit, envoi |
+| `/evaluation` | Fin de course : note étoilée, compliments, pourboire débité du portefeuille, chauffeur favori, message |
 | `/compte` | Provisoire, en attente de maquette |
 
 ## Organisation

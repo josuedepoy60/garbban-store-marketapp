@@ -27,6 +27,7 @@ export default function RootLayout() {
         <Stack.Screen name="recu" options={{ gestureEnabled: false }} />
         <Stack.Screen name="appel" />
         <Stack.Screen name="chat" />
+        <Stack.Screen name="evaluation" />
         <Stack.Screen name="navigation" options={{ contentStyle: { backgroundColor: '#131316' } }} />
       </Stack>
       </WalletProvider>

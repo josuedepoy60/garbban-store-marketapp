@@ -294,6 +294,18 @@ export default function ActiveRideScreen() {
               </AppText>
             </Touchable>
           )}
+          {confirmed && (
+            <Touchable
+              scale={0.98}
+              onPress={() => router.push({ pathname: '/evaluation', params: { price: String(price) } })}
+              style={styles.rate}
+            >
+              <Icon name="star" size={20} color={colors.primaryContainer} />
+              <AppText variant="labelLg" color={colors.primaryContainer}>
+                Course terminée ? Noter Koffi
+              </AppText>
+            </Touchable>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -412,6 +424,7 @@ const styles = StyleSheet.create({
   optionIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   radio: { width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   radioDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#fff' },
+  rate: { height: 48, borderRadius: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.violetSoft },
   follow: {
     height: 56,
     borderRadius: 18,
