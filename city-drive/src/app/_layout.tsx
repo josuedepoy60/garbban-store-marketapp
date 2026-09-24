@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { ResponsiveShell } from '@/components/ResponsiveShell';
 import { colors } from '@/constants/theme';
 import { WalletProvider } from '@/data/wallet';
 
@@ -16,6 +17,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <WalletProvider>
+      <ResponsiveShell>
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surface } }}>
         <Stack.Screen name="(tabs)" />
@@ -30,6 +32,7 @@ export default function RootLayout() {
         <Stack.Screen name="evaluation" />
         <Stack.Screen name="navigation" options={{ contentStyle: { backgroundColor: '#131316' } }} />
       </Stack>
+      </ResponsiveShell>
       </WalletProvider>
     </SafeAreaProvider>
   );

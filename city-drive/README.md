@@ -30,6 +30,11 @@ npm run typecheck
 | `/evaluation` | Fin de course : note étoilée, compliments, pourboire débité du portefeuille, chauffeur favori, message |
 | `/compte` (onglet) | Profil, Pass Gold Club, solde, lieux favoris (ajout/suppression), préférences, sécurité, assistance, déconnexion |
 
+## Adaptation aux écrans
+
+- **Téléphones** : plein écran. Sous 360 px de large (`useCompact`), les éléments secondaires sont masqués ou compactés ; les cartes s'adaptent à la hauteur de l'écran.
+- **Tablettes et ordinateurs** (≥ 700 px) : `ResponsiveShell` affiche l'app dans une colonne centrée (600 px sur tablette, 460 px sur ordinateur).
+
 ## Organisation
 
 - `src/app/` — routes (un fichier = un écran)

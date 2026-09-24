@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
   type PressableProps,
   type StyleProp,
   type TextProps,
@@ -171,3 +172,9 @@ const styles = StyleSheet.create({
   handle: { width: 48, height: 6, borderRadius: 3, alignSelf: 'center' },
   card: { backgroundColor: colors.surfaceLowest, borderRadius: 16, padding: 16, boxShadow: shadows.card },
 });
+
+/** Vrai sur les petits téléphones (largeur < 360 px) : masque ou compacte les éléments secondaires. */
+export function useCompact() {
+  const { width } = useWindowDimensions();
+  return width < 360;
+}

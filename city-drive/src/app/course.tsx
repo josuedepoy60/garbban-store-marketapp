@@ -5,7 +5,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CityMap } from '@/components/CityMap';
-import { AppText, Avatar, CircleButton, Icon, PingDot, Pill, Pulse, SheetHandle, Touchable } from '@/components/ui';
+import { AppText, Avatar, CircleButton, Icon, PingDot, Pill, Pulse, SheetHandle, Touchable, useCompact } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
 import { favoriteDriver, formatAmount, photos } from '@/data/mock';
@@ -21,6 +21,7 @@ export default function ActiveRideScreen() {
   const [confirmed, setConfirmed] = useState(false);
   const [refused, setRefused] = useState(false);
   const { balance, pay } = useWallet();
+  const compact = useCompact();
 
   const confirm = () => {
     if (method === 'wallet' && !pay(price, 'Plateau ➔ Marcory Zone 4', 'Chauffeur Koffi T.')) {
@@ -37,8 +38,8 @@ export default function ActiveRideScreen() {
       {/* En-tête */}
       <View style={styles.header}>
         <CircleButton icon="arrow-back" label="Retour" color={colors.ink} onPress={() => router.back()} />
-        <View style={{ alignItems: 'center' }}>
-          <AppText variant="headlineSm" color={colors.ink} style={{ fontSize: 16, lineHeight: 22, letterSpacing: -0.3 }}>
+        <View style={{ alignItems: 'center', flexShrink: 1 }}>
+          <AppText variant="headlineSm" color={colors.ink} numberOfLines={1} style={{ fontSize: compact ? 14 : 16, lineHeight: 22, letterSpacing: -0.3 }}>
             {brand.appName} Mobilité
           </AppText>
           <AppText variant="labelSm" color={colors.inkSoft} style={{ opacity: 0.7, fontSize: 10 }}>
@@ -47,9 +48,11 @@ export default function ActiveRideScreen() {
         </View>
         <View style={styles.status}>
           <PingDot color={colors.primaryContainer} />
-          <AppText variant="labelSm" color={colors.primaryContainer} style={{ fontSize: 12 }}>
-            En approche
-          </AppText>
+          {!compact && (
+            <AppText variant="labelSm" color={colors.primaryContainer} style={{ fontSize: 12 }}>
+              En approche
+            </AppText>
+          )}
         </View>
       </View>
 

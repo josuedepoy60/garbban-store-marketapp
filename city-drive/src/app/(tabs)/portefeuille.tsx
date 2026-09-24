@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AppText, Dot, Icon, Pill, Touchable, type IconName } from '@/components/ui';
+import { AppText, Dot, Icon, Pill, Touchable, useCompact, type IconName } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts, shadows } from '@/constants/theme';
 import { formatAmount } from '@/data/mock';
@@ -39,6 +39,7 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
 
 export default function WalletScreen() {
   const insets = useSafeAreaInsets();
+  const compact = useCompact();
   const { balance, transactions } = useWallet();
   const [operator, setOperator] = useState(OPERATORS[0].id);
   const [amount, setAmount] = useState(25000);
@@ -123,19 +124,19 @@ export default function WalletScreen() {
 
           <View style={[styles.row, { gap: 6 }]}>
             <Touchable style={[styles.cardBtn, { backgroundColor: colors.secondaryContainer }]} onPress={doRecharge}>
-              <Icon name="bolt" size={20} color={colors.onSecondaryFixed} />
+              {!compact && <Icon name="bolt" size={20} color={colors.onSecondaryFixed} />}
               <AppText variant="labelMd" color={colors.onSecondaryFixed} style={{ fontFamily: fonts.dm700 }}>
                 Recharger
               </AppText>
             </Touchable>
             <Touchable style={styles.cardBtn}>
-              <Icon name="send" size={18} color={colors.onPrimary} />
+              {!compact && <Icon name="send" size={18} color={colors.onPrimary} />}
               <AppText variant="labelMd" color={colors.onPrimary} style={{ fontFamily: fonts.dm700 }}>
                 Envoyer
               </AppText>
             </Touchable>
             <Touchable style={styles.cardBtn}>
-              <Icon name="receipt-long" size={18} color={colors.onPrimary} />
+              {!compact && <Icon name="receipt-long" size={18} color={colors.onPrimary} />}
               <AppText variant="labelMd" color={colors.onPrimary} style={{ fontFamily: fonts.dm700 }}>
                 Relevé
               </AppText>
@@ -178,7 +179,7 @@ export default function WalletScreen() {
             {AMOUNTS.map((a) => {
               const active = a === amount;
               return (
-                <Touchable key={a} onPress={() => setAmount(a)} style={[styles.amount, active && { backgroundColor: colors.primaryContainer }]}>
+                <Touchable key={a} onPress={() => setAmount(a)} style={[styles.amount, compact && styles.amountCompact, active && { backgroundColor: colors.primaryContainer }]}>
                   <AppText variant="labelLg" color={active ? colors.onPrimary : colors.onSurface}>
                     {formatAmount(a)} F
                   </AppText>
@@ -395,6 +396,7 @@ const styles = StyleSheet.create({
   operatorActive: { borderColor: colors.primary },
   operatorIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.surfaceContainer, alignItems: 'center', justifyContent: 'center' },
   amounts: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  amountCompact: { flexDirection: 'column', justifyContent: 'center', height: 58, gap: 2, paddingHorizontal: 8 },
   amount: {
     width: '48.8%',
     flexGrow: 1,

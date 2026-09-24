@@ -190,7 +190,7 @@ export default function AccountScreen() {
         {/* Gold Club */}
         <LinearGradient colors={[colors.primary, colors.primaryContainer, '#5845d6']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.gold}>
           <View style={styles.goldGlow} />
-          <View style={styles.between}>
+          <View style={[styles.between, { flexWrap: 'wrap', rowGap: 8 }]}>
             <Pill background={colors.secondaryContainer} style={{ paddingHorizontal: 12, paddingVertical: 4 }}>
               <Icon name="workspace-premium" size={16} color={colors.onSecondaryFixed} />
               <AppText variant="labelSm" color={colors.onSecondaryFixed}>

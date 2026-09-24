@@ -104,7 +104,7 @@ export default function VehiclesScreen() {
                       <VehicleIcon kind={v.kind} color={active ? colors.primary : colors.onSurface} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <View style={styles.row}>
+                      <View style={[styles.row, { flexWrap: 'wrap' }]}>
                         <AppText variant="headlineSm">{v.name}</AppText>
                         <Icon name="person" size={14} color={colors.onSurfaceVariant} />
                         <AppText variant="labelSm" color={colors.onSurfaceVariant} style={{ marginLeft: -4 }}>

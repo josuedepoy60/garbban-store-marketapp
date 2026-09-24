@@ -1,12 +1,12 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, TextInput, View, useWindowDimensions } from 'react-native';
 import { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CityMap } from '@/components/CityMap';
 import { TabHeader } from '@/components/headers';
-import { AppText, Avatar, Bounce, Dot, Icon, PingDot, Pill, SheetHandle, Touchable, type IconName } from '@/components/ui';
+import { AppText, Avatar, Bounce, Dot, Icon, PingDot, Pill, SheetHandle, Touchable, useCompact, type IconName } from '@/components/ui';
 import { colors, fonts, shadows } from '@/constants/theme';
 import { favoriteDriver, photos, quickPlaces, user } from '@/data/mock';
 
@@ -31,13 +31,17 @@ export default function HomeScreen() {
   const [route, setRoute] = useState('hkb');
   const [alertOpen, setAlertOpen] = useState(true);
   const mapTop = insets.top + 72;
+  const compact = useCompact();
+  const { height } = useWindowDimensions();
+  // La carte occupe ~55 % de la hauteur d'écran, entre 320 et 470 px.
+  const mapH = Math.round(Math.min(470, Math.max(320, height * 0.55)));
 
   return (
     <View style={styles.screen}>
       <TabHeader />
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 110 }} showsVerticalScrollIndicator={false}>
         {/* Carte */}
-        <View style={{ height: 470 + mapTop }}>
+        <View style={{ height: mapH + mapTop }}>
           <CityMap userMarker style={StyleSheet.absoluteFill}>
             <Path d={JAM_PATH} stroke={JAM_RED} strokeWidth={12} strokeLinecap="round" fill="none" opacity={0.3} />
             <Path d={JAM_PATH} stroke="#EF4444" strokeWidth={5} strokeDasharray="6 5" strokeLinecap="round" fill="none" />
@@ -71,12 +75,14 @@ export default function HomeScreen() {
               </AppText>
               <Icon name="expand-more" size={16} color={colors.onSurfaceVariant} />
             </Touchable>
-            <View style={styles.glassPill}>
-              <PingDot color={colors.secondary} />
-              <AppText variant="labelSm" color={colors.primary}>
-                HKB FLUIDE
-              </AppText>
-            </View>
+            {!compact && (
+              <View style={styles.glassPill}>
+                <PingDot color={colors.secondary} />
+                <AppText variant="labelSm" color={colors.primary}>
+                  HKB FLUIDE
+                </AppText>
+              </View>
+            )}
           </View>
 
           <View style={[styles.here, { top: mapTop + 112 }]}>
@@ -84,6 +90,7 @@ export default function HomeScreen() {
             <AppText variant="labelSm">Vous êtes ici</AppText>
           </View>
 
+          {!compact && (
           <Bounce style={[styles.mapChip, { top: mapTop + 90, right: 16 }]}>
             <View style={[styles.chipIcon, { backgroundColor: colors.secondaryContainer }]}>
               <Icon name="local-taxi" size={14} color={colors.onSecondaryFixed} />
@@ -95,8 +102,9 @@ export default function HomeScreen() {
               </AppText>
             </View>
           </Bounce>
+          )}
 
-          <View style={[styles.mapChip, { top: mapTop + 262, left: 12 }]}>
+          <View style={[styles.mapChip, { top: mapTop + Math.round(mapH * 0.56), left: 12 }]}>
             <View style={[styles.chipIcon, { backgroundColor: '#FFE58F' }]}>
               <Icon name="directions-bus" size={14} color="#664600" />
             </View>

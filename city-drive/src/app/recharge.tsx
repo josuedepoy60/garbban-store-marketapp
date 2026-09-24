@@ -87,7 +87,7 @@ export default function RechargeConfirmScreen() {
 
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]} showsVerticalScrollIndicator={false}>
         {/* Statut + minuteur */}
-        <View style={styles.between}>
+        <View style={[styles.between, { flexWrap: 'wrap', rowGap: 6 }]}>
           <View style={styles.stepChip}>
             <Dot color={step === 'done' ? colors.secondary : colors.secondaryContainer} />
             <AppText variant="labelSm" color={colors.primary}>

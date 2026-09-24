@@ -108,7 +108,7 @@ export default function CallScreen() {
               </AppText>
             </View>
           </View>
-          <View style={styles.between}>
+          <View style={[styles.between, { flexWrap: 'wrap', rowGap: 4 }]}>
             <View style={styles.row}>
               <Icon name="lock" size={16} color={colors.onSurfaceVariant} />
               <AppText variant="bodySm" color={colors.onSurfaceVariant}>

@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, G, Line, LinearGradient, Path, Polygon, Rect, Stop } from 'react-native-svg';
 
@@ -173,6 +173,8 @@ export default function NavigationScreen() {
   const insets = useSafeAreaInsets();
   const [speed, setSpeed] = useState(68);
   const [voice, setVoice] = useState(true);
+  const { height } = useWindowDimensions();
+  const mapHeight = Math.round(Math.min(620, Math.max(480, height * 0.72)));
 
   // Simule une vitesse qui varie autour de 68 km/h sur le pont.
   useEffect(() => {
@@ -194,7 +196,7 @@ export default function NavigationScreen() {
       <StatusBar style="light" />
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 16 }} showsVerticalScrollIndicator={false}>
         {/* Carte de conduite */}
-        <View style={styles.mapWrap}>
+        <View style={[styles.mapWrap, { height: mapHeight }]}>
           <CockpitMap />
 
           <View style={styles.hud}>
@@ -384,7 +386,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: dark.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  mapWrap: { height: 620, borderBottomLeftRadius: 32, borderBottomRightRadius: 32, overflow: 'hidden', backgroundColor: dark.lowest },
+  mapWrap: { borderBottomLeftRadius: 32, borderBottomRightRadius: 32, overflow: 'hidden', backgroundColor: dark.lowest },
   hud: { position: 'absolute', top: 12, left: 12, right: 12, gap: 8 },
   turnCard: {
     ...glass,
