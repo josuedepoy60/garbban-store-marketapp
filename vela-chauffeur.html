@@ -171,7 +171,8 @@
   .map-over { position: absolute; left: 10px; right: 10px; display: flex; justify-content: space-between; gap: 8px; pointer-events: none; }
   .map-over > * { pointer-events: auto; }
   .pill-glass { background: rgba(14, 14, 17, .82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
-  .home-grid { display: grid; gap: 14px; }
+  .home-grid { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+  .home-grid > *, .split > *, .stack > * { min-width: 0; }
   .empty { text-align: center; padding: 26px 16px; color: var(--mut); display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
   /* ---------- Offer / mission ---------- */
@@ -306,7 +307,7 @@
   }
   @media (min-width: 720px) {
     main { padding: 24px 24px calc(var(--nav-h) + 32px); }
-    .home-grid { grid-template-columns: 1fr 1fr; }
+    .home-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .home-grid .span-2 { grid-column: 1 / -1; }
     .sheet { left: 50%; right: auto; bottom: 50%; width: 480px; border-radius: 24px; transform: translate(-50%, 60%) scale(.96); opacity: 0; transition: transform .22s, opacity .22s; pointer-events: none; padding-bottom: 20px; }
     .sheet.open { transform: translate(-50%, 50%); opacity: 1; pointer-events: auto; }
@@ -327,7 +328,7 @@
     .side-link .badge-dot { position: static; margin-left: auto; }
     .side-foot { margin-top: auto; }
     .top .menu-avatar { display: none; }
-    .home-grid { grid-template-columns: repeat(3, 1fr); }
+    .home-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .home-grid .span-2 { grid-column: span 2; }
     .home-grid .span-3 { grid-column: 1 / -1; }
     .split { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, 1fr); align-items: start; gap: 20px; }
@@ -605,15 +606,27 @@
   const isToday = (t) => new Date(t).toDateString() === new Date().toDateString();
   const mmss = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(Math.floor(s % 60)).padStart(2, '0');
 
+  /* Règles de paiement des courses taxi
+     - Paiement Vela activé : le client paie en Vela Monnaie, Vela garde sa commission
+       et crédite le reste au chauffeur.
+     - Paiement Vela désactivé : le client paie le chauffeur à l'arrivée (espèces, Wave,
+       Orange Money). La commission Vela est prélevée sur le compte Vela du chauffeur.
+       Sans solde suffisant, le chauffeur ne reçoit plus de courses taxi : il doit recharger. */
+  const COMMISSION = 0.15;
+  const MIN_RESERVE = 1000;
+  const DIRECT_METHODS = ['Espèces', 'Wave', 'Orange Money'];
   function priceOffer(type, approach, trip, surge) {
     if (type === 'taxi') {
       const fare = round50((600 + 320 * trip.km) * surge) + trip.toll;
-      const net = round50((fare - trip.toll) * 0.85) + trip.toll;
-      return { fare, net, toll: trip.toll };
+      const commission = round50((fare - trip.toll) * COMMISSION);
+      return { fare, net: fare - commission, commission, toll: trip.toll };
     }
     const net = round50(700 + 190 * (approach.km + trip.km));
-    return { fare: net, net, toll: trip.toll };
+    return { fare: net, net, commission: 0, toll: trip.toll };
   }
+  const isDirect = () => S.payMode === 'direct';
+  // Le chauffeur en paiement direct doit garder de quoi payer la commission
+  const taxiBlocked = () => S.services.taxi && isDirect() && S.vm < MIN_RESERVE;
 
   function seed() {
     const now = Date.now();
@@ -639,6 +652,7 @@
       driver: { name: 'Koffi Traoré', first: 'Koffi', vehicle: 'Toyota Yaris blanche', plate: '4521 HJ 01', rating: 4.92 },
       online: true,
       services: { city: true, taxi: true },
+      payMode: 'vela',
       voice: true,
       sim: 2,
       pos: { x: 322, y: 188 },
@@ -679,11 +693,13 @@
   }
   // Une offre sauvegardée a forcément expiré entre deux visites
   if (S.offer) { S.offer = null; }
+  if (!S.payMode) S.payMode = 'vela';
+  if (S.mission && S.mission.type === 'taxi' && !S.mission.pay) { S.mission.pay = 'Vela'; S.mission.commission = S.mission.fare - S.mission.net; }
 
   /* =========================================================
      État d'interface (non sauvegardé)
      ========================================================= */
-  const ui = { view: 'home', stack: [], filter: 'all', walletTab: 'convert', sheet: null, sheetData: null, nextOfferAt: Date.now() + 7000, searching: null, driving: false, pinTries: 0, resetArmed: false, errors: {} };
+  const ui = { view: 'home', stack: [], filter: 'all', walletTab: 'recharge', sheet: null, sheetData: null, nextOfferAt: Date.now() + 7000, searching: null, driving: false, pinTries: 0, resetArmed: false, errors: {} };
   const $ = (id) => document.getElementById(id);
 
   /* ---------- Toast ---------- */
@@ -722,6 +738,8 @@
     const answered = today.filter((h) => h.status === 'done' || h.status === 'declined' || h.status === 'expired' || h.status === 'cancelled');
     return {
       earn: done.reduce((s, h) => s + h.amount, 0),
+      collected: done.reduce((s, h) => s + (h.collected || 0), 0),
+      commission: done.reduce((s, h) => s + (h.collected ? h.commission || 0 : 0), 0),
       city: done.filter((h) => h.type === 'city').length,
       taxi: done.filter((h) => h.type === 'taxi').length,
       rate: answered.length ? Math.round(done.length / answered.length * 100) : 100,
@@ -748,18 +766,21 @@
       id: 'CP-' + (20400 + Math.floor(Math.random() * 600)),
       type, pickupId: pickup.id, dropId: drop.id, surge,
       approachKm: approach.km, approachMin: approach.min, tripKm: trip.km, tripMin: trip.min, bridge: trip.bridge,
-      fare: price.fare, net: price.net, toll: price.toll,
+      fare: price.fare, net: price.net, toll: price.toll, commission: price.commission,
+      pay: type === 'taxi' ? (isDirect() ? pick(DIRECT_METHODS) : 'Vela') : 'City+',
       customer: cust,
       code: String(1000 + Math.floor(Math.random() * 9000)),
       createdAt: Date.now(), ttl: type === 'taxi' ? 25 : 30
     };
   }
   function enabledTypes() { return ['city', 'taxi'].filter((t) => S.services[t]); }
-  function canReceive() { return S.online && !S.mission && !S.offer && enabledTypes().length > 0; }
+  function availableTypes() { return enabledTypes().filter((t) => !(t === 'taxi' && taxiBlocked())); }
+  function canReceive() { return S.online && !S.mission && !S.offer && availableTypes().length > 0; }
 
   function pushOffer(type) {
     if (!canReceive()) return false;
-    type = type && S.services[type] ? type : pick(enabledTypes());
+    const types = availableTypes();
+    type = type && types.includes(type) ? type : pick(types);
     S.offer = makeOffer(type);
     notify((type === 'taxi' ? 'Nouvelle course Vela · ' : 'Nouvelle livraison City+ · ') + placeById(S.offer.pickupId).short + ' → ' + placeById(S.offer.dropId).short);
     speak(type === 'taxi' ? 'Nouvelle course disponible' : 'Nouvelle livraison City+ disponible');
@@ -774,6 +795,7 @@
     if (S.offer) { if (!type || S.offer.type === type) { go('offer'); return; } }
     if (!S.online) { toast('Passez en ligne pour recevoir des offres'); return; }
     if (!S.services[type]) { toast('Activez « ' + (type === 'taxi' ? 'Courses Vela Taxi' : 'Livraisons City+') + ' » dans votre profil'); return; }
+    if (type === 'taxi' && taxiBlocked()) { toast('Solde Vela insuffisant : rechargez pour recevoir des courses'); openRecharge(); return; }
     if (S.offer) { toast('Répondez d\'abord à l\'offre en cours'); go('offer'); return; }
     ui.searching = type;
     render();
@@ -799,6 +821,11 @@
   function acceptOffer() {
     const o = S.offer;
     if (!o) return;
+    if (o.type === 'taxi' && o.pay !== 'Vela' && S.vm < o.commission) {
+      toast('Solde Vela insuffisant pour la commission de ' + fmt(o.commission) + ' VM');
+      openRecharge();
+      return;
+    }
     const pickup = placeById(o.pickupId);
     S.mission = Object.assign({}, o, { phase: 'to_pickup', acceptedAt: Date.now(), avoidToll: false, leg: null, traveled: 0, events: [{ t: Date.now(), label: 'Mission acceptée' }], waitStart: 0, incidents: [] });
     S.mission.leg = buildRoute(S.pos, pickup, false);
@@ -853,13 +880,21 @@
     m.doneAt = Date.now();
     m.events.push({ t: Date.now(), label: m.type === 'taxi' ? 'Course terminée' : 'Colis remis' });
     const from = placeById(m.pickupId).short, to = placeById(m.dropId).short;
-    S.history.unshift({ id: uid(), type: m.type, from, to, amount: m.net, status: 'done', t: Date.now() });
-    S.vm += m.net;
-    S.tx.unshift({ id: uid(), label: (m.type === 'taxi' ? 'Course Vela · ' : 'Livraison City+ · ') + from + ' → ' + to, amount: m.net, unit: 'VM', t: Date.now() });
-    notify('+' + fmt(m.net) + ' VM crédités · ' + from + ' → ' + to);
+    const direct = m.type === 'taxi' && m.pay !== 'Vela';
+    S.history.unshift({ id: uid(), type: m.type, from, to, amount: m.net, status: 'done', t: Date.now(), pay: m.pay, collected: direct ? m.fare : 0, commission: m.commission || 0 });
+    if (direct) {
+      S.vm -= m.commission;
+      S.tx.unshift({ id: uid(), label: 'Commission Vela 15 % · ' + from + ' → ' + to + ' (' + m.pay + ')', amount: -m.commission, unit: 'VM', t: Date.now() });
+      notify(fmt(m.fare) + ' F encaissés en ' + m.pay + ' · commission −' + fmt(m.commission) + ' VM');
+      if (S.vm < MIN_RESERVE) notify('Solde Vela sous ' + fmt(MIN_RESERVE) + ' VM : rechargez pour recevoir de nouvelles courses taxi');
+    } else {
+      S.vm += m.net;
+      S.tx.unshift({ id: uid(), label: (m.type === 'taxi' ? 'Course Vela · ' : 'Livraison City+ · ') + from + ' → ' + to, amount: m.net, unit: 'VM', t: Date.now() });
+      notify('+' + fmt(m.net) + ' VM crédités · ' + from + ' → ' + to);
+    }
     if (S.share.active) stopShare(true);
     if (S.sos) S.sos = false;
-    speak('Mission terminée. ' + fmt(m.net) + ' Vela Monnaie crédités.');
+    speak(direct ? 'Course terminée. Encaissez ' + fmt(m.fare) + ' francs en ' + m.pay + '.' : 'Mission terminée. ' + fmt(m.net) + ' Vela Monnaie crédités.');
     save();
   }
 
@@ -1007,7 +1042,7 @@
   }
 
   function statusCard() {
-    const lockNote = S.mission ? 'Mission en cours · statut verrouillé' : S.online ? (enabledTypes().length ? 'Prêt pour nouvelles courses' : 'Aucun service activé dans le profil') : 'Vous ne recevez plus d\'offres';
+    const lockNote = S.mission ? 'Mission en cours · statut verrouillé' : S.online ? (availableTypes().length ? (taxiBlocked() ? 'Livraisons seulement · rechargez pour les courses' : 'Prêt pour nouvelles courses') : enabledTypes().length ? 'Rechargez votre compte Vela pour recevoir des courses' : 'Aucun service activé dans le profil') : 'Vous ne recevez plus d\'offres';
     return '<div class="card" style="padding:10px 12px"><div class="between">' +
       '<div class="row grow"><button class="switch" role="switch" aria-label="Disponibilité" aria-checked="' + S.online + '" data-action="toggle-online"></button>' +
       '<div class="grow"><b>' + (S.online ? 'En ligne' : 'Hors ligne') + '</b><div class="tiny muted trunc">' + lockNote + '</div></div></div>' +
@@ -1031,7 +1066,7 @@
     const searching = ui.searching;
     const cityBtn = searching === 'city' ? '<button class="btn btn-block" disabled>' + ic('refresh', 16) + 'Recherche de missions…</button>' :
       '<button class="btn btn-block" data-action="request" data-type="city">' + (o && o.type === 'city' ? 'Voir l\'offre en attente' : S.mission && S.mission.type === 'city' ? 'Voir la mission en cours' : 'Voir les missions') + ic('arrow', 16, ' style="color:var(--pink)"') + '</button>';
-    const taxiBtn = searching === 'taxi' ? '<button class="btn btn-block" disabled>' + ic('radar', 16) + 'Balayage du radar…</button>' :
+    const taxiBtn = taxiBlocked() ? '<button class="btn btn-lime btn-block" data-action="goto-recharge">' + ic('plus', 16) + 'Recharger mon compte Vela</button>' : searching === 'taxi' ? '<button class="btn btn-block" disabled>' + ic('radar', 16) + 'Balayage du radar…</button>' :
       '<button class="btn btn-block" data-action="request" data-type="taxi">' + (o && o.type === 'taxi' ? 'Voir l\'offre en attente' : S.mission && S.mission.type === 'taxi' ? 'Voir la course en cours' : 'Ouvrir le radar des courses') + ic('radar', 16, ' style="color:var(--lime)"') + '</button>';
     return '<div class="stack">' +
       '<div class="between hello"><div class="row" style="min-width:0"><div style="position:relative"><div class="avatar av-driver" style="width:48px;height:48px;font-size:16px">KT</div></div>' +
@@ -1042,7 +1077,8 @@
         '<div class="card earn"><div class="glow" style="right:-30px;bottom:-30px;width:130px;height:130px;background:rgba(85,109,0,.25)"></div>' +
           '<div class="between"><span class="label" style="color:#3b4d00">Gains aujourd\'hui</span><span class="chip">' + ic('trend', 14) + st.rate + '% d\'acceptation</span></div>' +
           '<div class="row" style="align-items:baseline;gap:6px"><span class="big">' + fmt(st.earn) + '</span><b>FCFA</b></div>' +
-          '<div class="sub"><span class="row" style="gap:6px">' + ic('bag', 16) + st.city + ' livraisons City+</span><span class="row" style="gap:6px">' + ic('taxi', 16) + st.taxi + ' courses Vela</span></div></div>' +
+          '<div class="sub"><span class="row" style="gap:6px">' + ic('bag', 16) + st.city + ' livraisons City+</span><span class="row" style="gap:6px">' + ic('taxi', 16) + st.taxi + ' courses Vela</span></div>' +
+          (st.collected ? '<div class="small" style="color:var(--ink);font-weight:700">dont ' + fmt(st.collected - st.commission) + ' F nets encaissés en direct (' + fmt(st.collected) + ' F − ' + fmt(st.commission) + ' VM de commission)</div>' : '') + '</div>' +
         '<div class="card"><div class="glow" style="right:-40px;top:-40px;width:160px;height:160px;background:rgba(96,80,209,.2)"></div>' +
           '<div class="between"><span class="chip chip-violet">' + ic('swap', 14) + 'Compte Vela lié</span><button class="link" data-action="go" data-view="wallet" style="color:var(--violet-soft)">Convertir' + ic('arrow', 14) + '</button></div>' +
           '<div><span class="small muted">Solde disponible</span><div class="row" style="align-items:baseline;gap:8px"><span class="num" style="font-size:28px">' + fmt(S.vm) + '</span><b style="color:var(--violet-soft)">VM</b></div></div>' +
@@ -1050,7 +1086,8 @@
         '<div class="card"><div class="between"><div class="row"><span class="tile-ic t-pink">' + ic('bag', 18) + '</span><div><h3 style="font-size:16px">Livraisons City+</h3><span class="small muted">Mode &amp; colis express</span></div></div>' +
           (o && o.type === 'city' ? '<span class="chip chip-pink">1 en attente</span>' : S.services.city ? '<span class="chip">Actif</span>' : '<span class="chip">Désactivé</span>') + '</div>' +
           '<div class="inset row">' + ic('store', 18, ' style="color:var(--pink)"') + '<div class="grow"><div class="label">Point relais assigné</div><b class="small trunc" style="display:block">Angré 8e Tranche · Boutique N°14</b></div></div>' + cityBtn + '</div>' +
-        '<div class="card"><div class="between"><div class="row"><span class="tile-ic t-violet">' + ic('taxi', 18) + '</span><div><h3 style="font-size:16px">Courses taxi Vela</h3><span class="small muted">Forte demande active</span></div></div><span class="chip chip-lime">x1.3 Surge</span></div>' +
+        '<div class="card"><div class="between"><div class="row"><span class="tile-ic t-violet">' + ic('taxi', 18) + '</span><div><h3 style="font-size:16px">Courses taxi Vela</h3><span class="small muted">' + (isDirect() ? 'Paiement à l\'arrivée · espèces, Wave, OM' : 'Paiement Vela Monnaie') + '</span></div></div>' + (S.services.taxi ? (taxiBlocked() ? '<span class="chip chip-red">Bloqué</span>' : '<span class="chip chip-lime">x1.3 Surge</span>') : '<span class="chip">Désactivé</span>') + '</div>' +
+          (taxiBlocked() ? '<div class="inset" style="background:rgba(255,90,82,.12);color:#ffb4ab"><b class="small" style="display:block">Solde Vela insuffisant : ' + fmt(S.vm) + ' VM</b><span class="small">En paiement direct, la commission de 15 % est prélevée sur votre compte Vela. Il faut au moins ' + fmt(MIN_RESERVE) + ' VM pour recevoir des courses.</span></div>' : '') +
           '<div class="inset between"><div class="row grow">' + ic('fire', 18, ' style="color:var(--lime)"') + '<div class="grow"><div class="label">Hotspots identifiés</div><b class="small trunc" style="display:block">Cocody Ambassades &amp; Plateau</b></div></div><span class="small" style="color:var(--lime);font-weight:700">x1.3 tarif</span></div>' + taxiBtn + '</div>' +
         '<div class="card span-2"><div class="between"><div class="row">' + ic('map', 20, ' style="color:var(--mut)"') + '<h3 style="font-size:16px">Zones à forte affluence</h3></div><span class="tiny muted">Mis à jour ' + hm(Date.now()) + '</span></div>' +
           '<div class="mapbox" style="height:220px">' + mapSVG({ id: 'home', heat: true, viewBox: '60 40 320 300', car: { x: S.pos.x, y: S.pos.y, deg: -90 }, carId: 'homecar', traffic: true }) +
@@ -1085,7 +1122,7 @@
         '<div class="between"><span class="chip ' + (isTaxi ? 'chip-violet' : 'chip-pink') + '">' + ic(isTaxi ? 'taxi' : 'bag', 14) + (isTaxi ? 'Nouvelle course · Vela Taxi' : 'Nouvelle livraison · City+') + '</span>' +
           '<div class="timer" aria-label="Temps restant"><svg viewBox="0 0 36 36" width="48" height="48"><circle cx="18" cy="18" r="15" fill="none" stroke="#2a2a30" stroke-width="3"/><circle data-offer-ring cx="18" cy="18" r="15" fill="none" stroke="#c6f338" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="' + (left / o.ttl * 100).toFixed(1) + ' 100"/></svg><span data-offer-left-s>' + left + 's</span></div></div>' +
         '<div class="between" style="align-items:flex-end"><div><div class="label">' + (isTaxi ? 'Vous recevez' : 'Rémunération nette') + '</div><div class="money" style="color:var(--lime)">+' + fmt(o.net) + ' <span style="font-size:16px">FCFA</span></div>' +
-          (isTaxi ? '<div class="tiny muted">Tarif client ' + fmt(o.fare) + ' F' + (o.surge > 1 ? ' · surge x' + o.surge : '') + (o.toll ? ' · péage ' + o.toll + ' F remboursé' : '') + '</div>' : '<div class="tiny muted">Commande déjà réglée sur City+</div>') + '</div>' +
+          (isTaxi ? '<div class="tiny muted">Tarif client ' + fmt(o.fare) + ' F' + (o.surge > 1 ? ' · surge x' + o.surge : '') + ' · commission ' + fmt(o.commission) + ' F' + (o.toll ? ' · péage ' + o.toll + ' F inclus' : '') + '</div>' : '<div class="tiny muted">Commande déjà réglée sur City+</div>') + '</div>' +
           '<div style="text-align:right"><div class="label">Estimation</div><b>' + (o.approachMin + o.tripMin) + ' min · ' + (o.approachKm + o.tripKm).toFixed(1) + ' km</b></div></div>' +
         '<div class="inset between"><div class="row grow"><div class="avatar" style="width:42px;height:42px;background:' + (isTaxi ? 'linear-gradient(135deg,#6050d1,#c7bfff);color:#170065' : 'linear-gradient(135deg,#ffb1c5,#8e1347);color:#fff') + '">' + initials(c.name) + '</div>' +
           '<div class="grow"><b class="trunc" style="display:block">' + esc(c.name) + '</b><span class="small muted">' + icFill('star', 12).replace('class="ic"', 'class="ic" style="display:inline;vertical-align:-1px;color:var(--lime)"') + ' ' + c.rating + ' · ' + c.rides + (isTaxi ? ' courses' : ' commandes') + '</span></div></div>' +
@@ -1093,10 +1130,19 @@
         '<div class="inset legs" style="padding:14px">' +
           legRow('var(--lime)', isTaxi ? 'Prise en charge' : 'Collecte magasin', o.approachKm + ' km · ' + o.approachMin + ' min', pickup.name, isTaxi ? pickup.detail : (c.shop || pickup.detail), true) +
           legRow('var(--violet-soft)', isTaxi ? 'Destination' : 'Livraison client', o.tripKm + ' km · ' + o.tripMin + ' min', drop.name, drop.detail, false) + '</div>' +
-        (isTaxi ? '<div class="inset row">' + ic('wallet', 20, ' style="color:var(--violet-soft)"') + '<div class="grow small"><b>Paiement Vela Monnaie</b><div class="muted">Versement instantané sur votre portefeuille. Aucune manipulation d\'espèces.</div></div></div>'
+        (isTaxi ? payCard(o)
           : '<div class="grid-2"><div class="inset kv"><span class="label">Contenu</span><b class="trunc">' + esc(c.items) + '</b></div><div class="inset kv"><span class="label">Charge</span><b class="trunc">' + esc(c.weight) + '</b></div></div>') +
         '<div class="row"><button class="btn btn-lg" style="width:120px" data-action="decline">' + (isTaxi ? 'Passer' : 'Refuser') + '</button><button class="btn btn-lime btn-lg grow" data-action="accept">' + ic(isTaxi ? 'checkc' : 'bolt', 20) + (isTaxi ? 'Accepter la course' : 'Accepter la livraison') + '</button></div>' +
       '</div></div>';
+  }
+  function payCard(o) {
+    if (o.pay === 'Vela') {
+      return '<div class="inset row">' + ic('wallet', 20, ' style="color:var(--violet-soft)"') + '<div class="grow small"><b>Paiement Vela Monnaie</b><div class="muted">Le client paie dans l\'app. Vous recevez ' + fmt(o.net) + ' VM, commission déjà déduite.</div></div></div>';
+    }
+    const ok = S.vm >= o.commission;
+    return '<div class="inset" style="display:flex;flex-direction:column;gap:6px"><div class="row">' + ic('wallet', 20, ' style="color:var(--amber)"') + '<div class="grow small"><b>Paiement à l\'arrivée · ' + esc(o.pay) + '</b><div class="muted">Vous encaissez ' + fmt(o.fare) + ' F auprès du client.</div></div></div>' +
+      '<div class="between small"><span class="muted">Commission Vela prélevée sur votre compte</span><b style="color:' + (ok ? 'var(--fg)' : 'var(--red)') + '">−' + fmt(o.commission) + ' VM</b></div>' +
+      '<div class="between tiny muted"><span>Solde Vela après la course</span><span>' + fmt(S.vm - o.commission) + ' VM</span></div></div>';
   }
   function legRow(color, label, meta, title, sub, line) {
     return '<div class="leg"><div class="leg-rail"><span class="leg-dot" style="background:' + color + '"></span>' + (line ? '<span class="leg-line"></span>' : '') + '</div>' +
@@ -1112,9 +1158,12 @@
     if (m.phase === 'done') {
       return '<div class="stack" style="max-width:560px;margin:0 auto"><div class="card summary-hero"><div class="check-big">' + ic('check', 34) + '</div>' +
         '<h2>' + (isTaxi ? 'Course terminée' : 'Livraison confirmée') + '</h2><p class="muted" style="margin-top:4px">' + esc(pickup.short) + ' → ' + esc(drop.short) + ' · ' + m.tripKm + ' km</p>' +
-        '<div class="money" style="margin-top:14px">+' + fmt(m.net) + ' VM</div><p class="small muted">Crédités instantanément sur votre portefeuille Vela</p></div>' +
-        '<div class="card"><div class="between"><span class="muted">Nouveau solde</span><b>' + fmt(S.vm) + ' VM</b></div><div class="between"><span class="muted">Gains du jour</span><b>' + fmt(todayStats().earn) + ' FCFA</b></div>' +
-        (m.toll ? '<div class="between"><span class="muted">Péage HKB remboursé</span><b>' + m.toll + ' F</b></div>' : '') + '</div>' +
+        (isTaxi && m.pay !== 'Vela'
+          ? '<div class="money" style="margin-top:14px">' + fmt(m.fare) + ' F</div><p class="small muted">Encaissés en ' + esc(m.pay) + ' · commission −' + fmt(m.commission) + ' VM prélevée sur votre compte</p></div>'
+          : '<div class="money" style="margin-top:14px">+' + fmt(m.net) + ' VM</div><p class="small muted">Crédités instantanément sur votre portefeuille Vela</p></div>') +
+        '<div class="card"><div class="between"><span class="muted">Gain net de la course</span><b>' + fmt(m.net) + ' F</b></div><div class="between"><span class="muted">Nouveau solde Vela</span><b style="color:' + (S.vm < MIN_RESERVE && isDirect() ? 'var(--red)' : 'var(--fg)') + '">' + fmt(S.vm) + ' VM</b></div><div class="between"><span class="muted">Gains du jour</span><b>' + fmt(todayStats().earn) + ' FCFA</b></div>' +
+        (m.toll ? '<div class="between"><span class="muted">Péage HKB inclus</span><b>' + m.toll + ' F</b></div>' : '') + '</div>' +
+        (isDirect() && S.vm < MIN_RESERVE ? '<div class="card" style="background:rgba(255,90,82,.12);color:#ffb4ab"><b>Solde Vela insuffisant</b><span class="small">Vous ne recevrez plus de courses taxi tant que votre compte Vela n\'a pas au moins ' + fmt(MIN_RESERVE) + ' VM.</span><button class="btn btn-lime" data-action="goto-recharge">' + ic('plus', 18) + 'Recharger mon compte Vela</button></div>' : '') +
         '<button class="btn btn-lime btn-lg btn-block" data-action="finish">' + ic('home', 20) + 'Retour à l\'accueil</button></div>';
     }
     const target = missionTarget(m);
@@ -1126,7 +1175,7 @@
       [isTaxi ? 'En route vers la prise en charge' : 'En route vers la collecte', pickup.name],
       [isTaxi ? 'Passager à bord' : 'Colis récupéré', isTaxi ? c.name : (c.shop || pickup.detail)],
       [isTaxi ? 'En route vers la destination' : 'En route vers la cliente', drop.name],
-      [isTaxi ? 'Arrivée et paiement' : 'Remise avec code de sécurité', isTaxi ? 'Paiement Vela Monnaie' : 'Signature numérique City+']
+      [isTaxi ? 'Arrivée et paiement' : 'Remise avec code de sécurité', isTaxi ? (m.pay === 'Vela' ? 'Paiement Vela Monnaie' : 'Encaissement ' + m.pay + ' · commission sur compte Vela') : 'Signature numérique City+']
     ];
     const stepState = (i) => {
       const map = { to_pickup: 0, at_pickup: 1, to_drop: 2, at_drop: 3 };
@@ -1146,8 +1195,18 @@
         '<div class="tiny muted">' + (isTaxi ? 'Attente gratuite 3 min, puis 50 F/min facturés au client.' : 'Présentez le code de mission ' + m.id + ' au comptoir.') + '</div>' +
         '<button class="btn btn-lime btn-lg btn-block" data-action="advance">' + ic('checkc', 20) + (isTaxi ? esc(c.name) + ' est à bord' : 'Colis récupéré') + '</button>';
     } else if (m.phase === 'at_drop') {
-      if (isTaxi) {
-        action = '<div class="inset"><div class="between"><span class="muted">Tarif client</span><b>' + fmt(m.fare) + ' F</b></div>' + (m.toll ? '<div class="between small"><span class="muted">dont péage HKB</span><span>' + m.toll + ' F</span></div>' : '') + '<div class="between"><span class="muted">Commission Vela (15 %)</span><span>−' + fmt(m.fare - m.net) + ' F</span></div><div class="between" style="margin-top:6px"><b>Vous recevez</b><b style="color:var(--lime)">' + fmt(m.net) + ' VM</b></div></div>' +
+      if (isTaxi && m.pay !== 'Vela') {
+        action = '<div class="card" style="background:var(--s2)"><div class="between"><span class="label">À encaisser auprès du client</span><span class="chip chip-amber">Paiement direct</span></div>' +
+          '<div class="money">' + fmt(m.fare) + ' <span style="font-size:16px">FCFA</span></div>' +
+          '<div class="seg" role="radiogroup" aria-label="Moyen de paiement">' + DIRECT_METHODS.map((x) => '<button role="radio" aria-checked="' + (m.pay === x) + '" class="' + (m.pay === x ? 'on' : '') + '" data-action="pay-method" data-v="' + x + '">' + x + '</button>').join('') + '</div>' +
+          '<p class="tiny muted">' + (m.pay === 'Espèces' ? 'Comptez les billets avant de valider. Rendez la monnaie si besoin.' : 'Vérifiez la notification ' + esc(m.pay) + ' de ' + fmt(m.fare) + ' F sur votre téléphone avant de valider.') + '</p>' +
+          '<div class="inset" style="background:var(--bg)">' + (m.toll ? '<div class="between small"><span class="muted">dont péage HKB</span><span>' + m.toll + ' F</span></div>' : '') +
+          '<div class="between small"><span class="muted">Commission Vela 15 % (prélevée sur votre compte)</span><span>−' + fmt(m.commission) + ' VM</span></div>' +
+          '<div class="between small"><span class="muted">Solde Vela après prélèvement</span><span>' + fmt(S.vm - m.commission) + ' VM</span></div>' +
+          '<div class="between" style="margin-top:6px"><b>Votre gain net</b><b style="color:var(--lime)">' + fmt(m.net) + ' F</b></div></div></div>' +
+          '<button class="btn btn-lime btn-lg btn-block" data-action="complete">' + ic('checkc', 20) + 'J\'ai encaissé ' + fmt(m.fare) + ' F en ' + esc(m.pay) + '</button>';
+      } else if (isTaxi) {
+        action = '<div class="inset"><div class="between"><span class="muted">Tarif client (payé en VM)</span><b>' + fmt(m.fare) + ' F</b></div>' + (m.toll ? '<div class="between small"><span class="muted">dont péage HKB</span><span>' + m.toll + ' F</span></div>' : '') + '<div class="between"><span class="muted">Commission Vela (15 %)</span><span>−' + fmt(m.commission) + ' F</span></div><div class="between" style="margin-top:6px"><b>Vous recevez</b><b style="color:var(--lime)">' + fmt(m.net) + ' VM</b></div></div>' +
           '<button class="btn btn-lime btn-lg btn-block" data-action="complete">' + ic('checkc', 20) + 'Terminer la course</button>';
       } else {
         action = '<div class="card" style="background:var(--s2)"><div class="row">' + ic('lock', 20, ' style="color:var(--pink)"') + '<h3 style="font-size:16px">Code de confirmation client</h3></div>' +
@@ -1200,14 +1259,22 @@
     return '<div class="stack" style="max-width:820px">' + current +
       '<div class="stats"><div class="stat"><span class="label">Gains du jour</span><b>' + fmt(st.earn) + '</b><span class="tiny muted">FCFA</span></div><div class="stat"><span class="label">Terminées</span><b>' + st.count + '</b><span class="tiny muted">' + st.city + ' City+ · ' + st.taxi + ' Vela</span></div><div class="stat"><span class="label">Acceptation</span><b>' + st.rate + '%</b><span class="tiny muted">aujourd\'hui</span></div></div>' +
       '<div class="filters" role="tablist">' + [['all', 'Tout'], ['done', 'Terminées'], ['city', 'City+'], ['taxi', 'Vela Taxi']].map((x) => '<button role="tab" aria-selected="' + (f === x[0]) + '" class="' + (f === x[0] ? 'on' : '') + '" data-action="filter" data-f="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
-      '<div class="card" style="padding:4px 16px">' + (list.length ? '<div class="list">' + list.map((h) => '<div class="li"><span class="tile-ic ' + (h.type === 'taxi' ? 't-violet' : 't-pink') + '">' + ic(h.type === 'taxi' ? 'taxi' : 'bag', 18) + '</span><div class="grow"><b class="trunc" style="display:block">' + esc(h.from) + ' → ' + esc(h.to) + '</b><span class="tiny muted">' + (isToday(h.t) ? 'Aujourd\'hui' : new Date(h.t).toLocaleDateString('fr-FR')) + ' · ' + hm(h.t) + (h.reason ? ' · ' + esc(h.reason) : '') + '</span></div><div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px">' + (h.amount ? '<b style="color:var(--lime)">+' + fmt(h.amount) + '</b>' : '') + statusChip(h) + '</div></div>').join('') + '</div>' : '<div class="empty">Aucune mission pour ce filtre.</div>') + '</div>' +
+      '<div class="card" style="padding:4px 16px">' + (list.length ? '<div class="list">' + list.map((h) => '<div class="li"><span class="tile-ic ' + (h.type === 'taxi' ? 't-violet' : 't-pink') + '">' + ic(h.type === 'taxi' ? 'taxi' : 'bag', 18) + '</span><div class="grow"><b class="trunc" style="display:block">' + esc(h.from) + ' → ' + esc(h.to) + '</b><span class="tiny muted">' + (isToday(h.t) ? 'Aujourd\'hui' : new Date(h.t).toLocaleDateString('fr-FR')) + ' · ' + hm(h.t) + (h.collected ? ' · ' + esc(h.pay) + ' ' + fmt(h.collected) + ' F' : '') + (h.reason ? ' · ' + esc(h.reason) : '') + '</span></div><div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px">' + (h.amount ? '<b style="color:var(--lime)">+' + fmt(h.amount) + '</b>' : '') + statusChip(h) + '</div></div>').join('') + '</div>' : '<div class="empty">Aucune mission pour ce filtre.</div>') + '</div>' +
       '</div>';
   }
 
   function viewWallet() {
     const t = ui.walletTab;
     const e = ui.errors;
-    const form = t === 'convert'
+    const form = t === 'recharge'
+      ? '<p class="small muted">' + (isDirect() ? 'En paiement direct, les commissions de vos courses sont prélevées sur ce solde. Gardez au moins ' + fmt(MIN_RESERVE) + ' VM pour recevoir des courses taxi.' : 'Rechargez votre compte Vela depuis Mobile Money. 1 F = 1 VM.') + '</p>' +
+        '<div class="field"><label for="rcAmt">Montant à recharger (F)</label><input class="input' + (e.rc ? ' err' : '') + '" id="rcAmt" inputmode="numeric" placeholder="Minimum 1 000" value="' + (ui.rcVal || '') + '"></div>' +
+        '<div class="row wrap">' + [2000, 5000, 10000].map((v) => '<button class="btn btn-sm" data-action="preset" data-field="rcAmt" data-v="' + v + '">' + fmt(v) + '</button>').join('') + '</div>' +
+        '<div class="field"><label for="rcOp">Depuis</label><select class="input" id="rcOp">' + ['Wave', 'Orange Money', 'MTN MoMo', 'Moov Money'].map((o) => '<option' + (ui.rcOp === o ? ' selected' : '') + '>' + o + '</option>').join('') + '</select></div>' +
+        '<div class="field"><label for="rcNum">Numéro Mobile Money</label><input class="input' + (e.rcNum ? ' err' : '') + '" id="rcNum" inputmode="tel" value="' + esc(ui.rcNum || '07 48 21 90 12') + '"></div>' +
+        (e.rc ? '<p class="err-msg">' + e.rc + '</p>' : '') + (e.rcNum ? '<p class="err-msg">' + e.rcNum + '</p>' : '') +
+        '<button class="btn btn-lime btn-lg btn-block" data-action="recharge">' + ic('plus', 20) + 'Recharger mon compte Vela</button>'
+      : t === 'convert'
       ? '<div class="field"><label for="convAmt">Montant à convertir (VM)</label><input class="input' + (e.conv ? ' err' : '') + '" id="convAmt" inputmode="numeric" placeholder="Ex. 10 000" value="' + (ui.convVal || '') + '"></div>' +
         (e.conv ? '<p class="err-msg">' + e.conv + '</p>' : '') +
         '<div class="row wrap">' + [5000, 10000, 20000].map((v) => '<button class="btn btn-sm" data-action="preset" data-field="convAmt" data-v="' + v + '">' + fmt(v) + '</button>').join('') + '<button class="btn btn-sm" data-action="preset" data-field="convAmt" data-v="' + S.vm + '">Tout</button></div>' +
@@ -1219,9 +1286,9 @@
         (e.wd ? '<p class="err-msg">' + e.wd + '</p>' : '') + (e.wdNum ? '<p class="err-msg">' + e.wdNum + '</p>' : '') +
         '<button class="btn btn-lime btn-lg btn-block" data-action="withdraw">' + ic('send', 20) + 'Retirer vers Mobile Money</button>';
     return '<div class="stack" style="max-width:820px"><div class="home-grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">' +
-      '<div class="card"><div class="glow" style="right:-40px;top:-40px;width:160px;height:160px;background:rgba(96,80,209,.25)"></div><span class="label">Vela Monnaie</span><div class="row" style="align-items:baseline;gap:8px"><span class="num" style="font-size:32px">' + fmt(S.vm) + '</span><b style="color:var(--violet-soft)">VM</b></div><span class="small muted">Gains des courses et livraisons</span></div>' +
+      '<div class="card"><div class="glow" style="right:-40px;top:-40px;width:160px;height:160px;background:rgba(96,80,209,.25)"></div><span class="label">Vela Monnaie</span><div class="row" style="align-items:baseline;gap:8px"><span class="num" style="font-size:32px">' + fmt(S.vm) + '</span><b style="color:var(--violet-soft)">VM</b></div><span class="small ' + (isDirect() && S.vm < MIN_RESERVE ? '" style="color:var(--red)">Sous le minimum de ' + fmt(MIN_RESERVE) + ' VM · courses taxi bloquées' : 'muted">' + (isDirect() ? 'Sert à payer les commissions (min. ' + fmt(MIN_RESERVE) + ' VM)' : 'Gains des courses et livraisons')) + '</span></div>' +
       '<div class="card"><span class="label">Solde FCFA</span><div class="row" style="align-items:baseline;gap:8px"><span class="num" style="font-size:32px">' + fmt(S.fcfa) + '</span><b style="color:var(--lime)">F</b></div><span class="small muted">Disponible pour retrait Mobile Money</span></div></div>' +
-      '<div class="card"><div class="seg" role="tablist"><button role="tab" class="' + (t === 'convert' ? 'on' : '') + '" data-action="wtab" data-t="convert">Convertir</button><button role="tab" class="' + (t === 'withdraw' ? 'on' : '') + '" data-action="wtab" data-t="withdraw">Retirer</button></div>' + form + '</div>' +
+      '<div class="card"><div class="seg" role="tablist"><button role="tab" class="' + (t === 'recharge' ? 'on' : '') + '" data-action="wtab" data-t="recharge">Recharger</button><button role="tab" class="' + (t === 'convert' ? 'on' : '') + '" data-action="wtab" data-t="convert">Convertir</button><button role="tab" class="' + (t === 'withdraw' ? 'on' : '') + '" data-action="wtab" data-t="withdraw">Retirer</button></div>' + form + '</div>' +
       '<div class="card" style="padding:14px 16px 4px"><span class="label">Transactions</span><div class="list">' + S.tx.slice(0, 20).map((x) => '<div class="li"><span class="tile-ic ' + (x.amount > 0 ? 't-lime' : 't-grey') + '">' + ic(x.amount > 0 ? 'plus' : 'send', 16) + '</span><div class="grow"><b class="small trunc" style="display:block">' + esc(x.label) + '</b><span class="tiny muted">' + (isToday(x.t) ? 'Aujourd\'hui' : new Date(x.t).toLocaleDateString('fr-FR')) + ' · ' + hm(x.t) + '</span></div><b style="color:' + (x.amount > 0 ? 'var(--lime)' : 'var(--mut)') + '">' + (x.amount > 0 ? '+' : '−') + fmt(Math.abs(x.amount)) + ' ' + x.unit + '</b></div>').join('') + '</div></div></div>';
   }
 
@@ -1232,7 +1299,8 @@
         '<div class="grid-2"><div class="inset kv"><span class="label">Véhicule</span><b class="trunc">' + esc(S.driver.vehicle) + '</b></div><div class="inset kv"><span class="label">Immatriculation</span><b>' + esc(S.driver.plate) + '</b></div></div></div>' +
       '<div class="card"><span class="label">Services</span>' +
         settingRow('bag', 't-pink', 'Livraisons City+', 'Mode & colis express', 'svc-city', S.services.city) +
-        settingRow('taxi', 't-violet', 'Courses Vela Taxi', 'Passagers, paiement VM', 'svc-taxi', S.services.taxi) +
+        settingRow('taxi', 't-violet', 'Courses Vela Taxi', 'Passagers Vela', 'svc-taxi', S.services.taxi) +
+        settingRow('wallet', 't-violet', 'Paiement in-app Vela', S.payMode === 'vela' ? 'Le client paie en VM, commission déduite automatiquement' : 'Désactivé : le client paie à l\'arrivée (espèces, Wave, Orange Money). Commission 15 % prélevée sur votre compte Vela, min. ' + fmt(MIN_RESERVE) + ' VM', 'pay-mode', S.payMode === 'vela') +
         settingRow('vol', 't-lime', 'Guidage vocal', 'Annonces en français', 'voice', S.voice) +
         '<div class="between"><div class="row">' + '<span class="tile-ic t-grey">' + ic('bolt', 18) + '</span><div><b>Vitesse de simulation</b><div class="tiny muted">Démo : accélère la conduite</div></div></div><div class="seg" style="width:150px">' + [1, 2, 4].map((v) => '<button class="' + (S.sim === v ? 'on' : '') + '" data-action="sim" data-v="' + v + '">×' + v + '</button>').join('') + '</div></div></div>' +
       '<div class="card"><div class="between"><span class="label">Proches de confiance</span><span class="tiny muted">Partage de trajet &amp; SOS</span></div>' +
@@ -1630,6 +1698,7 @@
       if (!v) return fail('conv', 'Saisissez un montant.');
       if (v < 500) return fail('conv', 'Montant minimum : 500 VM.');
       if (v > S.vm) return fail('conv', 'Solde insuffisant : ' + fmt(S.vm) + ' VM disponibles.');
+      if (isDirect() && S.vm - v < MIN_RESERVE) return fail('conv', 'En paiement direct, gardez au moins ' + fmt(MIN_RESERVE) + ' VM pour les commissions (max. ' + fmt(Math.max(0, S.vm - MIN_RESERVE)) + ' VM convertibles).');
       S.vm -= v; S.fcfa += v;
       const t = Date.now();
       S.tx.unshift({ id: uid(), label: 'Conversion VM → FCFA', amount: v, unit: 'F', t }, { id: uid(), label: 'Conversion VM → FCFA', amount: -v, unit: 'VM', t });
@@ -1653,6 +1722,34 @@
       save(); render(); toast('Retrait envoyé vers ' + ui.wdOp);
     },
     'svc-city': () => toggleService('city'),
+    'pay-mode': () => {
+      S.payMode = isDirect() ? 'vela' : 'direct';
+      if (S.offer && S.offer.type === 'taxi') closeOffer('expired');
+      notify(isDirect() ? 'Paiement Vela désactivé · courses payées à l\'arrivée' : 'Paiement Vela activé');
+      save(); render();
+      if (isDirect() && S.vm < MIN_RESERVE) toast('Solde Vela insuffisant : rechargez au moins ' + fmt(MIN_RESERVE - S.vm) + ' VM pour recevoir des courses');
+      else toast(isDirect() ? 'Courses payées à l\'arrivée · commission prélevée sur votre compte Vela' : 'Paiement Vela activé');
+    },
+    'pay-method': (el) => { if (S.mission) { S.mission.pay = el.dataset.v; save(); render(); } },
+    'goto-recharge': () => openRecharge(),
+    recharge: () => {
+      const v = parseAmount($('rcAmt').value);
+      const num = $('rcNum').value.replace(/\D/g, '').replace(/^225/, '');
+      ui.rcVal = $('rcAmt').value; ui.rcNum = $('rcNum').value; ui.rcOp = $('rcOp').value;
+      ui.errors = {};
+      if (!v || v < 1000) ui.errors.rc = 'Montant minimum de recharge : 1 000 F.';
+      else if (v > 500000) ui.errors.rc = 'Montant maximum par recharge : 500 000 F.';
+      if (!/^(01|05|07)\d{8}$/.test(num)) ui.errors.rcNum = 'Numéro ivoirien à 10 chiffres commençant par 01, 05 ou 07.';
+      if (ui.errors.rc || ui.errors.rcNum) { render(); return; }
+      const wasBlocked = taxiBlocked();
+      S.vm += v;
+      S.tx.unshift({ id: uid(), label: 'Recharge ' + ui.rcOp + ' · ' + num.slice(0, 2) + ' •• •• ' + num.slice(-2), amount: v, unit: 'VM', t: Date.now() });
+      notify('Compte Vela rechargé de ' + fmt(v) + ' VM via ' + ui.rcOp);
+      ui.rcVal = '';
+      if (wasBlocked && !taxiBlocked()) ui.nextOfferAt = Date.now() + 5000;
+      save(); render();
+      toast(wasBlocked && !taxiBlocked() ? 'Compte rechargé · courses taxi réactivées' : 'Compte Vela rechargé de ' + fmt(v) + ' VM');
+    },
     'svc-taxi': () => toggleService('taxi'),
     voice: () => { S.voice = !S.voice; save(); render(); toast(S.voice ? 'Guidage vocal activé' : 'Guidage vocal désactivé'); },
     sim: (el) => { S.sim = +el.dataset.v; save(); render(); },
@@ -1689,6 +1786,13 @@
       toast('Démo réinitialisée');
     }
   };
+  function openRecharge() {
+    closeSheet();
+    if (ui.driving) exitDrive(true);
+    ui.walletTab = 'recharge';
+    ui.errors = {};
+    go('wallet');
+  }
   function fail(key, msg) { ui.errors = {}; ui.errors[key] = msg; render(); }
   function parseAmount(s) { return parseInt(String(s).replace(/\D/g, ''), 10) || 0; }
   function toggleService(t) {
@@ -1749,6 +1853,7 @@
       if (full && i === 3) checkPin();
     }
     if (t.id === 'convAmt') { const v = parseAmount(t.value); t.value = v ? fmt(v) : ''; ui.convVal = t.value; }
+    if (t.id === 'rcAmt') { const v = parseAmount(t.value); t.value = v ? fmt(v) : ''; ui.rcVal = t.value; }
     if (t.id === 'wdAmt') { const v = parseAmount(t.value); t.value = v ? fmt(v) : ''; ui.wdVal = t.value; }
   });
   document.addEventListener('keydown', (e) => {
