@@ -121,9 +121,9 @@ export default function CallScreen() {
         {/* Scène de l'appel */}
         <View style={styles.stage}>
           <View style={styles.rings}>
-            <Pulse style={[styles.ring, { width: 176, height: 176, backgroundColor: 'rgba(232,89,12,0.1)' }]} />
+            <Pulse style={[styles.ring, { width: 176, height: 176, backgroundColor: 'rgba(17,24,39,0.1)' }]} />
             <View style={[styles.ring, { width: 144, height: 144, backgroundColor: 'rgba(255,196,0,0.3)' }]} />
-            <View style={[styles.ring, { width: 112, height: 112, backgroundColor: 'rgba(255,210,170,0.4)' }]} />
+            <View style={[styles.ring, { width: 112, height: 112, backgroundColor: 'rgba(209,213,219,0.4)' }]} />
             <View style={styles.bigAvatar}>
               <Avatar name={favoriteDriver.fullName} size={96} radius={48} />
               <View style={styles.ratingBand}>
@@ -170,7 +170,7 @@ export default function CallScreen() {
           </View>
           <View style={styles.miniMap}>
             <CityMap style={StyleSheet.absoluteFill} animated={false} />
-            <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(232,89,12,0.1)' }]}>
+            <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(17,24,39,0.1)' }]}>
               <View style={styles.miniCar}>
                 <Icon name="directions-car" size={18} color={colors.onPrimary} />
               </View>
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   rings: { width: 176, height: 176, alignItems: 'center', justifyContent: 'center' },
   ring: { position: 'absolute', borderRadius: 100 },
   bigAvatar: { width: 96, height: 96, borderRadius: 48, overflow: 'hidden', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
-  ratingBand: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(232,89,12,0.75)' },
+  ratingBand: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(17,24,39,0.75)' },
   eq: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 24, marginVertical: 8 },
   eta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4, backgroundColor: colors.primaryFixed, paddingHorizontal: 16, paddingVertical: 4, borderRadius: 12 },
   mini: { flexDirection: 'row', alignItems: 'center', gap: 16, borderRadius: 16, backgroundColor: colors.surfaceLowest, padding: 16, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },

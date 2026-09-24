@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: 16, paddingTop: 16, gap: 24 },
   card: { minHeight: 220, borderRadius: 16, backgroundColor: '#16181D', padding: 24, overflow: 'hidden', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   glowLime: { position: 'absolute', right: -48, top: -48, width: 192, height: 192, borderRadius: 96, backgroundColor: 'rgba(255,196,0,0.2)' },
-  glowViolet: { position: 'absolute', left: -40, bottom: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(255,122,26,0.35)' },
+  glowViolet: { position: 'absolute', left: -40, bottom: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(17,24,39,0.35)' },
   cardBtn: {
     flex: 1,
     height: 48,

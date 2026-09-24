@@ -1,13 +1,13 @@
 import type { TextStyle } from 'react-native';
 
-// Palette « jeune et réaliste » : orange taxi d'Abidjan pour l'action, jaune soleil,
-// vert, bleu et rose en accents, sur des fonds blancs et gris neutres.
+// Palette premium : noir profond pour l'action (comme les apps de VTC haut de gamme),
+// jaune soleil, vert, bleu et rose en accents, sur des fonds blancs et gris neutres.
 export const colors = {
-  primary: '#E8590C',
-  primaryContainer: '#FF7A1A',
-  primaryFixed: '#FFE8D6',
+  primary: '#111827',
+  primaryContainer: '#1F2937',
+  primaryFixed: '#E5E7EB',
   onPrimary: '#ffffff',
-  onPrimaryContainer: '#FFE0C7',
+  onPrimaryContainer: '#D1D5DB',
 
   secondary: '#00875F',
   secondaryContainer: '#FFC400',
@@ -33,8 +33,8 @@ export const colors = {
   // Écran « course active »
   ink: '#14161A',
   inkSoft: '#3D4350',
-  violetSoft: '#FFF1E6',
-  violetMist: '#FFF8F2',
+  violetSoft: '#F3F4F6',
+  violetMist: '#F7F7F8',
   violetCard: '#F7F8FA',
   border: '#E3E6EB',
 

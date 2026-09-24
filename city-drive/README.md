@@ -32,7 +32,7 @@ npm run typecheck
 
 ## Couleurs
 
-Palette « jeune et réaliste » définie dans `src/constants/theme.ts` : orange taxi d'Abidjan (`primary`) pour les actions, jaune soleil (`secondaryContainer`), vert, bleu et rose en accents, sur des fonds blancs et gris neutres. Chaque grande carte a sa couleur : portefeuille noir/jaune, Gold Club bleu, reçu vert.
+Palette premium définie dans `src/constants/theme.ts` : noir profond (`primary`) pour les actions, jaune soleil (`secondaryContainer`), vert, bleu et rose en accents, sur des fonds blancs et gris neutres. Chaque grande carte a sa couleur : portefeuille noir/jaune, Gold Club bleu, reçu vert.
 
 ## Style visuel
 

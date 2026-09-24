@@ -60,9 +60,9 @@ export default function StopsScreen() {
             <Defs>
               <LinearGradient id="route" x1="0" y1="0.1" x2="1" y2="0.9">
                 <Stop offset="0" stopColor="#C8F53A" />
-                <Stop offset="0.35" stopColor="#FF7A1A" />
+                <Stop offset="0.35" stopColor="#1F2937" />
                 <Stop offset="0.7" stopColor="#991E50" />
-                <Stop offset="1" stopColor="#E8590C" />
+                <Stop offset="1" stopColor="#111827" />
               </LinearGradient>
             </Defs>
             <Path d={ROUTE} stroke="url(#route)" strokeWidth={12} strokeLinecap="round" fill="none" opacity={0.3} />
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   checkOff: { backgroundColor: colors.surfaceLowest, borderWidth: 2, borderColor: colors.outlineVariant, boxShadow: undefined },
   face: { width: 40, height: 40, borderRadius: 20, marginLeft: -8, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   price: { padding: 16, borderRadius: 16, backgroundColor: colors.ink, gap: 8, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
-  split: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10, borderRadius: 12, backgroundColor: 'rgba(232,89,12,0.2)' },
+  split: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10, borderRadius: 12, backgroundColor: 'rgba(17,24,39,0.2)' },
   cta: {
     height: 56,
     borderRadius: 12,

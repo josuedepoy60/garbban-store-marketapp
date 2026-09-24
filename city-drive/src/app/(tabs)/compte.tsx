@@ -266,7 +266,7 @@ export default function AccountScreen() {
               <View key={p.id}>
                 <Row
                   icon={p.icon}
-                  iconBg="rgba(232,89,12,0.1)"
+                  iconBg="rgba(17,24,39,0.1)"
                   title={p.label}
                   subtitle={p.address}
                   right={

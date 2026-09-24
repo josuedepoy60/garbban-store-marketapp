@@ -21,7 +21,7 @@ const dark = {
   onSurfaceVariant: '#c4c9ae',
   lime: '#FFC400',
   onLime: '#283500',
-  violet: '#FF9A3C',
+  violet: '#2F6BFF',
   pink: '#ffb1c5',
   pinkContainer: '#8e1347',
   onPinkContainer: '#ff9bb7',
@@ -40,9 +40,9 @@ function CockpitMap() {
     <Svg width="100%" height="100%" viewBox="0 0 400 620" preserveAspectRatio="xMidYMid slice">
       <Defs>
         <LinearGradient id="lagoon" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor="#FF7A1A" stopOpacity={0.35} />
+          <Stop offset="0" stopColor="#1F2937" stopOpacity={0.35} />
           <Stop offset="0.5" stopColor="#14161A" stopOpacity={0.7} />
-          <Stop offset="1" stopColor="#E8590C" stopOpacity={0.4} />
+          <Stop offset="1" stopColor="#111827" stopOpacity={0.4} />
         </LinearGradient>
         <LinearGradient id="gps" x1="0" y1="1" x2="1" y2="0">
           <Stop offset="0" stopColor={dark.lime} />
@@ -84,7 +84,7 @@ function CockpitMap() {
 
       {/* Destination : tour CCIA */}
       <G transform="translate(290, 80)">
-        <Circle r={14} fill="#FF7A1A" opacity={0.3} />
+        <Circle r={14} fill="#1F2937" opacity={0.3} />
         <Circle r={8} fill={dark.lime} />
         <Circle r={4} fill="#14161A" />
       </G>
@@ -96,7 +96,7 @@ function CockpitMap() {
         <G rotation={-30}>
           <Polygon points="-7,-18 7,-18 16,-44 -16,-44" fill={dark.lime} opacity={0.35} />
           <Rect x={-10} y={-18} width={20} height={36} rx={7} fill="#14161A" />
-          <Rect x={-8} y={-12} width={16} height={24} rx={4} fill="#E8590C" />
+          <Rect x={-8} y={-12} width={16} height={24} rx={4} fill="#111827" />
           <Line x1={-5} y1={0} x2={5} y2={0} stroke={dark.lime} strokeWidth={3} strokeLinecap="round" />
           <Circle cx={-6} cy={17} r={2} fill="#ba1a1a" />
           <Circle cx={6} cy={17} r={2} fill="#ba1a1a" />

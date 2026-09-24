@@ -62,7 +62,7 @@ export default function ActiveRideScreen() {
           <CityMap style={StyleSheet.absoluteFill} />
           <LinearGradient
             pointerEvents="none"
-            colors={['rgba(255,248,242,0.4)', 'rgba(255,248,242,0)', 'rgba(255,248,242,0.8)', '#FFFFFF']}
+            colors={['rgba(247,247,248,0.4)', 'rgba(247,247,248,0)', 'rgba(247,247,248,0.8)', '#FFFFFF']}
             locations={[0, 0.4, 0.9, 1]}
             style={StyleSheet.absoluteFill}
           />
@@ -96,7 +96,7 @@ export default function ActiveRideScreen() {
               <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: colors.secondaryContainer }} />
             </View>
             <View>
-              <Pulse style={[StyleSheet.absoluteFill, { borderRadius: 22, backgroundColor: 'rgba(255,122,26,0.35)' }]} />
+              <Pulse style={[StyleSheet.absoluteFill, { borderRadius: 22, backgroundColor: 'rgba(17,24,39,0.35)' }]} />
               <View style={styles.car}>
                 <Icon name="directions-car" size={20} color="#fff" />
               </View>
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: 'rgba(255,248,242,0.95)',
+    backgroundColor: 'rgba(247,247,248,0.95)',
     boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
     zIndex: 10,
   },

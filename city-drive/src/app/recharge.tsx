@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: 16, paddingTop: 12, gap: 16 },
   stepChip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 6, borderRadius: 12, backgroundColor: colors.surfaceHigh },
   hero: { borderRadius: 16, backgroundColor: colors.surfaceLowest, padding: 24, gap: 4, overflow: 'hidden', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
-  heroGlow: { position: 'absolute', right: -40, bottom: -40, width: 144, height: 144, borderRadius: 72, backgroundColor: 'rgba(255,232,214,0.4)' },
+  heroGlow: { position: 'absolute', right: -40, bottom: -40, width: 144, height: 144, borderRadius: 72, backgroundColor: 'rgba(229,231,235,0.4)' },
   offered: { position: 'absolute', right: 16, top: 16, paddingHorizontal: 12, paddingVertical: 4 },
   reward: { marginTop: 12, padding: 8, borderRadius: 16, backgroundColor: colors.surfaceLow, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   rewardIcon: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.primaryContainer, alignItems: 'center', justifyContent: 'center' },

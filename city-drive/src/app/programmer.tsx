@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     boxShadow: shadows.soft,
   },
   routeCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 16, padding: 16, gap: 16, overflow: 'hidden', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
-  blob: { position: 'absolute', right: -32, top: -32, width: 112, height: 112, borderRadius: 56, backgroundColor: 'rgba(255,232,214,0.5)' },
+  blob: { position: 'absolute', right: -32, top: -32, width: 112, height: 112, borderRadius: 56, backgroundColor: 'rgba(229,231,235,0.5)' },
   fromDot: { width: 14, height: 14, borderRadius: 7, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', boxShadow: `0px 0px 0px 4px ${colors.primaryFixed}` },
   timeline: { width: 2, height: 40, borderRadius: 1, marginVertical: 2 },
   toDot: { width: 14, height: 14, borderRadius: 6, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center' },

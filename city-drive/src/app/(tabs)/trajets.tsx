@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     gap: 8,
     boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
   },
-  pinIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(232,89,12,0.1)', alignItems: 'center', justifyContent: 'center' },
+  pinIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(17,24,39,0.1)', alignItems: 'center', justifyContent: 'center' },
   itinerary: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surfaceHigh, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 },
   filter: { height: 36, paddingHorizontal: 14, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.surfaceLowest, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   filterActive: { backgroundColor: colors.primary, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },

@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     boxShadow: shadows.sheet,
   },
   search: { height: 56, borderRadius: 12, backgroundColor: colors.surfaceLow, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 10 },
-  searchIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(232,89,12,0.1)', alignItems: 'center', justifyContent: 'center' },
+  searchIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(17,24,39,0.1)', alignItems: 'center', justifyContent: 'center' },
   searchInput: { flex: 1, fontFamily: fonts.sora600, fontSize: 17, color: colors.onSurface, paddingVertical: 0 },
   mic: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(229,222,255,0.8)', alignItems: 'center', justifyContent: 'center' },
   shortcuts: { flexDirection: 'row', justifyContent: 'space-between' },
