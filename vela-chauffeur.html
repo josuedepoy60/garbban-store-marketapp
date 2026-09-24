@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html class="dark" lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Vela Chauffeur</title>
+<meta name="theme-color" content="#131316">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0..1,0&display=block" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: { extend: {
+      colors: {
+        "surface-container-lowest": "#0e0e11", "surface": "#131316", "surface-container-low": "#1b1b1e",
+        "surface-container": "#1f1f22", "surface-container-high": "#2a2a2d", "surface-container-highest": "#353438",
+        "surface-variant": "#353438", "on-surface": "#e4e1e6", "on-surface-variant": "#c4c9ae", "outline": "#8e937b",
+        "primary": "#ffffff", "on-primary": "#283500", "primary-container": "#c6f338", "on-primary-container": "#556d00",
+        "primary-fixed": "#c6f338", "primary-fixed-dim": "#abd611", "on-primary-fixed": "#161f00",
+        "secondary": "#ffb1c5", "secondary-container": "#8e1347", "on-secondary-container": "#ff9bb7",
+        "tertiary-container": "#e4dfff", "tertiary-fixed": "#e4dfff", "on-tertiary-fixed": "#170065",
+        "on-tertiary-container": "#6050d1", "error": "#ffb4ab"
+      },
+      borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+      spacing: { "space-xs": "0.25rem", "space-sm": "0.5rem", "space-md": "1rem", "space-lg": "1.5rem", "space-xl": "2rem",
+                 "gutter": "1rem", "gutter-mobile": "0.75rem", "margin-mobile": "1rem", "margin": "1.5rem" },
+      fontFamily: {
+        "currency-display": ["Sora", "system-ui", "sans-serif"], "headline-xl-mobile": ["Sora", "system-ui", "sans-serif"],
+        "headline-md": ["Sora", "system-ui", "sans-serif"], "headline-sm": ["Sora", "system-ui", "sans-serif"],
+        "body-md": ["DM Sans", "system-ui", "sans-serif"], "body-sm": ["DM Sans", "system-ui", "sans-serif"],
+        "label-lg": ["DM Sans", "system-ui", "sans-serif"], "label-md": ["DM Sans", "system-ui", "sans-serif"],
+        "label-sm": ["DM Sans", "system-ui", "sans-serif"]
+      },
+      fontSize: {
+        "currency-display": ["32px", { lineHeight: "38px", fontWeight: "700" }],
+        "headline-xl-mobile": ["28px", { lineHeight: "34px", fontWeight: "700" }],
+        "headline-md": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+        "headline-sm": ["16px", { lineHeight: "22px", fontWeight: "600" }],
+        "body-md": ["15px", { lineHeight: "22px", fontWeight: "400" }],
+        "body-sm": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+        "label-lg": ["14px", { lineHeight: "18px", fontWeight: "700" }],
+        "label-md": ["12px", { lineHeight: "16px", fontWeight: "600" }],
+        "label-sm": ["10px", { lineHeight: "14px", fontWeight: "600" }]
+      }
+    } }
+  };
+</script>
+<style>
+  :root { color-scheme: dark; }
+  [hidden] { display: none !important; }
+  html, body { background: #131316; color: #e4e1e6; }
+  body { margin: 0; overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; font-variant-numeric: tabular-nums; }
+  .app { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; background: #131316; }
+  .bar { position: sticky; z-index: 50; }
+  .top-bar { top: env(safe-area-inset-top, 0px); }
+  .bottom-bar { bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .material-symbols-outlined { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; line-height: 1;
+    letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; direction: ltr;
+    -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; }
+  .fill { font-variation-settings: 'FILL' 1; }
+  .pin { caret-color: #c6f338; }
+  .pin:focus { outline: 2px solid #c6f338; outline-offset: 0; }
+  button:focus-visible, a:focus-visible { outline: 2px solid #c6f338; outline-offset: 2px; }
+  .toast { transform: translate(-50%, -150%); transition: transform .3s; }
+  .toast.show { transform: translate(-50%, 12px); }
+  .screen { animation: in .25s ease; }
+  @keyframes in { from { opacity: .4; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="app flex flex-col font-body-md text-body-md text-on-surface antialiased">
+
+  <!-- ===== En-tête commun ===== -->
+  <header class="bar top-bar bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.35)]">
+    <div class="h-16 px-gutter flex items-center justify-between">
+      <div class="flex items-center gap-space-sm min-w-0">
+        <button id="backBtn" class="w-11 h-11 -ml-2 flex items-center justify-center text-on-surface hover:text-primary-container" aria-label="Retour" hidden>
+          <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+        </button>
+        <div id="liveDot" class="w-2.5 h-2.5 rounded-full bg-primary-container animate-pulse"></div>
+        <h1 id="pageTitle" class="font-headline-sm text-headline-sm tracking-tight truncate">Accueil</h1>
+      </div>
+      <div class="flex items-center gap-space-sm">
+        <button id="notifBtn" class="relative w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface" aria-label="Notifications">
+          <span class="material-symbols-outlined text-[22px]">notifications</span>
+          <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-secondary"></span>
+        </button>
+        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 flex flex-col w-full">
+
+    <!-- =========================================================
+         ÉCRAN 1 · ACCUEIL CHAUFFEUR
+         ========================================================= -->
+    <section class="screen flex flex-col px-margin-mobile pt-space-sm pb-space-lg gap-space-md" data-screen="accueil" data-title="Accueil">
+      <div class="flex items-center justify-between gap-space-sm">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="relative shrink-0">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-on-tertiary-container to-secondary-container flex items-center justify-center font-headline-sm text-headline-sm">KT</div>
+            <div class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-primary-container ring-2 ring-surface" id="avatarDot"></div>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-space-xs">
+              <span class="font-headline-md text-headline-md tracking-tight truncate">Bonsoir, Koffi</span>
+              <span class="material-symbols-outlined fill text-[16px] text-primary-container">verified</span>
+            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant truncate">City Drive · Chauffeur-livreur</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded-full shrink-0">
+          <span class="material-symbols-outlined text-[15px] text-primary-container">near_me</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant">HD</span>
+          <span class="w-px h-3 bg-surface-container-highest mx-1"></span>
+          <span class="material-symbols-outlined text-[15px] text-on-surface-variant">battery_charging_full</span>
+          <span class="font-label-sm text-label-sm">94%</span>
+        </div>
+      </div>
+
+      <div class="bg-surface-container-low rounded-xl p-space-sm flex items-center justify-between gap-space-sm">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <button id="statusToggle" role="switch" aria-checked="true" aria-label="Disponibilité"
+                  class="relative inline-flex h-8 w-14 shrink-0 rounded-full bg-primary-container p-0.5 transition-colors">
+            <span id="statusKnob" class="h-7 w-7 translate-x-6 rounded-full bg-on-primary-container shadow-md transition flex items-center justify-center">
+              <span id="statusPing" class="w-2 h-2 rounded-full bg-primary-container animate-ping"></span>
+            </span>
+          </button>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span id="statusDot" class="w-2 h-2 rounded-full bg-primary-container"></span>
+              <span id="statusLabel" class="font-label-lg text-label-lg">En ligne</span>
+            </div>
+            <p id="statusSub" class="font-label-sm text-label-sm text-on-surface-variant truncate">Prêt pour nouvelles courses</p>
+          </div>
+        </div>
+        <div class="bg-surface-container-high px-space-sm py-1.5 rounded-lg flex items-center gap-1 shrink-0">
+          <span class="material-symbols-outlined text-[15px] text-primary-container">location_on</span>
+          <span class="font-label-md text-label-md">Cocody · Riviera</span>
+        </div>
+      </div>
+
+      <div class="bg-primary-container text-on-primary-container rounded-xl p-space-md shadow-xl relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-on-primary-container/10 blur-xl pointer-events-none"></div>
+        <div class="relative flex flex-col gap-space-sm">
+          <div class="flex items-center justify-between">
+            <span class="font-label-md text-label-md tracking-wider uppercase">Gains aujourd'hui</span>
+            <span class="bg-on-primary-container/15 px-2.5 py-0.5 rounded-full flex items-center gap-1 font-label-sm text-label-sm">
+              <span class="material-symbols-outlined text-[14px]">trending_up</span>+18% vs hier
+            </span>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span id="earnings" class="font-currency-display text-currency-display tracking-tight">18 500</span>
+            <span class="font-headline-sm text-headline-sm">FCFA</span>
+          </div>
+          <div class="bg-on-primary-container/10 rounded-lg p-space-sm flex items-center justify-between gap-2 flex-wrap">
+            <span class="flex items-center gap-2 font-label-md text-label-md"><span class="material-symbols-outlined text-[18px]">checkroom</span><span id="countCity">8</span> livraisons City+</span>
+            <span class="flex items-center gap-2 font-label-md text-label-md"><span class="material-symbols-outlined text-[18px]">local_taxi</span><span id="countVela">4</span> courses Vela</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-44 h-44 rounded-full bg-on-tertiary-container/10 blur-2xl pointer-events-none"></div>
+        <div class="flex items-center justify-between relative">
+          <span class="bg-on-tertiary-container/20 text-tertiary-fixed px-space-sm py-0.5 rounded-full flex items-center gap-1.5 font-label-sm text-label-sm uppercase tracking-wide">
+            <span class="material-symbols-outlined text-[15px]">sync_alt</span>Compte Vela lié
+          </span>
+          <button class="text-tertiary-fixed flex items-center gap-0.5 font-label-sm text-label-sm hover:opacity-80" data-toast="Conversion 42 300 VM → FCFA disponible sans frais">
+            Convertir<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+          </button>
+        </div>
+        <div class="relative flex flex-col gap-0.5">
+          <span class="font-body-sm text-body-sm text-on-surface-variant">Solde disponible</span>
+          <div class="flex items-baseline gap-2">
+            <span id="vmBalance" class="font-headline-xl-mobile text-headline-xl-mobile">42 300</span>
+            <span class="font-headline-sm text-headline-sm text-tertiary-fixed">VM</span>
+          </div>
+        </div>
+        <div class="bg-surface-container rounded-lg p-space-sm flex items-center gap-space-sm relative">
+          <span class="material-symbols-outlined text-tertiary-fixed text-[20px] shrink-0">account_balance_wallet</span>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">Disponible pour conversion directe FCFA sans frais ou dépenses super-app.</p>
+        </div>
+      </div>
+
+      <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-secondary-container/40 flex items-center justify-center text-secondary"><span class="material-symbols-outlined text-[18px]">shopping_bag</span></div>
+            <div>
+              <h2 class="font-headline-sm text-headline-sm leading-tight">Livraisons City+</h2>
+              <span class="font-body-sm text-body-sm text-on-surface-variant">Mode &amp; Colis express</span>
+            </div>
+          </div>
+          <span id="pendingBadge" class="bg-secondary-container/30 text-secondary px-2.5 py-1 rounded-full font-label-sm text-label-sm uppercase tracking-wider shrink-0">2 en attente</span>
+        </div>
+        <div class="bg-surface-container rounded-lg p-space-sm flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-secondary shrink-0">storefront</span>
+          <div class="min-w-0">
+            <p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Point relais assigné</p>
+            <p class="font-label-md text-label-md truncate">Angré 8e Tranche · Boutique N°14</p>
+          </div>
+        </div>
+        <button class="w-full bg-surface-container-high hover:bg-surface-container-highest py-3 rounded-lg flex items-center justify-center gap-2" data-go="offre-city">
+          <span class="font-label-lg text-label-lg">Voir les missions</span><span class="material-symbols-outlined text-[16px] text-secondary">arrow_forward</span>
+        </button>
+      </div>
+
+      <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-tertiary-container/20 flex items-center justify-center text-tertiary-fixed"><span class="material-symbols-outlined text-[18px]">local_taxi</span></div>
+            <div>
+              <h2 class="font-headline-sm text-headline-sm leading-tight">Courses taxi Vela</h2>
+              <span class="font-body-sm text-body-sm text-on-surface-variant">Forte demande active</span>
+            </div>
+          </div>
+          <span class="bg-primary-container text-on-primary-container px-2.5 py-1 rounded-full font-label-md text-label-md shrink-0">x1.3 Surge</span>
+        </div>
+        <div class="bg-surface-container rounded-lg p-space-sm flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="material-symbols-outlined text-[18px] text-primary-container shrink-0">whatshot</span>
+            <div class="min-w-0">
+              <p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Hotspots identifiés</p>
+              <p class="font-label-md text-label-md truncate">Cocody Ambassades &amp; Plateau</p>
+            </div>
+          </div>
+          <span class="font-label-sm text-label-sm text-primary-container shrink-0">+950 F / course</span>
+        </div>
+        <button class="w-full bg-surface-container-high hover:bg-surface-container-highest py-3 rounded-lg flex items-center justify-center gap-2" data-go="offre-taxi">
+          <span class="font-label-lg text-label-lg">Ouvrir le radar des courses</span><span class="material-symbols-outlined text-[16px] text-primary-container">radar</span>
+        </button>
+      </div>
+
+      <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px] text-on-surface-variant">map</span>
+            <h3 class="font-headline-sm text-headline-sm">Zones à forte affluence</h3>
+          </div>
+          <span class="font-label-sm text-label-sm text-on-surface-variant">Rafraîchi à l'instant</span>
+        </div>
+        <div class="w-full h-36 rounded-lg relative overflow-hidden bg-surface-container-lowest flex items-end p-space-sm">
+          <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 144" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs><filter id="heatBlur"><feGaussianBlur stdDeviation="14"/></filter></defs>
+            <path d="M0 110 C 80 90, 160 130, 260 105 S 380 80, 400 90 L400 144 L0 144Z" fill="#0f2140"/>
+            <g stroke="#2a2a2d" stroke-width="5" fill="none" stroke-linecap="round">
+              <path d="M0 40 L400 55"/><path d="M120 0 L150 144"/><path d="M290 0 L270 144"/><path d="M0 80 C 120 70, 250 60, 400 20"/>
+            </g>
+            <g filter="url(#heatBlur)">
+              <circle cx="150" cy="50" r="34" fill="#c6f338" opacity=".55"/>
+              <circle cx="280" cy="42" r="26" fill="#ffb1c5" opacity=".5"/>
+              <circle cx="60" cy="70" r="20" fill="#6050d1" opacity=".6"/>
+            </g>
+            <g font-family="DM Sans, sans-serif" font-size="10" font-weight="600" fill="#8e937b" letter-spacing="1.5">
+              <text x="160" y="22">COCODY</text><text x="300" y="75">RIVIERA</text><text x="16" y="30">PLATEAU</text>
+            </g>
+          </svg>
+          <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/30 to-transparent"></div>
+          <div class="relative w-full flex items-center justify-between gap-2">
+            <div class="flex items-center gap-1.5 bg-surface-container-lowest/80 backdrop-blur-md px-2.5 py-1 rounded-md min-w-0">
+              <span class="w-2 h-2 rounded-full bg-primary-container animate-pulse shrink-0"></span>
+              <span class="font-label-sm text-label-sm truncate">Affluence max : Boulevard Latrille</span>
+            </div>
+            <button class="w-8 h-8 rounded-md bg-surface-container-high/90 flex items-center justify-center shrink-0" data-go="offre-taxi" aria-label="Aller vers la zone">
+              <span class="material-symbols-outlined text-[18px]">navigation</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         ÉCRAN 2 · NOUVELLE LIVRAISON CITY+
+         ========================================================= -->
+    <section class="screen flex flex-col" data-screen="offre-city" data-title="Nouvelle livraison" hidden>
+      <div class="relative w-full h-[300px] bg-surface-container-lowest overflow-hidden">
+        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <path d="M-20 170 Q90 150 140 200 T280 180 T420 230" fill="none" stroke="#2a2a2d" stroke-linecap="round" stroke-width="8"/>
+          <path d="M80 -20 Q110 120 160 170 T240 340" fill="none" stroke="#2a2a2d" stroke-linecap="round" stroke-width="12"/>
+          <path d="M210 -10 L190 330" fill="none" stroke="#353438" stroke-dasharray="6 6" stroke-width="4"/>
+          <path d="M40 300 C110 230 180 170 320 120" fill="none" stroke="#1f1f22" stroke-width="16"/>
+          <path d="M40 300 C110 230 180 170 320 120" fill="none" stroke="#353438" stroke-dasharray="8 8" stroke-width="2"/>
+          <path d="M120 100 C160 110 170 180 270 210" fill="none" stroke="#ffb1c5" stroke-dasharray="7 5" stroke-linecap="round" stroke-width="4"/>
+          <text x="236" y="146" font-family="DM Sans, sans-serif" font-size="9" fill="#8e937b" letter-spacing="1">BD HASSAN II</text>
+        </svg>
+        <div class="absolute left-[30%] top-[33%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+          <div class="relative flex items-center justify-center">
+            <span class="absolute w-10 h-10 rounded-full bg-secondary opacity-30 animate-ping"></span>
+            <div class="w-9 h-9 rounded-full bg-secondary-container flex items-center justify-center shadow-lg"><span class="material-symbols-outlined text-secondary text-[20px]">shopping_bag</span></div>
+          </div>
+          <span class="mt-1 px-2 py-0.5 rounded-full bg-surface-container-high/90 font-label-sm text-label-sm text-secondary uppercase tracking-wider">Collecte</span>
+        </div>
+        <div class="absolute left-[67%] top-[70%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+          <div class="relative flex items-center justify-center">
+            <span class="absolute w-8 h-8 rounded-full bg-primary-fixed opacity-25 animate-pulse"></span>
+            <div class="w-9 h-9 rounded-full bg-surface-container-highest flex items-center justify-center shadow-lg"><span class="material-symbols-outlined text-primary-fixed text-[20px]">home</span></div>
+          </div>
+          <span class="mt-1 px-2 py-0.5 rounded-full bg-surface-container-high/90 font-label-sm text-label-sm uppercase tracking-wider">Riviera 3</span>
+        </div>
+        <div class="absolute top-4 left-4 right-4 flex items-center justify-between">
+          <span class="flex items-center gap-space-xs px-3 py-1.5 rounded-full bg-surface-container-high/90 backdrop-blur-sm font-label-md text-label-md">
+            <span class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span>Cocody · Fluide
+          </span>
+          <span class="px-2.5 py-1 rounded-full bg-surface-container-high/90 font-label-md text-label-md text-on-surface-variant">Zone 04</span>
+        </div>
+      </div>
+
+      <div class="-mt-6 relative z-10 bg-surface-container-low rounded-t-[28px] shadow-2xl px-margin-mobile pt-space-xs pb-space-lg flex flex-col gap-space-md">
+        <div class="w-12 h-1 rounded-full bg-surface-variant mx-auto my-1"></div>
+        <div class="flex items-center justify-between gap-2">
+          <span class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary-container/40 font-label-sm text-label-sm text-secondary tracking-wider">
+            <span class="material-symbols-outlined text-[16px]">local_mall</span>NOUVELLE LIVRAISON · CITY+
+          </span>
+          <div class="relative w-11 h-11 flex items-center justify-center shrink-0">
+            <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15" fill="none" stroke="#2a2a2d" stroke-width="2.5"/>
+              <circle id="cityRing" cx="18" cy="18" r="15" fill="none" stroke="#c6f338" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="94.25" stroke-dashoffset="0" style="transition: stroke-dashoffset 1s linear"/>
+            </svg>
+            <span id="cityCount" class="absolute font-label-md text-label-md">28s</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between rounded-xl bg-surface-container p-space-md gap-2">
+          <div class="flex flex-col">
+            <span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-wider">Rémunération nette</span>
+            <span class="font-headline-xl-mobile text-headline-xl-mobile text-primary-fixed tracking-tight">+1 500 FCFA</span>
+          </div>
+          <div class="flex flex-col items-end">
+            <span class="px-2 py-0.5 rounded bg-surface-variant font-label-sm text-label-sm">6.0 km total</span>
+            <span class="font-body-sm text-body-sm text-outline mt-1">~17 min</span>
+          </div>
+        </div>
+        <div class="flex flex-col gap-space-sm bg-surface-container-high rounded-xl p-space-md">
+          <div class="flex items-start gap-space-md">
+            <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-secondary text-[18px]">storefront</span></div>
+            <div class="flex flex-col min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-label-sm text-label-sm text-secondary uppercase">Collecte magasin</span>
+                <span class="font-label-sm text-label-sm text-on-surface-variant">1.8 km · 5 min</span>
+              </div>
+              <span class="font-headline-sm text-headline-sm truncate">City+ Point Relais · Cocody Angré</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant truncate">Angle Bd Latrille, Station Total</span>
+            </div>
+          </div>
+          <div class="ml-4 w-0.5 h-3 bg-surface-variant"></div>
+          <div class="flex items-start gap-space-md">
+            <div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-primary text-[18px]">person_pin_circle</span></div>
+            <div class="flex flex-col min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-label-sm text-label-sm text-primary-fixed uppercase">Livraison client</span>
+                <span class="font-label-sm text-label-sm text-on-surface-variant">4.2 km · 12 min</span>
+              </div>
+              <span class="font-headline-sm text-headline-sm truncate">Aya K. · Riviera 3</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant truncate">Carrefour Duncan, Résidence Les Oliviers</span>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-space-sm">
+          <div class="flex items-center gap-2.5 rounded-lg bg-surface-container p-2.5 min-w-0">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">checkroom</span>
+            <div class="flex flex-col min-w-0"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Contenu</span><span class="font-label-md text-label-md truncate">2 articles prêt-à-porter</span></div>
+          </div>
+          <div class="flex items-center gap-2.5 rounded-lg bg-surface-container p-2.5 min-w-0">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">fitness_center</span>
+            <div class="flex flex-col min-w-0"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Charge</span><span class="font-label-md text-label-md truncate">Léger &lt; 2 kg</span></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-space-md rounded-xl bg-surface-container-high p-space-md">
+          <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-secondary text-[20px]">verified</span></div>
+          <div class="flex flex-col min-w-0">
+            <span class="font-label-md text-label-md">Commande déjà réglée sur City+</span>
+            <span class="font-body-sm text-body-sm text-secondary">Aucun encaissement en espèces auprès de la cliente.</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-space-sm">
+          <button id="cityDecline" class="w-28 h-14 rounded-xl bg-surface-container-high active:bg-surface-variant flex items-center justify-center font-label-lg text-label-lg text-outline">Refuser</button>
+          <button id="cityAccept" class="flex-1 h-14 rounded-xl bg-primary-container flex items-center justify-center gap-2 shadow-lg shadow-primary-container/20 font-label-lg text-label-lg text-on-primary-fixed">
+            <span class="material-symbols-outlined text-[22px]">flash_on</span><span>Accepter la livraison</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         ÉCRAN 3 · LIVRAISON EN COURS (code de remise)
+         ========================================================= -->
+    <section class="screen flex flex-col" data-screen="livraison" data-title="Course en direct" hidden>
+      <div class="px-gutter pt-space-sm pb-space-sm flex items-center justify-between gap-2">
+        <div class="flex items-center gap-space-sm flex-wrap">
+          <span class="px-space-sm py-1 rounded-full bg-secondary/15 text-secondary font-label-md text-label-md tracking-wider">#CP-20417</span>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary-fixed animate-pulse"></span>City+ Mode Express
+          </span>
+        </div>
+        <div class="flex items-center gap-space-xs">
+          <button class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center active:scale-95" aria-label="Appeler la cliente" data-toast="Aya K. · +225 07 00 00 00 00"><span class="material-symbols-outlined text-[20px]">phone</span></button>
+          <button class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center active:scale-95" aria-label="Message SMS" data-toast="SMS envoyé : « J'arrive dans 8 min »"><span class="material-symbols-outlined text-[20px]">chat_bubble_outline</span></button>
+        </div>
+      </div>
+      <div class="px-gutter flex flex-col gap-space-md pb-space-lg">
+        <div class="relative w-full h-[142px] rounded-xl overflow-hidden bg-surface-container-lowest">
+          <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 142" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <g stroke="#2a2a2d" stroke-width="6" fill="none" stroke-linecap="round"><path d="M0 40 L400 60"/><path d="M90 0 L130 142"/><path d="M300 0 L280 142"/></g>
+            <path d="M40 130 C 120 110, 180 60, 330 40" stroke="#c6f338" stroke-width="4" fill="none" stroke-linecap="round" opacity=".9"/>
+            <circle cx="330" cy="40" r="6" fill="#ffb1c5" stroke="#131316" stroke-width="2"/>
+          </svg>
+          <div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/90 via-surface-container-lowest/20 to-transparent"></div>
+          <div class="absolute top-2.5 left-2.5 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-lowest/90">
+            <span class="material-symbols-outlined text-primary-fixed text-[18px]">navigation</span>
+            <span class="font-headline-sm text-headline-sm">1,8 km <span class="font-body-sm text-body-sm text-on-surface-variant">· 8 min</span></span>
+          </div>
+          <div class="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between gap-2">
+            <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-surface-container-high/90 font-label-sm text-label-sm truncate"><span class="w-2 h-2 rounded-full bg-primary-fixed shrink-0"></span>Boulevard Mitterrand fluide</span>
+            <span class="px-2.5 py-1 rounded-md bg-surface-container-high/90 font-label-sm text-label-sm text-primary-fixed shrink-0">Arrivée 14:32</span>
+          </div>
+        </div>
+
+        <div class="rounded-xl bg-surface-container p-space-md flex flex-col gap-space-sm">
+          <div class="flex items-start justify-between gap-space-sm">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-11 h-11 rounded-full bg-gradient-to-br from-secondary to-secondary-container flex items-center justify-center font-headline-sm text-headline-sm text-surface shrink-0">AK</div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5"><span class="font-headline-sm text-headline-sm truncate">Aya K.</span><span class="material-symbols-outlined fill text-primary-fixed text-[16px]" title="Client VIP City+">verified</span></div>
+                <p class="font-body-sm text-body-sm text-secondary truncate">Commande Mode Luxe City+</p>
+              </div>
+            </div>
+            <span class="flex items-center gap-1 text-primary-fixed font-label-md text-label-md bg-surface-container-high px-2 py-1 rounded-md"><span class="material-symbols-outlined fill text-[15px]">star</span>4.95</span>
+          </div>
+          <div class="rounded-lg bg-surface-container-low p-2.5 flex items-start gap-2.5">
+            <span class="material-symbols-outlined text-secondary text-[20px] shrink-0">location_on</span>
+            <div class="min-w-0 flex-1">
+              <span class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider">Adresse de livraison</span>
+              <p class="font-body-md text-body-md font-semibold truncate">Riviera 3, Villa 42, Rue des Jardins</p>
+              <p class="font-body-sm text-body-sm text-on-surface-variant truncate">Portail blanc · Sonner à l'interphone B</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-xl bg-surface-container p-space-md">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant block mb-3">Statut de l'acheminement</span>
+          <ol class="relative flex flex-col gap-4">
+            <li class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[16px]">check</span></span>
+              <div class="flex-1 flex items-start justify-between gap-2"><div><p class="font-headline-sm text-headline-sm">Colis récupéré au relais Angré</p><p class="font-body-sm text-body-sm text-on-surface-variant">Boutique partenaire certifiée</p></div><span class="font-label-md text-label-md text-primary-fixed">14:15</span></div>
+            </li>
+            <li class="flex items-start gap-3" id="step2">
+              <span id="step2Icon" class="w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center shrink-0 ring-4 ring-secondary/20"><span class="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></span></span>
+              <div class="flex-1 flex items-start justify-between gap-2"><div><p class="font-headline-sm text-headline-sm text-secondary">En route vers la cliente</p><p class="font-body-sm text-body-sm text-on-surface-variant">Approche de la Riviera 3</p></div><span class="font-label-md text-label-md text-secondary">14:32</span></div>
+            </li>
+            <li class="flex items-start gap-3" id="step3">
+              <span id="step3Icon" class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center shrink-0"><span class="w-2 h-2 rounded-full bg-outline"></span></span>
+              <div class="flex-1 flex items-start justify-between gap-2"><div><p id="step3Title" class="font-headline-sm text-headline-sm text-on-surface-variant">Remise avec code de sécurité</p><p class="font-body-sm text-body-sm text-on-surface-variant/70">Signature numérique City+</p></div><span id="step3Time" class="font-label-md text-label-md text-on-surface-variant">Étape 3</span></div>
+            </li>
+          </ol>
+        </div>
+
+        <div class="rounded-xl bg-surface-container-high p-space-md flex flex-col gap-space-sm relative overflow-hidden">
+          <div class="absolute -top-12 -right-12 w-28 h-28 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[22px]">pin</span><h2 class="font-headline-sm text-headline-sm">Code de confirmation client</h2></div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">Demandez le code à 4 chiffres reçu par la cliente dans son application City+. Exemple : <b class="text-on-surface">8421</b>.</p>
+          <div class="flex items-center gap-2.5 pt-2" id="pinRow">
+            <input id="pin1" class="pin flex-1 min-w-0 h-14 rounded-lg bg-surface-container-lowest text-center font-currency-display text-currency-display text-on-surface" inputmode="numeric" maxlength="1" value="8" aria-label="Chiffre 1">
+            <input id="pin2" class="pin flex-1 min-w-0 h-14 rounded-lg bg-surface-container-lowest text-center font-currency-display text-currency-display text-on-surface" inputmode="numeric" maxlength="1" value="4" aria-label="Chiffre 2">
+            <input id="pin3" class="pin flex-1 min-w-0 h-14 rounded-lg bg-surface-container-lowest text-center font-currency-display text-currency-display text-on-surface" inputmode="numeric" maxlength="1" value="2" aria-label="Chiffre 3">
+            <input id="pin4" class="pin flex-1 min-w-0 h-14 rounded-lg bg-surface-container-lowest text-center font-currency-display text-currency-display text-primary-fixed" inputmode="numeric" maxlength="1" value="" aria-label="Chiffre 4">
+          </div>
+          <p id="pinMsg" class="font-label-md text-label-md text-error" hidden>Code incorrect. Vérifiez avec la cliente puis réessayez.</p>
+          <div class="flex items-center justify-between text-on-surface-variant pt-1 font-label-sm text-label-sm gap-2">
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px] text-primary-fixed">lock</span>Garantie anti-fraude active</span>
+            <button class="text-secondary hover:underline underline-offset-2" data-toast="Support City+ : un agent vous rappelle sous 2 min">Problème de code ?</button>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <button id="confirmDelivery" class="w-full h-14 rounded-xl bg-primary-container text-on-primary-fixed font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed" disabled>
+            <span class="material-symbols-outlined text-[22px]">check_circle</span><span>Confirmer la livraison</span>
+          </button>
+          <p class="flex items-center justify-center gap-2 text-on-surface-variant font-label-sm text-label-sm text-center">
+            <span class="material-symbols-outlined text-[14px]">account_balance_wallet</span>Crédit instantané de 2 800 FCFA sur votre portefeuille Vela
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         ÉCRAN 4 · NOUVELLE COURSE VELA TAXI
+         ========================================================= -->
+    <section class="screen flex flex-col" data-screen="offre-taxi" data-title="Nouvelle course" hidden>
+      <div class="relative w-full h-[300px] overflow-hidden bg-surface-container-lowest">
+        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <filter id="taxiGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <linearGradient id="taxiRoute" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#abd611"/><stop offset=".45" stop-color="#c7bfff"/><stop offset="1" stop-color="#c6f338"/></linearGradient>
+          </defs>
+          <path d="M0 150 C 90 120, 170 180, 260 150 S 380 110, 400 130 L400 220 C 330 240, 260 200, 180 230 S 60 250, 0 230 Z" fill="#0f2140"/>
+          <text x="20" y="200" font-family="DM Sans, sans-serif" font-size="9" fill="#2e4d80" letter-spacing="2">LAGUNE ÉBRIÉ</text>
+          <g stroke="#2a2a2d" stroke-width="6" fill="none" stroke-linecap="round"><path d="M0 60 L400 40"/><path d="M40 0 L90 150"/><path d="M340 300 L320 220"/><path d="M0 270 L400 260"/></g>
+          <path d="M150 140 L215 225" stroke="#353438" stroke-width="12"/>
+          <path d="M125 75 Q160 130 195 160 T265 245" fill="none" opacity=".35" stroke="#6050d1" stroke-linecap="round" stroke-width="8"/>
+          <path d="M125 75 Q160 130 195 160 T265 245" fill="none" filter="url(#taxiGlow)" stroke="url(#taxiRoute)" stroke-dasharray="6 4" stroke-width="3"/>
+          <text x="210" y="178" font-family="DM Sans, sans-serif" font-size="9" font-weight="700" fill="#c6f338" letter-spacing="1">PONT HKB</text>
+        </svg>
+        <div class="absolute inset-0 bg-gradient-to-b from-surface/70 via-transparent to-surface pointer-events-none"></div>
+        <div class="absolute left-[31%] top-[25%] -translate-x-1/2 -translate-y-1/2 flex items-center">
+          <div class="relative w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center shadow-lg">
+            <span class="absolute w-8 h-8 rounded-full bg-primary-fixed-dim/20 animate-ping"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-primary-fixed"></span>
+          </div>
+          <span class="ml-1.5 px-2 py-0.5 rounded-full bg-surface-container-high/90 font-label-sm text-label-sm text-primary-fixed uppercase tracking-wider whitespace-nowrap">Plateau · 4 min</span>
+        </div>
+        <div class="absolute left-[66%] top-[81%] -translate-x-1/2 -translate-y-1/2 flex items-center flex-row-reverse">
+          <div class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center shadow-xl"><span class="material-symbols-outlined text-[15px] text-tertiary-fixed">flag</span></div>
+          <span class="mr-1.5 px-2 py-0.5 rounded-full bg-surface-container-high/90 font-label-sm text-label-sm uppercase tracking-wider whitespace-nowrap">Zone 4 · 9.7 km</span>
+        </div>
+        <div class="absolute top-space-md right-space-md flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-surface-container-high/95 shadow-md">
+          <span class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span>
+          <span class="font-label-sm text-label-sm uppercase tracking-wide">Trafic fluide Pont HKB</span>
+        </div>
+      </div>
+
+      <div class="relative -mt-6 rounded-t-xl bg-surface-container-low shadow-[0_-12px_32px_rgba(0,0,0,0.7)] px-margin-mobile pt-space-md pb-space-lg flex flex-col gap-space-md">
+        <div class="flex items-center justify-between gap-2">
+          <span class="inline-flex items-center gap-space-xs px-2.5 py-1 rounded-full bg-tertiary-container/15 font-label-md text-label-md text-tertiary-fixed tracking-wider uppercase">
+            <span class="material-symbols-outlined text-[14px]">local_taxi</span>Nouvelle course · Vela Taxi
+          </span>
+          <span class="flex items-center gap-space-xs px-2 py-1 rounded-full bg-surface-container-highest shrink-0">
+            <svg class="w-5 h-5 -rotate-90" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+              <circle id="taxiRing" cx="18" cy="18" r="15.9" fill="none" stroke="#abd611" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="100 100" pathLength="100"/>
+            </svg>
+            <span id="taxiCount" class="font-label-md text-label-md text-primary-fixed">22s</span>
+          </span>
+        </div>
+        <div class="flex items-end justify-between gap-2">
+          <div class="flex flex-col">
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Tarif garanti</span>
+            <span class="flex items-baseline gap-space-xs"><span class="font-currency-display text-currency-display tracking-tight">3 200</span><span class="font-headline-sm text-headline-sm text-primary-fixed">FCFA</span></span>
+          </div>
+          <div class="flex flex-col items-end">
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Estimation trajet</span>
+            <span class="font-headline-sm text-headline-sm">22 min · 9.7 km</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container gap-2">
+          <div class="flex items-center gap-space-sm min-w-0">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-on-tertiary-container to-tertiary-fixed flex items-center justify-center font-label-lg text-label-lg text-on-tertiary-fixed shrink-0">JM</div>
+            <div class="flex flex-col min-w-0">
+              <span class="font-label-lg text-label-lg truncate">Jean-Marc D.</span>
+              <span class="flex items-center gap-1"><span class="material-symbols-outlined fill text-[13px] text-primary-fixed">star</span><span class="font-label-sm text-label-sm">4.9</span><span class="font-body-sm text-body-sm text-on-surface-variant">· 142 courses</span></span>
+            </div>
+          </div>
+          <span class="flex items-center gap-space-xs px-2.5 py-1 rounded-full bg-surface-container-highest font-label-sm text-label-sm shrink-0"><span class="material-symbols-outlined text-[14px] text-primary-fixed">verified</span>Client VIP</span>
+        </div>
+        <div class="p-space-md rounded-xl bg-surface-container flex flex-col gap-space-md">
+          <div class="flex items-start gap-space-md">
+            <div class="flex flex-col items-center pt-1">
+              <div class="w-3.5 h-3.5 rounded-full bg-primary-fixed flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-on-primary"></div></div>
+              <div class="w-0.5 h-10 bg-surface-variant my-1"></div>
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col">
+              <div class="flex items-center justify-between gap-2"><span class="font-label-sm text-label-sm text-primary-fixed uppercase tracking-wider">Prise en charge</span><span class="font-label-sm text-label-sm text-on-surface-variant">1.2 km · 4 min</span></div>
+              <span class="font-label-lg text-label-lg truncate">Plateau, Rue du Commerce</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant truncate">Immeuble Postel 2001 · Près de la BCEAO</span>
+            </div>
+          </div>
+          <div class="flex items-start gap-space-md">
+            <div class="pt-0.5"><div class="w-3.5 h-3.5 rounded-full bg-tertiary-fixed"></div></div>
+            <div class="flex-1 min-w-0 flex flex-col">
+              <div class="flex items-center justify-between gap-2"><span class="font-label-sm text-label-sm text-tertiary-fixed uppercase tracking-wider">Destination</span><span class="font-label-sm text-label-sm text-on-surface-variant">8.5 km · 18 min</span></div>
+              <span class="font-label-lg text-label-lg truncate">Marcory Zone 4, Rue du 7 Décembre</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant truncate">En face du supermarché Hayat</span>
+            </div>
+          </div>
+        </div>
+        <div class="p-space-md rounded-xl bg-tertiary-container/10 flex items-start gap-space-md">
+          <div class="w-9 h-9 rounded-full bg-tertiary-fixed/20 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[20px] text-tertiary-fixed">account_balance_wallet</span></div>
+          <div class="flex-1 min-w-0 flex flex-col">
+            <div class="flex items-center justify-between gap-2"><span class="font-label-md text-label-md text-tertiary-fixed">Paiement Vela Monnaie</span><span class="font-label-sm text-label-sm text-tertiary-fixed uppercase">3 200 VM</span></div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Versement instantané sur votre portefeuille chauffeur. Aucune manipulation d'espèces ni risque d'impayé.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-space-sm">
+          <button id="taxiDecline" class="w-28 h-14 rounded-xl bg-surface-container-high active:bg-surface-variant flex items-center justify-center font-label-lg text-label-lg text-on-surface-variant">Passer</button>
+          <button id="taxiAccept" class="flex-1 h-14 rounded-xl bg-primary-fixed shadow-[0_4px_20px_rgba(198,243,56,0.3)] flex items-center justify-center gap-space-xs font-label-lg text-label-lg text-on-primary-fixed uppercase tracking-wide">
+            <span class="material-symbols-outlined text-[20px]">check_circle</span><span>Accepter la course</span>
+          </button>
+        </div>
+        <a id="driveLink" href="https://claude.ai/artifact/Kw7soPvwwRuzFqygxgmnAg" target="_blank" rel="noopener"
+           class="w-full h-12 rounded-xl bg-on-tertiary-container flex items-center justify-center gap-2 font-label-lg text-label-lg text-primary" hidden>
+          <span class="material-symbols-outlined text-[20px]">navigation</span>Ouvrir le mode conduite
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Barre de navigation ===== -->
+  <nav class="bar bottom-bar bg-surface-container-low/95 backdrop-blur-xl shadow-[0_-4px_20px_rgba(0,0,0,0.5)]" aria-label="Navigation principale">
+    <div class="h-16 px-gutter-mobile flex items-center justify-around">
+      <button class="tab flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-space-xs" data-go="accueil"><span class="material-symbols-outlined text-[24px]">dashboard</span><span class="font-label-sm text-label-sm tracking-wider uppercase">Accueil</span></button>
+      <button class="tab flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-space-xs" data-go="offre-city"><span class="material-symbols-outlined text-[24px]">local_shipping</span><span class="font-label-sm text-label-sm tracking-wider uppercase">Missions</span></button>
+      <button class="tab flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-space-xs" data-go="offre-taxi"><span class="material-symbols-outlined text-[24px]">local_taxi</span><span class="font-label-sm text-label-sm tracking-wider uppercase">Courses</span></button>
+      <button class="tab flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-space-xs" data-go="livraison"><span class="material-symbols-outlined text-[24px]">pin_drop</span><span class="font-label-sm text-label-sm tracking-wider uppercase">En cours</span></button>
+    </div>
+  </nav>
+
+  <div id="toast" class="toast fixed left-1/2 top-0 z-[60] max-w-[92%] px-4 py-2.5 rounded-full bg-primary text-surface font-label-lg text-label-lg shadow-2xl text-center" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+    const fmt = (n) => n.toLocaleString('fr-FR').replace(/ | /g, ' ');
+    const state = { earnings: 18500, vm: 42300, city: 8, vela: 4, pending: 2, online: true, history: [] };
+
+    // ---------- Toast ----------
+    let toastT;
+    function toast(msg) {
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastT);
+      toastT = setTimeout(() => t.classList.remove('show'), 2600);
+    }
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-toast]');
+      if (b) toast(b.dataset.toast);
+    });
+
+    // ---------- Navigation ----------
+    let current = 'accueil';
+    const timers = {};
+    function show(name, push = true) {
+      if (name === current) return;
+      if (push) state.history.push(current);
+      document.querySelectorAll('[data-screen]').forEach((s) => { s.hidden = s.dataset.screen !== name; });
+      const screen = document.querySelector('[data-screen="' + name + '"]');
+      $('pageTitle').textContent = screen.dataset.title;
+      $('backBtn').hidden = name === 'accueil';
+      $('liveDot').hidden = name !== 'accueil';
+      document.querySelectorAll('.tab').forEach((t) => {
+        const on = t.dataset.go === name;
+        t.classList.toggle('text-primary-container', on);
+        t.classList.toggle('text-on-surface-variant', !on);
+        if (on) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current');
+      });
+      stopTimers();
+      current = name;
+      window.scrollTo(0, 0);
+      if (name === 'offre-city') startCountdown('city', 28);
+      if (name === 'offre-taxi') startCountdown('taxi', 22);
+    }
+    document.addEventListener('click', (e) => {
+      const g = e.target.closest('[data-go]');
+      if (g) show(g.dataset.go);
+    });
+    $('backBtn').addEventListener('click', () => show(state.history.pop() || 'accueil', false));
+
+    // ---------- Compte à rebours des offres ----------
+    function stopTimers() { Object.values(timers).forEach(clearInterval); }
+    function startCountdown(kind, total) {
+      resetOffer(kind);
+      let left = total;
+      const label = $(kind + 'Count');
+      const ring = $(kind + 'Ring');
+      const draw = () => {
+        label.textContent = left + 's';
+        if (kind === 'city') ring.style.strokeDashoffset = (94.25 - 94.25 * (left / total)).toFixed(2);
+        else ring.setAttribute('stroke-dasharray', Math.round((left / total) * 100) + ' 100');
+      };
+      draw();
+      timers[kind] = setInterval(() => {
+        left--;
+        draw();
+        if (left <= 0) {
+          clearInterval(timers[kind]);
+          toast('Offre expirée · proposée à un autre chauffeur');
+          setTimeout(() => { if (current !== 'accueil') show('accueil'); }, 1200);
+        }
+      }, 1000);
+    }
+
+    function resetOffer(kind) {
+      const acc = $(kind + 'Accept'), dec = $(kind + 'Decline');
+      acc.disabled = false; dec.disabled = false; dec.classList.remove('opacity-40');
+      if (kind === 'city') {
+        acc.innerHTML = '<span class="material-symbols-outlined text-[22px]">flash_on</span><span>Accepter la livraison</span>';
+        dec.textContent = 'Refuser';
+      } else {
+        acc.innerHTML = '<span class="material-symbols-outlined text-[20px]">check_circle</span><span>Accepter la course</span>';
+        dec.textContent = 'Passer';
+        $('driveLink').hidden = true;
+      }
+    }
+
+    // Offre City+
+    $('cityAccept').addEventListener('click', () => {
+      clearInterval(timers.city);
+      const b = $('cityAccept');
+      b.disabled = true;
+      b.innerHTML = '<span class="material-symbols-outlined text-[22px] animate-spin">sync</span><span>Assignation…</span>';
+      setTimeout(() => { toast('Livraison #CP-20417 assignée'); show('livraison'); $('pin4').focus(); }, 900);
+    });
+    $('cityDecline').addEventListener('click', () => {
+      clearInterval(timers.city);
+      $('cityDecline').classList.add('opacity-40');
+      toast('Livraison refusée');
+      setTimeout(() => show('accueil'), 700);
+    });
+
+    // Offre Taxi
+    $('taxiAccept').addEventListener('click', () => {
+      clearInterval(timers.taxi);
+      const b = $('taxiAccept');
+      b.disabled = true; $('taxiDecline').disabled = true;
+      b.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">progress_activity</span><span>Acceptation…</span>';
+      setTimeout(() => {
+        b.innerHTML = '<span class="material-symbols-outlined text-[20px]">navigation</span><span>Itinéraire lancé</span>';
+        $('driveLink').hidden = false;
+        state.vela++; state.earnings += 3200; state.vm += 3200;
+        renderStats();
+        toast('Course acceptée · Jean-Marc D. vous attend');
+      }, 700);
+    });
+    $('taxiDecline').addEventListener('click', () => {
+      clearInterval(timers.taxi);
+      $('taxiDecline').classList.add('opacity-40');
+      $('taxiDecline').textContent = 'Recherche…';
+      setTimeout(() => show('accueil'), 800);
+    });
+
+    // ---------- Code de remise ----------
+    const pins = [1, 2, 3, 4].map((i) => $('pin' + i));
+    function pinValue() { return pins.map((p) => p.value).join(''); }
+    function checkPin() {
+      $('confirmDelivery').disabled = !/^\d{4}$/.test(pinValue());
+      $('pinMsg').hidden = true;
+    }
+    pins.forEach((p, i) => {
+      p.addEventListener('input', () => {
+        p.value = p.value.replace(/\D/g, '').slice(-1);
+        if (p.value && pins[i + 1]) pins[i + 1].focus();
+        checkPin();
+      });
+      p.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !p.value && pins[i - 1]) pins[i - 1].focus();
+      });
+    });
+
+    let delivered = false;
+    $('confirmDelivery').addEventListener('click', () => {
+      if (delivered) { show('accueil'); return; }
+      const b = $('confirmDelivery');
+      b.disabled = true;
+      b.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">progress_activity</span><span>Vérification du code…</span>';
+      setTimeout(() => {
+        if (pinValue() !== '8421') {
+          b.innerHTML = '<span class="material-symbols-outlined text-[22px]">check_circle</span><span>Confirmer la livraison</span>';
+          $('pinMsg').hidden = false;
+          pins[3].value = ''; pins[3].focus();
+          return;
+        }
+        delivered = true;
+        pins.forEach((p) => { p.disabled = true; });
+        b.disabled = false;
+        b.classList.replace('bg-primary-container', 'bg-primary-fixed-dim');
+        b.innerHTML = '<span class="material-symbols-outlined text-[20px]">task_alt</span><span>Livraison confirmée · Retour accueil</span>';
+        $('step2Icon').className = 'w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0';
+        $('step2Icon').innerHTML = '<span class="material-symbols-outlined text-[16px]">check</span>';
+        $('step3Icon').className = 'w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0';
+        $('step3Icon').innerHTML = '<span class="material-symbols-outlined text-[16px]">check</span>';
+        $('step3Title').className = 'font-headline-sm text-headline-sm text-on-surface';
+        $('step3Time').textContent = '14:31';
+        $('step3Time').className = 'font-label-md text-label-md text-primary-fixed';
+        state.city++; state.earnings += 2800; state.vm += 2800; state.pending = Math.max(0, state.pending - 1);
+        renderStats();
+        toast('+2 800 FCFA crédités sur votre portefeuille Vela');
+      }, 1100);
+    });
+
+    // ---------- Statut en ligne ----------
+    $('statusToggle').addEventListener('click', () => {
+      state.online = !state.online;
+      const on = state.online;
+      $('statusToggle').setAttribute('aria-checked', on);
+      $('statusToggle').classList.toggle('bg-primary-container', on);
+      $('statusToggle').classList.toggle('bg-surface-container-highest', !on);
+      $('statusKnob').classList.toggle('translate-x-6', on);
+      $('statusKnob').classList.toggle('translate-x-0', !on);
+      $('statusKnob').classList.toggle('bg-on-primary-container', on);
+      $('statusKnob').classList.toggle('bg-outline', !on);
+      $('statusPing').hidden = !on;
+      $('statusDot').classList.toggle('bg-primary-container', on);
+      $('statusDot').classList.toggle('bg-outline', !on);
+      $('avatarDot').classList.toggle('bg-primary-container', on);
+      $('avatarDot').classList.toggle('bg-outline', !on);
+      $('statusLabel').textContent = on ? 'En ligne' : 'Hors ligne';
+      $('statusSub').textContent = on ? 'Prêt pour nouvelles courses' : 'Vous ne recevez plus de courses';
+      toast(on ? 'Vous êtes en ligne' : 'Vous êtes hors ligne');
+    });
+
+    $('notifBtn').addEventListener('click', () => {
+      if (!state.online) { toast('Passez en ligne pour recevoir des offres'); return; }
+      toast('Nouvelle livraison City+ à Cocody Angré');
+      show('offre-city');
+    });
+
+    function renderStats() {
+      $('earnings').textContent = fmt(state.earnings);
+      $('vmBalance').textContent = fmt(state.vm);
+      $('countCity').textContent = state.city;
+      $('countVela').textContent = state.vela;
+      $('pendingBadge').textContent = state.pending ? state.pending + ' en attente' : 'À jour';
+    }
+
+    show('accueil', false);
+    document.querySelector('.tab[data-go="accueil"]').classList.add('text-primary-container');
+    document.querySelectorAll('.tab:not([data-go="accueil"])').forEach((t) => t.classList.add('text-on-surface-variant'));
+  })();
+</script>
+</body>
+</html>
