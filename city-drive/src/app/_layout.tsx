@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ResponsiveShell } from '@/components/ResponsiveShell';
 import { colors } from '@/constants/theme';
+import { RideProvider } from '@/data/ride';
 import { WalletProvider } from '@/data/wallet';
 
 export default function RootLayout() {
@@ -17,10 +18,12 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <WalletProvider>
+      <RideProvider>
       <ResponsiveShell>
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surface } }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="destination" options={{ animation: 'fade_from_bottom' }} />
         <Stack.Screen name="arrets" />
         <Stack.Screen name="vehicules" />
         <Stack.Screen name="programmer" options={{ presentation: 'modal' }} />
@@ -33,6 +36,7 @@ export default function RootLayout() {
         <Stack.Screen name="navigation" options={{ contentStyle: { backgroundColor: '#131316' } }} />
       </Stack>
       </ResponsiveShell>
+      </RideProvider>
       </WalletProvider>
     </SafeAreaProvider>
   );

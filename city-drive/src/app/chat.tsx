@@ -6,17 +6,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText, Avatar, Icon, Touchable, type IconName } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
-import { favoriteDriver } from '@/data/mock';
+import { useRide } from '@/data/ride';
+import { isActive } from '@/logic/ride';
 
 type Message =
   | { id: string; from: 'driver' | 'me'; text: string; time: string }
   | { id: string; from: 'driver'; voice: { duration: string; transcript: string }; time: string };
 
 const INITIAL: Message[] = [
-  { id: 'm1', from: 'driver', text: "Bonjour M. Kouassi, je suis engagé sur le boulevard, j'arrive dans environ 3 minutes.", time: '12:35' },
+  { id: 'm1', from: 'driver', text: "Bonjour M. Kouassi, je suis engagé sur le boulevard, j'arrive dans quelques minutes.", time: '12:35' },
   { id: 'm2', from: 'me', text: 'Parfait, je vous attends devant la pharmacie Saint-Jean côté station.', time: '12:36' },
   { id: 'm3', from: 'driver', voice: { duration: '0:08', transcript: '« Bien reçu ! Je mets les feux de détresse en arrivant. »' }, time: '12:37' },
-  { id: 'm4', from: 'me', text: "Je vois votre Yaris blanche, j'arrive !", time: '12:38' },
+  { id: 'm4', from: 'me', text: "Je vois votre voiture, j'arrive !", time: '12:38' },
 ];
 
 const QUICK_REPLIES: { icon: IconName; label: string; text: string }[] = [
@@ -35,6 +36,9 @@ const nowTime = () => {
 };
 
 export default function ChatScreen() {
+  const ride = useRide();
+  // Chauffeur de la course en cours (à défaut, le favori).
+  const driver = ride.current?.driver ?? ride.favoriteDriver;
   const insets = useSafeAreaInsets();
   const [messages, setMessages] = useState<Message[]>(INITIAL);
   const [draft, setDraft] = useState('');
@@ -63,7 +67,7 @@ export default function ChatScreen() {
             <View style={styles.row}>
               <View style={styles.dot} />
               <AppText variant="labelSm" color={colors.onSurfaceVariant}>
-                En course • {favoriteDriver.fullName}
+                En course • {driver.fullName}
               </AppText>
             </View>
           </View>
@@ -77,13 +81,13 @@ export default function ChatScreen() {
       <View style={styles.driver}>
         <View style={[styles.row, { gap: 8, flex: 1 }]}>
           <View>
-            <Avatar name={favoriteDriver.fullName} size={48} radius={24} />
+            <Avatar name={driver.fullName} size={48} radius={24} />
             <View style={styles.online} />
           </View>
           <View style={{ flex: 1 }}>
             <View style={styles.row}>
               <AppText variant="headlineSm" numberOfLines={1}>
-                {favoriteDriver.fullName}
+                {driver.fullName}
               </AppText>
               <View style={styles.rating}>
                 <Icon name="star" size={14} color="#00A676" />
@@ -98,7 +102,7 @@ export default function ChatScreen() {
             </View>
           </View>
         </View>
-        <Touchable accessibilityLabel="Appeler Koffi" style={[styles.round, { backgroundColor: colors.secondaryContainer }]} onPress={() => router.replace('/appel')}>
+        <Touchable accessibilityLabel={`Appeler ${driver.fullName.split(" ")[0]}`} style={[styles.round, { backgroundColor: colors.secondaryContainer }]} onPress={() => router.replace('/appel')}>
           <Icon name="phone-in-talk" size={22} color={colors.onSecondaryContainer} />
         </Touchable>
         <Touchable accessibilityLabel="Détails de la course" style={[styles.round, { backgroundColor: colors.surfaceHighest }]} onPress={() => router.back()}>
@@ -115,13 +119,13 @@ export default function ChatScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <AppText variant="labelMd" color={colors.secondaryContainer} numberOfLines={1}>
-                À 350m • 2 min{' '}
+                {!isActive(ride.current) ? 'Aucune course en cours' : ride.current.status === 'arrived' ? 'Arrivé au point de rendez-vous' : `${ride.current.eta} min`}{' '}
                 <AppText variant="bodySm" color="rgba(255,255,255,0.9)">
-                  · Plateau CCIA
+                  · {ride.current?.destination.name ?? ride.destination.name}
                 </AppText>
               </AppText>
               <AppText variant="labelSm" color="rgba(255,255,255,0.8)" numberOfLines={1}>
-                {favoriteDriver.shortCar} • {favoriteDriver.plate}
+                {driver.car} • {driver.plate}
               </AppText>
             </View>
           </View>
@@ -169,7 +173,7 @@ export default function ChatScreen() {
             </View>
           ) : (
             <View key={m.id} style={[styles.row, { alignItems: 'flex-end', gap: 6, maxWidth: '86%' }]}>
-              <Avatar name={favoriteDriver.fullName} size={24} radius={12} style={{ marginBottom: 4 }} />
+              <Avatar name={driver.fullName} size={24} radius={12} style={{ marginBottom: 4 }} />
               <View style={[styles.bubble, styles.theirs]}>
                 {'voice' in m ? (
                   <>
@@ -222,14 +226,14 @@ export default function ChatScreen() {
 
       {/* Saisie */}
       <View style={[styles.dock, { paddingBottom: insets.bottom + 12 }]}>
-        <Touchable accessibilityLabel="Partager ma position" style={[styles.dockBtn, { backgroundColor: colors.surfaceContainer }]} onPress={() => setDraft('📍 Ma position : Pharmacie Saint-Jean, Riviera 2')}>
+        <Touchable accessibilityLabel="Partager ma position" style={[styles.dockBtn, { backgroundColor: colors.surfaceContainer }]} onPress={() => setDraft(`📍 Ma position : ${ride.current?.pickup.name ?? ride.pickup.name}, ${ride.current?.pickup.area ?? ride.pickup.area}`)}>
           <Icon name="add-location-alt" size={22} />
         </Touchable>
         <View style={styles.input}>
           <TextInput
             value={draft}
             onChangeText={setDraft}
-            placeholder={`Écrire à ${favoriteDriver.fullName.split(' ')[0]}...`}
+            placeholder={`Écrire à ${driver.fullName.split(' ')[0]}...`}
             placeholderTextColor={colors.outline}
             style={styles.inputText}
             returnKeyType="send"

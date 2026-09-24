@@ -7,7 +7,8 @@ import { CityMap } from '@/components/CityMap';
 import { AppText, Avatar, Icon, PingDot, Pulse, Touchable, type IconName } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
-import { favoriteDriver } from '@/data/mock';
+import { useRide } from '@/data/ride';
+import { isActive } from '@/logic/ride';
 
 const BAR_HEIGHTS = [12, 24, 16, 20, 8, 16, 20];
 
@@ -54,6 +55,17 @@ function Control({ icon, label, onPress, bg, fg, badge }: { icon: IconName; labe
 }
 
 export default function CallScreen() {
+  const ride = useRide();
+  // Chauffeur de la course en cours (à défaut, le favori).
+  const driver = ride.current?.driver ?? ride.favoriteDriver;
+  const r = isActive(ride.current) ? ride.current : null;
+  const etaText = !r
+    ? 'Aucune course en cours'
+    : r.status === 'arrived'
+      ? 'Votre chauffeur est arrivé'
+      : r.status === 'ongoing'
+        ? `Arrivée à destination dans ${r.eta} min`
+        : `Arrivée estimée dans ${r.eta} min`;
   const insets = useSafeAreaInsets();
   const [seconds, setSeconds] = useState(84);
   const [muted, setMuted] = useState(false);
@@ -81,7 +93,7 @@ export default function CallScreen() {
             <View style={styles.row}>
               <View style={styles.dot} />
               <AppText variant="labelSm" color={colors.onSurfaceVariant}>
-                En course • {favoriteDriver.fullName}
+                En course • {driver.fullName}
               </AppText>
             </View>
           </View>
@@ -125,7 +137,7 @@ export default function CallScreen() {
             <View style={[styles.ring, { width: 144, height: 144, backgroundColor: 'rgba(255,196,0,0.3)' }]} />
             <View style={[styles.ring, { width: 112, height: 112, backgroundColor: 'rgba(209,213,219,0.4)' }]} />
             <View style={styles.bigAvatar}>
-              <Avatar name={favoriteDriver.fullName} size={96} radius={48} />
+              <Avatar name={driver.fullName} size={96} radius={48} />
               <View style={styles.ratingBand}>
                 <AppText variant="labelSm" color={colors.onPrimary}>
                   4.9 ★
@@ -139,15 +151,15 @@ export default function CallScreen() {
             ))}
           </View>
           <AppText variant="headlineLg" style={{ textAlign: 'center' }}>
-            {favoriteDriver.fullName}
+            {driver.fullName}
           </AppText>
           <AppText variant="bodyMd" color={colors.onSurfaceVariant} style={{ textAlign: 'center' }}>
-            {favoriteDriver.shortCar} • {favoriteDriver.plate}
+            {driver.car} • {driver.plate}
           </AppText>
           <View style={styles.eta}>
             <Icon name="near-me" size={18} color={colors.primary} />
             <AppText variant="labelMd" color="#7A2E00">
-              Arrivée estimée dans 4 min
+              {etaText}
             </AppText>
           </View>
         </View>
@@ -158,14 +170,14 @@ export default function CallScreen() {
             <View style={styles.row}>
               <View style={[styles.dot, { width: 8, height: 8 }]} />
               <AppText variant="labelSm" color={colors.secondary}>
-                VÉHICULE À 250M
+                {ride.current?.status === 'ongoing' ? 'EN COURSE' : 'EN APPROCHE'}
               </AppText>
             </View>
             <AppText variant="headlineSm" numberOfLines={1}>
-              Carrefour Riviera 2
+              {ride.current?.pickup.name ?? ride.pickup.name}
             </AppText>
             <AppText variant="bodySm" color={colors.onSurfaceVariant} numberOfLines={1}>
-              En route vers CCIA Plateau
+              En route vers {ride.current?.destination.name ?? ride.destination.name}
             </AppText>
           </View>
           <View style={styles.miniMap}>

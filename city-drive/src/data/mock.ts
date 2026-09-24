@@ -24,9 +24,9 @@ export const favoriteDriver = {
 };
 
 export const quickPlaces = [
-  { icon: 'home', label: 'Maison', address: 'Riviera Bonoumin', tone: 'primary' },
-  { icon: 'work', label: 'Bureau', address: 'Plateau, Immeuble CCIA', tone: 'secondary' },
-  { icon: 'local-mall', label: 'Cap Sud', address: 'Marcory', tone: 'tertiary' },
+  { icon: 'home', label: 'Maison', address: 'Riviera Bonoumin', tone: 'primary', placeId: 'bonoumin' },
+  { icon: 'work', label: 'Bureau', address: 'Plateau, Immeuble CCIA', tone: 'secondary', placeId: 'plateau-ccia' },
+  { icon: 'local-mall', label: 'Cap Sud', address: 'Marcory', tone: 'tertiary', placeId: 'cap-sud' },
 ] as const;
 
 export type VehicleKind = 'sedan' | 'suv' | 'van' | 'moto';

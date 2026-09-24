@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -6,7 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText, Avatar, Icon, Pill, Touchable, type IconName } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
-import { favoriteDriver, formatAmount } from '@/data/mock';
+import { formatAmount } from '@/data/mock';
+import { useRide } from '@/data/ride';
 import { useWallet } from '@/data/wallet';
 
 const RATING_LABELS = ['', 'Décevant', 'Passable', 'Bien', 'Très bon trajet', 'Exceptionnel !'];
@@ -27,16 +28,19 @@ type Status = 'idle' | 'sending' | 'done';
 
 export default function RatingScreen() {
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ price?: string }>();
-  const price = Number(params.price) || 3200;
-  const firstName = favoriteDriver.fullName.split(' ')[0];
+  const ride = useRide();
+  // Course à noter : celle qui vient de se terminer, sinon la dernière non notée.
+  const r = ride.current?.status === 'completed' && ride.current.rating === null ? ride.current : ride.history.find((h) => h.status === 'completed' && h.rating === null);
+  const driver = r?.driver ?? ride.favoriteDriver;
+  const firstName = driver.fullName.split(' ')[0];
+  const price = r?.fare ?? 0;
 
-  const { balance, pay } = useWallet();
+  const { balance } = useWallet();
   const [rating, setRating] = useState(5);
   const [compliments, setCompliments] = useState<string[]>(['drive', 'ac', 'time']);
   const [tip, setTip] = useState<number | 'custom'>(RECOMMENDED_TIP);
   const [customTip, setCustomTip] = useState('');
-  const [favorite, setFavorite] = useState(true);
+  const [favorite, setFavorite] = useState(ride.favoriteDriver.id === driver.id);
   const [note, setNote] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -48,27 +52,53 @@ export default function RatingScreen() {
 
   const submit = () => {
     setError(null);
+    if (!r) {
+      setError('Aucune course terminée à noter.');
+      return;
+    }
     if (tipAmount > balance) {
       setError('Solde insuffisant pour ce pourboire : choisissez un montant plus petit ou rechargez.');
+      return;
+    }
+    const err = ride.rate(rating, tipAmount, favorite);
+    if (err) {
+      setError(err);
       return;
     }
     setStatus('sending');
   };
 
-  // Transmission simulée, débit du pourboire puis retour.
+  // Note et pourboire enregistrés par ride.rate ; court délai d'envoi puis retour à l'accueil.
   useEffect(() => {
     if (status === 'sending') {
-      const id = setTimeout(() => {
-        if (tipAmount > 0) pay(tipAmount, `Pourboire ${favoriteDriver.name}`, 'Reversé à 100 % au chauffeur');
-        setStatus('done');
-      }, 700);
+      const id = setTimeout(() => setStatus('done'), 600);
       return () => clearTimeout(id);
     }
     if (status === 'done') {
-      const id = setTimeout(() => router.navigate('/'), 900);
+      const id = setTimeout(() => {
+        ride.dismiss();
+        router.navigate('/');
+      }, 900);
       return () => clearTimeout(id);
     }
-  }, [status, tipAmount, pay]);
+  }, [status]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!r && status === 'idle') {
+    return (
+      <View style={[styles.screen, styles.empty, { paddingTop: insets.top }]}>
+        <Icon name="star" size={40} color={colors.outline} />
+        <AppText variant="headlineSm">Aucune course à noter</AppText>
+        <AppText variant="bodyMd" color={colors.onSurfaceVariant} style={{ textAlign: 'center' }}>
+          Vous pourrez noter votre chauffeur à la fin de votre prochaine course.
+        </AppText>
+        <Touchable style={styles.emptyCta} onPress={() => router.navigate('/')}>
+          <AppText variant="labelLg" color={colors.onPrimary}>
+            Retour à l&apos;accueil
+          </AppText>
+        </Touchable>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView style={styles.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -99,21 +129,25 @@ export default function RatingScreen() {
           </View>
           <View style={{ paddingLeft: 36, gap: 4, marginTop: 4 }}>
             <View style={styles.row}>
-              <AppText variant="labelLg">Plateau</AppText>
+              <AppText variant="labelLg" numberOfLines={1} style={{ flexShrink: 1 }}>
+                {r?.pickup.name ?? '—'}
+              </AppText>
               <Icon name="arrow-forward" size={16} color={colors.primary} />
-              <AppText variant="labelLg">Marcory Zone 4</AppText>
+              <AppText variant="labelLg" numberOfLines={1} style={{ flexShrink: 1 }}>
+                {r?.destination.name ?? '—'}
+              </AppText>
             </View>
-            <View style={[styles.row, { gap: 8 }]}>
+            <View style={[styles.row, { gap: 8, flexWrap: 'wrap' }]}>
               <AppText variant="bodySm" color={colors.onSurfaceVariant}>
-                14 min
+                {r?.route.minutes ?? 0} min
               </AppText>
               <View style={styles.sep} />
               <AppText variant="bodySm" color={colors.onSurfaceVariant}>
-                4,2 km
+                {(r?.route.km ?? 0).toString().replace('.', ',')} km
               </AppText>
               <View style={styles.sep} />
               <AppText variant="labelSm" color={colors.primary}>
-                {formatAmount(price)} {brand.walletUnit} prélevés
+                {r?.paidWith === 'wallet' ? `${formatAmount(price)} ${brand.walletUnit} prélevés` : `${formatAmount(price)} F en espèces`}
               </AppText>
             </View>
           </View>
@@ -122,28 +156,28 @@ export default function RatingScreen() {
         {/* Chauffeur + note */}
         <View style={[styles.card, { alignItems: 'center' }]}>
           <View style={styles.avatarRing}>
-            <Avatar name={favoriteDriver.fullName} size={72} radius={36} />
+            <Avatar name={driver.fullName} size={72} radius={36} />
             <View style={styles.ratingBadge}>
               <Icon name="star" size={12} color={colors.secondaryContainer} />
               <AppText variant="labelSm" color={colors.onPrimary}>
-                4.9
+                {driver.rating.toFixed(1).replace('.', ',')}
               </AppText>
             </View>
           </View>
-          <AppText variant="headlineSm">{favoriteDriver.fullName}</AppText>
+          <AppText variant="headlineSm">{driver.fullName}</AppText>
           <View style={[styles.row, { gap: 8 }]}>
             <AppText variant="bodySm" color={colors.onSurfaceVariant}>
-              {favoriteDriver.shortCar}
+              {driver.car}
             </AppText>
             <View style={styles.sep} />
             <Pill background={colors.surfaceContainer} style={{ paddingHorizontal: 8 }}>
               <AppText variant="labelSm" style={{ letterSpacing: 1 }}>
-                {favoriteDriver.plate}
+                {driver.plate}
               </AppText>
             </Pill>
           </View>
           <AppText variant="bodySm" color={colors.outline}>
-            1 240 courses complétées
+            {driver.trips} courses complétées
           </AppText>
 
           <View style={styles.divider} />
@@ -341,6 +375,8 @@ export default function RatingScreen() {
 }
 
 const styles = StyleSheet.create({
+  empty: { alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 32 },
+  emptyCta: { marginTop: 8, paddingHorizontal: 24, height: 48, borderRadius: 12, backgroundColor: colors.primary, justifyContent: 'center' },
   screen: { flex: 1, backgroundColor: colors.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },

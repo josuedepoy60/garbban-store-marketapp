@@ -1,101 +1,124 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Path } from 'react-native-svg';
 
 import { CityMap } from '@/components/CityMap';
 import { StackHeader } from '@/components/headers';
-import { AppText, Bounce, Dot, Icon, Pill, PingDot, Touchable, type IconName } from '@/components/ui';
+import { RouteLayer } from '@/components/RouteLayer';
+import { AppText, Dot, Icon, Pill, Touchable, useLayout, type IconName } from '@/components/ui';
 import { VehicleIcon } from '@/components/VehicleIcon';
 import { brand } from '@/constants/brand';
 import { colors, shadows } from '@/constants/theme';
-import { carModels, formatAmount, vehicles } from '@/data/mock';
+import { formatAmount, vehicles } from '@/data/mock';
+import { useRide } from '@/data/ride';
 import { useWallet } from '@/data/wallet';
+import { shortName } from '@/logic/fleet';
+import { FREE_CANCEL_MIN, FREE_WAIT_MIN, WAIT_FEE_PER_MIN } from '@/logic/pricing';
+import type { PaymentMethod } from '@/logic/ride';
+import { arrivalTime } from '@/logic/time';
 
-const PAYMENT_METHODS: { name: string; icon: IconName; detail: string }[] = [
-  { name: brand.walletName, icon: 'toll', detail: '' },
-  { name: 'Wave', icon: 'phone-iphone', detail: 'Paiement mobile' },
-  { name: 'Orange Money', icon: 'phone-android', detail: 'Paiement mobile' },
-  { name: 'Espèces', icon: 'payments', detail: 'À régler au chauffeur' },
+const PAYMENTS: { id: PaymentMethod; name: string; icon: IconName }[] = [
+  { id: 'wallet', name: brand.walletName, icon: 'toll' },
+  { id: 'cash', name: 'Espèces', icon: 'payments' },
 ];
+
+const F = (n: number) => `${formatAmount(n)} F`;
 
 export default function VehiclesScreen() {
   const insets = useSafeAreaInsets();
-  const [selected, setSelected] = useState(vehicles[0].id);
-  const [model, setModel] = useState(carModels[0]);
-  const [payment, setPayment] = useState(0);
+  const { gutter, mapHeight, compact } = useLayout();
+  const ride = useRide();
+  const { pickup, destination, stops, route, offers, offer, draft, fleet } = ride;
+  const { balance, canPay } = useWallet();
+  const [error, setError] = useState<string | null>(null);
 
-  const vehicle = vehicles.find((v) => v.id === selected) ?? vehicles[0];
-  const { balance } = useWallet();
-  const method = PAYMENT_METHODS[payment];
-  const methodDetail = payment === 0 ? `Solde disponible : ${formatAmount(balance)} ${brand.walletUnit}` : method.detail;
+  const q = offer.quote;
+  const walletShort = draft.payment === 'wallet' && !canPay(q.total);
+  const preferred = draft.preferredDriverId ? fleet.find((d) => d.id === draft.preferredDriverId) : undefined;
+
+  const order = () => {
+    const err = ride.request();
+    if (err) return setError(err);
+    router.replace('/course');
+  };
+
+  const breakdown: [string, number][] = [
+    ['Prise en charge', q.base],
+    [`Distance · ${route.km.toString().replace('.', ',')} km`, q.distance],
+    [`Durée estimée · ${route.minutes} min`, q.time],
+    ...(q.stops ? ([[`${stops.length} arrêt${stops.length > 1 ? 's' : ''}`, q.stops]] as [string, number][]) : []),
+    ...(q.toll ? ([[`Péage ${route.via}`, q.toll]] as [string, number][]) : []),
+  ];
 
   return (
     <View style={styles.screen}>
-      <StackHeader title="Confirmation de course" />
+      <StackHeader title="Choisir un véhicule" />
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 32 }} showsVerticalScrollIndicator={false}>
         {/* Mini carte */}
-        <View style={{ height: 176 }}>
-          <CityMap style={StyleSheet.absoluteFill} animated={false}>
-            <Path d="M 60 190 C 130 170, 170 240, 230 225 S 330 260, 380 300" stroke={colors.primaryContainer} strokeWidth={5} strokeLinecap="round" fill="none" />
+        <View style={{ height: mapHeight(0.22, 150, 210) }}>
+          <CityMap style={StyleSheet.absoluteFill}>
+            <RouteLayer points={[pickup, ...stops, destination]} jam={!!route.jam} />
           </CityMap>
-          <LinearGradient
-            pointerEvents="none"
-            colors={['rgba(250,250,251,0.2)', 'rgba(250,250,251,0)', colors.surface]}
-            locations={[0, 0.5, 1]}
-            style={StyleSheet.absoluteFill}
-          />
-          <View style={styles.routePill}>
+          <Touchable style={[styles.routePill, { left: gutter, right: gutter }]} onPress={() => router.push('/destination')} scale={0.99}>
             <View style={[styles.row, { flex: 1 }]}>
-              <PingDot color={colors.primary} size={10} />
+              <Dot color={colors.blue} size={10} />
               <AppText variant="labelMd" numberOfLines={1} style={{ flexShrink: 1 }}>
-                Riviera 2 → Plateau{' '}
-                <AppText variant="bodySm" color={colors.onSurfaceVariant}>
-                  (via 2 arrêts)
-                </AppText>
+                {pickup.name} → {destination.name}
+                {stops.length > 0 && (
+                  <AppText variant="bodySm" color={colors.onSurfaceVariant}>
+                    {' '}
+                    (via {stops.length} arrêt{stops.length > 1 ? 's' : ''})
+                  </AppText>
+                )}
               </AppText>
             </View>
             <View style={styles.timePill}>
               <Icon name="schedule" size={15} color={colors.primary} />
               <AppText variant="labelSm" color={colors.primary}>
-                34 min
+                {route.minutes} min
               </AppText>
             </View>
-          </View>
-          <Bounce style={styles.enRoute} duration={1600}>
-            <Dot color={colors.secondaryContainer} />
-            <AppText variant="labelSm">En route</AppText>
-            <Icon name="local-taxi" size={16} color={colors.secondary} />
-          </Bounce>
+          </Touchable>
         </View>
 
-        <View style={styles.content}>
-          <View style={styles.between}>
-            <View style={{ flex: 1 }}>
-              <AppText variant="headlineMd">Véhicules disponibles</AppText>
-              <AppText variant="bodySm" color={colors.onSurfaceVariant}>
-                Trajet direct avec chauffeur vérifié
-              </AppText>
-            </View>
+        <View style={[styles.content, { paddingHorizontal: gutter }]}>
+          <View>
+            <AppText variant="headlineMd">Véhicules disponibles</AppText>
+            <AppText variant="bodySm" color={colors.onSurfaceVariant}>
+              {route.via} · arrivée vers {arrivalTime(route.minutes + (offer.eta ?? 0))}
+            </AppText>
           </View>
 
+          {preferred && (
+            <View style={styles.notice}>
+              <Icon name="favorite" size={16} color={colors.tertiary} />
+              <AppText variant="bodySm" style={{ flex: 1 }}>
+                {shortName(preferred)} sera sollicité en priorité s’il est à moins de 5 min de plus que le plus proche.
+              </AppText>
+            </View>
+          )}
+
           <View style={{ gap: 12 }}>
-            {vehicles.map((v) => {
-              const active = v.id === selected;
+            {offers.map((o) => {
+              const v = vehicles.find((x) => x.id === o.category)!;
+              const active = o.category === draft.category;
+              const none = o.available === 0;
               return (
-                <Touchable key={v.id} scale={0.98} onPress={() => setSelected(v.id)} style={[styles.vehicle, active && styles.vehicleActive]}>
-                  {v.recommended && active && (
-                    <View style={styles.recommended}>
-                      <Icon name="verified" size={12} color={colors.onPrimary} />
-                      <AppText variant="labelSm" color={colors.onPrimary}>
-                        Recommandé
-                      </AppText>
-                    </View>
-                  )}
-                  <View style={[styles.row, { gap: 14, flex: 1 }]}>
-                    <View style={styles.vehicleArt}>
+                <Touchable
+                  key={o.category}
+                  scale={0.98}
+                  disabled={none}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: active, disabled: none }}
+                  onPress={() => {
+                    ride.setCategory(o.category);
+                    setError(null);
+                  }}
+                  style={[styles.vehicle, active && styles.vehicleActive, none && { opacity: 0.45 }]}
+                >
+                  <View style={[styles.row, { gap: compact ? 10 : 14, flex: 1 }]}>
+                    <View style={[styles.vehicleArt, compact && { width: 52, height: 46 }]}>
                       <VehicleIcon kind={v.kind} color={active ? colors.primary : colors.onSurface} />
                     </View>
                     <View style={{ flex: 1 }}>
@@ -110,31 +133,28 @@ export default function VehiclesScreen() {
                       <AppText variant="bodySm" color={colors.onSurfaceVariant} numberOfLines={1}>
                         {v.description}
                       </AppText>
-                      <View style={[styles.row, { gap: 2, marginTop: 2 }]}>
-                        <Icon name={v.fast ? 'bolt' : 'schedule'} size={13} color={v.fast ? colors.secondary : colors.onSurfaceVariant} />
-                        <AppText variant="labelSm" color={v.fast ? colors.secondary : colors.onSurfaceVariant}>
-                          {v.eta}
+                      <View style={[styles.row, { gap: 4, marginTop: 2, flexWrap: 'wrap' }]}>
+                        <Icon name={none ? 'block' : 'schedule'} size={13} color={none ? colors.outline : colors.secondary} />
+                        <AppText variant="labelSm" color={none ? colors.outline : colors.secondary}>
+                          {none ? 'Aucun chauffeur proche' : `Dans ${o.eta} min · ${o.available} libre${o.available > 1 ? 's' : ''}`}
                         </AppText>
                       </View>
                     </View>
                   </View>
                   <View style={{ alignItems: 'flex-end' }}>
                     <AppText variant="headlineSm" color={active ? colors.primary : colors.onSurface}>
-                      {formatAmount(v.price)}{' '}
+                      {formatAmount(o.quote.total)}
                       <AppText variant="labelSm" color={active ? colors.primary : colors.onSurface}>
-                        FCFA
+                        {' '}F
                       </AppText>
                     </AppText>
-                    {active ? (
-                      <Pill background={colors.secondaryContainer} style={{ paddingHorizontal: 6, paddingVertical: 2, marginTop: 2 }}>
-                        <AppText variant="labelSm" color={colors.onSecondaryFixed}>
-                          {formatAmount(v.price)} {brand.walletUnit}
+                    {o.surge > 1 && !none && (
+                      <Pill background="#FEF3C7" style={{ paddingHorizontal: 6, paddingVertical: 2, marginTop: 2 }}>
+                        <Icon name="trending-up" size={11} color="#92400E" />
+                        <AppText variant="labelSm" color="#92400E" style={{ fontSize: 10 }}>
+                          ×{o.surge.toString().replace('.', ',')}
                         </AppText>
                       </Pill>
-                    ) : (
-                      <AppText variant="labelSm" color={colors.onSurfaceVariant}>
-                        {formatAmount(v.price)} {brand.walletUnit}
-                      </AppText>
                     )}
                   </View>
                 </Touchable>
@@ -142,98 +162,95 @@ export default function VehiclesScreen() {
             })}
           </View>
 
-          {/* Choix du modèle */}
-          <View style={{ gap: 10, paddingTop: 4 }}>
+          {/* Détail du prix */}
+          <View style={styles.breakdown}>
             <View style={styles.between}>
-              <View style={styles.row}>
-                <Icon name="directions-car" size={19} color={colors.primary} />
-                <AppText variant="headlineSm">Choisir un modèle précis</AppText>
-              </View>
+              <AppText variant="labelLg">Détail du prix</AppText>
+              <AppText variant="labelSm" color={colors.secondary}>
+                Prix garanti
+              </AppText>
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
-              {carModels.map((m) => {
-                const active = m === model;
-                return (
-                  <Touchable key={m} onPress={() => setModel(m)} style={[styles.modelChip, active && { backgroundColor: colors.primary }]}>
-                    <AppText variant="labelMd" color={active ? colors.onPrimary : colors.onSurface}>
-                      {m}
-                    </AppText>
-                  </Touchable>
-                );
-              })}
-            </ScrollView>
-          </View>
-
-          {/* Avantages */}
-          <View style={[styles.row, { gap: 12 }]}>
-            <View style={styles.perk}>
-              <View style={[styles.perkIcon, { backgroundColor: colors.surfaceLowest }]}>
-                <Icon name="security" size={18} color={colors.primary} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <AppText variant="labelMd" numberOfLines={1}>
-                  Trajet sécurisé
+            {breakdown.map(([label, amount]) => (
+              <View key={label} style={styles.between}>
+                <AppText variant="bodySm" color={colors.onSurfaceVariant} numberOfLines={1} style={{ flex: 1 }}>
+                  {label}
                 </AppText>
-                <AppText variant="bodySm" color={colors.onSurfaceVariant} numberOfLines={1}>
-                  Assurance AXA incluse
+                <AppText variant="labelMd">{F(amount)}</AppText>
+              </View>
+            ))}
+            {q.surge > 1 && (
+              <View style={styles.between}>
+                <AppText variant="bodySm" color="#92400E" style={{ flex: 1 }}>
+                  Forte demande (×{q.surge.toString().replace('.', ',')} hors péage)
                 </AppText>
               </View>
+            )}
+            <View style={[styles.between, styles.totalRow]}>
+              <AppText variant="labelLg">Total</AppText>
+              <AppText variant="headlineSm">{F(q.total)}</AppText>
             </View>
-            <View style={styles.perk}>
-              <View style={[styles.perkIcon, { backgroundColor: colors.secondaryContainer }]}>
-                <Icon name="price-check" size={18} color={colors.onSecondaryFixed} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <AppText variant="labelMd" numberOfLines={1}>
-                  Prix garanti
-                </AppText>
-                <AppText variant="bodySm" color={colors.onSurfaceVariant} numberOfLines={1}>
-                  Zéro surcoût trafic
-                </AppText>
-              </View>
-            </View>
+            <AppText variant="bodySm" color={colors.onSurfaceVariant}>
+              Attente offerte {FREE_WAIT_MIN} min, puis {WAIT_FEE_PER_MIN} F/min.
+            </AppText>
           </View>
 
           {/* Paiement + action */}
           <View style={styles.checkout}>
-            <View style={styles.between}>
-              <View style={[styles.row, { gap: 12, flex: 1 }]}>
-                <View style={styles.payIcon}>
-                  <Icon name={method.icon} size={20} color={colors.onSecondaryFixed} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <View style={styles.row}>
-                    <AppText variant="labelMd">{method.name}</AppText>
-                    <View style={styles.tick}>
-                      <Icon name="check" size={11} color={colors.onPrimary} />
+            <View style={styles.payRow}>
+              {PAYMENTS.map((m) => {
+                const on = draft.payment === m.id;
+                return (
+                  <Touchable
+                    key={m.id}
+                    accessibilityRole="radio"
+                    accessibilityState={{ checked: on }}
+                    onPress={() => {
+                      ride.setPayment(m.id);
+                      setError(null);
+                    }}
+                    style={[styles.payOption, on && styles.payOn]}
+                  >
+                    <Icon name={m.icon} size={18} color={on ? colors.onPrimary : colors.onSurface} />
+                    <View style={{ flexShrink: 1 }}>
+                      <AppText variant="labelMd" color={on ? colors.onPrimary : colors.onSurface} numberOfLines={1}>
+                        {m.name}
+                      </AppText>
+                      <AppText variant="labelSm" color={on ? colors.onPrimaryContainer : colors.onSurfaceVariant} numberOfLines={1} style={{ fontSize: 10 }}>
+                        {m.id === 'wallet' ? `${formatAmount(balance)} ${brand.walletUnit}` : 'Au chauffeur'}
+                      </AppText>
                     </View>
-                  </View>
-                  <AppText variant="bodySm" color={colors.onSurfaceVariant} numberOfLines={1}>
-                    {methodDetail}
-                  </AppText>
-                </View>
-              </View>
-              <Touchable style={styles.change} onPress={() => setPayment((p) => (p + 1) % PAYMENT_METHODS.length)}>
-                <AppText variant="labelSm" color={colors.primary}>
-                  Changer
-                </AppText>
-              </Touchable>
+                  </Touchable>
+                );
+              })}
             </View>
 
-            <Touchable
-              style={styles.cta}
-              scale={0.98}
-              onPress={() => router.push({ pathname: '/course', params: { price: String(vehicle.price) } })}
-            >
+            {walletShort && (
+              <Touchable style={styles.short} onPress={() => router.push('/portefeuille')}>
+                <Icon name="warning" size={16} color="#B42318" />
+                <AppText variant="bodySm" color="#B42318" style={{ flex: 1 }}>
+                  Il manque {F(q.total - balance)}. Rechargez ou payez en espèces.
+                </AppText>
+                <AppText variant="labelSm" color={colors.primary}>
+                  Recharger
+                </AppText>
+              </Touchable>
+            )}
+
+            <Touchable style={[styles.cta, (walletShort || !offer.available) && { opacity: 0.5 }]} scale={0.98} onPress={order}>
               <Icon name="lock" size={20} color={colors.onPrimary} />
-              <AppText variant="headlineSm" color={colors.onPrimary}>
-                Commander {vehicle.name} · {formatAmount(vehicle.price)} FCFA
+              <AppText variant="headlineSm" color={colors.onPrimary} numberOfLines={1} style={{ flexShrink: 1, fontSize: compact ? 15 : 17 }}>
+                Commander {vehicles.find((x) => x.id === draft.category)?.name} · {F(q.total)}
               </AppText>
             </Touchable>
+            {error && (
+              <AppText variant="labelMd" color="#B42318" style={{ textAlign: 'center' }}>
+                {error}
+              </AppText>
+            )}
             <View style={[styles.row, { justifyContent: 'center' }]}>
               <Icon name="verified-user" size={13} color={colors.secondary} />
               <AppText variant="labelSm" color={colors.onSurfaceVariant}>
-                Paiement débité uniquement à l'arrivée
+                Débité uniquement à l’arrivée · annulation gratuite {FREE_CANCEL_MIN} min
               </AppText>
             </View>
           </View>
@@ -250,8 +267,6 @@ const styles = StyleSheet.create({
   routePill: {
     position: 'absolute',
     top: 12,
-    left: 16,
-    right: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -276,7 +291,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     boxShadow: shadows.card,
   },
-  content: { paddingHorizontal: 16, gap: 16, marginTop: -8 },
+  content: { gap: 16, marginTop: 12 },
   vehicle: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -306,6 +321,13 @@ const styles = StyleSheet.create({
   modelChip: { height: 38, paddingHorizontal: 16, borderRadius: 12, backgroundColor: colors.surfaceLowest, justifyContent: 'center', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   perk: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 16, backgroundColor: colors.surfaceLow },
   perkIcon: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  notice: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 12, backgroundColor: colors.pinkSoft },
+  breakdown: { backgroundColor: colors.surfaceLowest, padding: 16, borderRadius: 16, gap: 8, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  totalRow: { borderTopWidth: 1, borderTopColor: colors.surfaceHigh, paddingTop: 8, marginTop: 2 },
+  payRow: { flexDirection: 'row', gap: 8 },
+  payOption: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 12, backgroundColor: colors.surfaceLow },
+  payOn: { backgroundColor: colors.primary },
+  short: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderRadius: 12, backgroundColor: '#FEF3F2' },
   checkout: { backgroundColor: colors.surfaceLowest, padding: 16, borderRadius: 24, gap: 14, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)', marginTop: 4 },
   payIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center' },
   tick: { width: 16, height: 16, borderRadius: 8, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },

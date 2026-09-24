@@ -4,7 +4,9 @@
 import type { Icon as PhosphorIcon } from 'phosphor-react-native';
 
 import { ArrowBendUpRightIcon } from 'phosphor-react-native/src/icons/ArrowBendUpRight';
+import { ArrowClockwiseIcon } from 'phosphor-react-native/src/icons/ArrowClockwise';
 import { ArrowCounterClockwiseIcon } from 'phosphor-react-native/src/icons/ArrowCounterClockwise';
+import { ArrowDownIcon } from 'phosphor-react-native/src/icons/ArrowDown';
 import { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
 import { ArrowRightIcon } from 'phosphor-react-native/src/icons/ArrowRight';
 import { ArrowUpIcon } from 'phosphor-react-native/src/icons/ArrowUp';
@@ -62,6 +64,7 @@ import { LightningIcon } from 'phosphor-react-native/src/icons/Lightning';
 import { LockIcon } from 'phosphor-react-native/src/icons/Lock';
 import { LockKeyIcon } from 'phosphor-react-native/src/icons/LockKey';
 import { MagnifyingGlassIcon } from 'phosphor-react-native/src/icons/MagnifyingGlass';
+import { MagnifyingGlassMinusIcon } from 'phosphor-react-native/src/icons/MagnifyingGlassMinus';
 import { MapPinIcon } from 'phosphor-react-native/src/icons/MapPin';
 import { MapPinLineIcon } from 'phosphor-react-native/src/icons/MapPinLine';
 import { MapPinPlusIcon } from 'phosphor-react-native/src/icons/MapPinPlus';
@@ -81,6 +84,7 @@ import { PhoneCallIcon } from 'phosphor-react-native/src/icons/PhoneCall';
 import { PhoneDisconnectIcon } from 'phosphor-react-native/src/icons/PhoneDisconnect';
 import { PlayIcon } from 'phosphor-react-native/src/icons/Play';
 import { PlusCircleIcon } from 'phosphor-react-native/src/icons/PlusCircle';
+import { ProhibitIcon } from 'phosphor-react-native/src/icons/Prohibit';
 import { QrCodeIcon } from 'phosphor-react-native/src/icons/QrCode';
 import { QuestionIcon } from 'phosphor-react-native/src/icons/Question';
 import { ReceiptIcon } from 'phosphor-react-native/src/icons/Receipt';
@@ -101,6 +105,7 @@ import { TaxiIcon } from 'phosphor-react-native/src/icons/Taxi';
 import { TimerIcon } from 'phosphor-react-native/src/icons/Timer';
 import { TrafficSignalIcon } from 'phosphor-react-native/src/icons/TrafficSignal';
 import { TrashIcon } from 'phosphor-react-native/src/icons/Trash';
+import { TrendUpIcon } from 'phosphor-react-native/src/icons/TrendUp';
 import { UserIcon } from 'phosphor-react-native/src/icons/User';
 import { UsersIcon } from 'phosphor-react-native/src/icons/Users';
 import { WalletIcon } from 'phosphor-react-native/src/icons/Wallet';
@@ -108,6 +113,7 @@ import { WarningIcon } from 'phosphor-react-native/src/icons/Warning';
 import { WaveformIcon } from 'phosphor-react-native/src/icons/Waveform';
 import { WavesIcon } from 'phosphor-react-native/src/icons/Waves';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
+import { XCircleIcon } from 'phosphor-react-native/src/icons/XCircle';
 
 export const PHOSPHOR: Record<string, PhosphorIcon> = {
   'ac-unit': SnowflakeIcon,
@@ -229,6 +235,13 @@ export const PHOSPHOR: Record<string, PhosphorIcon> = {
   'waves': WavesIcon,
   'work': BriefcaseIcon,
   'workspace-premium': CrownIcon,
+  'arrow-downward': ArrowDownIcon,
+  'arrow-upward': ArrowUpIcon,
+  block: ProhibitIcon,
+  cancel: XCircleIcon,
+  refresh: ArrowClockwiseIcon,
+  'search-off': MagnifyingGlassMinusIcon,
+  'trending-up': TrendUpIcon,
 };
 
 /** Icônes affichées pleines par défaut (symboles pleins par nature ou états actifs). */

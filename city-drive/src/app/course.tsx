@@ -1,313 +1,385 @@
-import { LinearGradient } from 'expo-linear-gradient';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CityMap } from '@/components/CityMap';
-import { AppText, Avatar, CircleButton, Icon, PingDot, Pill, Pulse, SheetHandle, Touchable, useCompact } from '@/components/ui';
+import { pointAlong, RouteLayer } from '@/components/RouteLayer';
+import { AppText, Avatar, CircleButton, Icon, SheetHandle, Touchable, useLayout, type IconName } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
-import { favoriteDriver, formatAmount } from '@/data/mock';
+import { formatAmount, vehicles } from '@/data/mock';
+import { useRide } from '@/data/ride';
 import { useWallet } from '@/data/wallet';
+import { shortName } from '@/logic/fleet';
+import { lerp } from '@/logic/geo';
+import { FREE_WAIT_MIN, waitingFee } from '@/logic/pricing';
+import { canCancel, cancelFeeNow, freeWaitLeft, isActive, type Ride, type RideStatus } from '@/logic/ride';
+import { arrivalTime } from '@/logic/time';
 
-type Method = 'wallet' | 'cash';
+const F = (n: number) => `${formatAmount(n)} F`;
+
+const STATUS_PILL: Record<RideStatus, string> = {
+  searching: 'Recherche',
+  accepted: 'En approche',
+  arrived: 'Arrivé',
+  ongoing: 'En course',
+  completed: 'Terminée',
+  cancelled: 'Annulée',
+  no_driver: 'Indisponible',
+};
+
+const STEPS: { label: string; of: RideStatus[] }[] = [
+  { label: 'Recherche', of: ['searching'] },
+  { label: 'Approche', of: ['accepted'] },
+  { label: 'Prise en charge', of: ['arrived'] },
+  { label: 'Trajet', of: ['ongoing'] },
+  { label: 'Arrivée', of: ['completed'] },
+];
+
+/** Position de la voiture sur la carte selon l'étape de la course. */
+function carPosition(r: Ride) {
+  if (!r.driver) return null;
+  const path = [r.pickup, ...r.stops, r.destination];
+  if (r.status === 'accepted') return lerp(r.driver.position, r.pickup, r.approachTotal ? 1 - r.eta / r.approachTotal : 1);
+  if (r.status === 'arrived') return r.pickup;
+  if (r.status === 'ongoing' || r.status === 'completed') return pointAlong(path, r.progress);
+  return null;
+}
 
 export default function ActiveRideScreen() {
   const insets = useSafeAreaInsets();
-  const params = useLocalSearchParams<{ price?: string }>();
-  const price = Number(params.price) || 3200;
-  const [method, setMethod] = useState<Method>('wallet');
-  const [confirmed, setConfirmed] = useState(false);
-  const [refused, setRefused] = useState(false);
-  const { balance, pay } = useWallet();
-  const compact = useCompact();
+  const { gutter, mapHeight, compact } = useLayout();
+  const ride = useRide();
+  const { balance } = useWallet();
+  const r = ride.current;
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
-  const confirm = () => {
-    if (method === 'wallet' && !pay(price, 'Plateau ➔ Marcory Zone 4', 'Chauffeur Koffi T.')) {
-      setRefused(true);
-      return;
-    }
-    setConfirmed(true);
+  const home = () => {
+    ride.dismiss();
+    router.navigate('/');
   };
 
-  const amount = `${formatAmount(price)} FCFA`;
+  if (!r) {
+    return (
+      <View style={[styles.screen, styles.empty, { paddingTop: insets.top }]}>
+        <Icon name="local-taxi" size={40} color={colors.outline} />
+        <AppText variant="headlineSm">Aucune course en cours</AppText>
+        <Touchable style={[styles.cta, { backgroundColor: colors.primary, paddingHorizontal: 24 }]} onPress={() => router.replace('/destination')}>
+          <AppText variant="labelLg" color="#fff">
+            Commander une course
+          </AppText>
+        </Touchable>
+      </View>
+    );
+  }
+
+  const d = r.driver;
+  const vehicle = vehicles.find((v) => v.id === r.category);
+  const fee = cancelFeeNow(r);
+  const stepIndex = STEPS.findIndex((s) => s.of.includes(r.status));
+  const firstName = d?.fullName.split(' ')[0] ?? '';
+
+  const title =
+    r.status === 'searching'
+      ? `Recherche d’un chauffeur ${vehicle?.name ?? ''}…`
+      : r.status === 'accepted'
+        ? `${firstName} arrive dans ${r.eta} min`
+        : r.status === 'arrived'
+          ? `${firstName} vous attend`
+          : r.status === 'ongoing'
+            ? `Arrivée dans ${r.eta} min`
+            : r.status === 'completed'
+              ? 'Vous êtes arrivé'
+              : r.status === 'cancelled'
+                ? 'Course annulée'
+                : 'Aucun chauffeur disponible';
+
+  const subtitle =
+    r.status === 'searching'
+      ? 'Nous contactons les chauffeurs les plus proches'
+      : r.status === 'accepted'
+        ? `Rendez-vous à ${r.pickup.name}`
+        : r.status === 'arrived'
+          ? freeWaitLeft(r) > 0
+            ? `Attente offerte encore ${freeWaitLeft(r)} min`
+            : `Attente facturée ${F(waitingFee(r.waited))}`
+          : r.status === 'ongoing'
+            ? `${r.destination.name} vers ${arrivalTime(r.eta)} · ${r.route.via}`
+            : r.status === 'completed'
+              ? `${r.destination.name} · ${r.route.km.toString().replace('.', ',')} km`
+              : r.status === 'cancelled'
+                ? r.cancelFee
+                  ? `Frais d’annulation : ${F(r.cancelFee)}`
+                  : 'Annulation gratuite'
+                : 'Réessayez dans quelques minutes ou changez de catégorie';
+
+  const counter = r.status === 'accepted' || r.status === 'ongoing' ? r.eta : null;
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top }]}>
       {/* En-tête */}
-      <View style={styles.header}>
-        <CircleButton icon="arrow-back" label="Retour" color={colors.ink} onPress={() => router.back()} />
+      <View style={[styles.header, { paddingHorizontal: gutter }]}>
+        <CircleButton icon="arrow-back" label="Retour" color={colors.ink} onPress={() => (router.canGoBack() ? router.back() : router.navigate('/'))} />
         <View style={{ alignItems: 'center', flexShrink: 1 }}>
           <AppText variant="headlineSm" color={colors.ink} numberOfLines={1} style={{ fontSize: compact ? 14 : 16, lineHeight: 22, letterSpacing: -0.3 }}>
-            {brand.appName} Mobilité
+            {vehicle?.name ?? 'Course'} · {r.pickup.name} → {r.destination.name}
           </AppText>
           <AppText variant="labelSm" color={colors.inkSoft} style={{ opacity: 0.7, fontSize: 10 }}>
-            Course active #VM-9402
+            Course {r.id}
           </AppText>
         </View>
         <View style={styles.status}>
-          <PingDot color={colors.primaryContainer} />
-          {!compact && (
-            <AppText variant="labelSm" color={colors.primaryContainer} style={{ fontSize: 12 }}>
-              En approche
-            </AppText>
-          )}
+          <AppText variant="labelSm" color={colors.primaryContainer} style={{ fontSize: 11 }}>
+            {STATUS_PILL[r.status]}
+          </AppText>
         </View>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 32 }} showsVerticalScrollIndicator={false}>
         {/* Carte de suivi */}
-        <View style={{ height: 288 }}>
-          <CityMap style={StyleSheet.absoluteFill} />
-          <LinearGradient
-            pointerEvents="none"
-            colors={['rgba(247,247,248,0.4)', 'rgba(247,247,248,0)', 'rgba(247,247,248,0.8)', '#FFFFFF']}
-            locations={[0, 0.4, 0.9, 1]}
-            style={StyleSheet.absoluteFill}
-          />
-
-          <View style={styles.locator}>
-            <View style={[styles.row, { gap: 10, flex: 1 }]}>
-              <View style={styles.locatorIcon}>
-                <Icon name="near-me" size={18} color={colors.primaryContainer} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <AppText variant="labelMd" color={colors.ink} numberOfLines={1}>
-                  Boulevard de la République
-                </AppText>
-                <AppText variant="bodySm" color={colors.inkSoft} style={{ opacity: 0.75 }}>
-                  À 1.2 km de votre position
-                </AppText>
-              </View>
-            </View>
-            <View style={styles.minutes}>
-              <AppText variant="headlineSm" color="#fff" style={{ fontSize: 16 }}>
-                4 min
-              </AppText>
-            </View>
-          </View>
-
-          <View style={styles.carMarker}>
-            <View style={styles.carTag}>
-              <AppText variant="labelSm" color="#fff" style={{ fontSize: 10 }}>
-                Toyota Yaris
-              </AppText>
-              <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: colors.secondaryContainer }} />
-            </View>
-            <View>
-              <Pulse style={[StyleSheet.absoluteFill, { borderRadius: 22, backgroundColor: 'rgba(17,24,39,0.35)' }]} />
-              <View style={styles.car}>
-                <Icon name="directions-car" size={20} color="#fff" />
-              </View>
-            </View>
-          </View>
+        <View style={{ height: mapHeight(0.32, 200, 300) }}>
+          <CityMap style={StyleSheet.absoluteFill}>
+            <RouteLayer points={[r.pickup, ...r.stops, r.destination]} car={carPosition(r)} />
+          </CityMap>
         </View>
 
         {/* Feuille principale */}
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, { paddingHorizontal: compact ? 14 : 20 }]}>
           <SheetHandle color="rgba(49,46,129,0.3)" />
 
           <View style={styles.between}>
             <View style={{ flex: 1 }}>
-              <AppText variant="headlineMd" color={colors.ink} style={{ letterSpacing: -0.3 }}>
-                Votre chauffeur arrive dans 4 min
+              <AppText variant="headlineMd" color={colors.ink} style={{ letterSpacing: -0.3, fontSize: compact ? 18 : 20 }}>
+                {title}
               </AppText>
               <AppText variant="bodySm" color={colors.inkSoft} style={{ opacity: 0.8 }}>
-                Préparez-vous au point de prise en charge
+                {subtitle}
               </AppText>
             </View>
-            <View style={styles.countdown}>
-              <AppText variant="headlineSm" color={colors.primaryContainer} style={{ fontFamily: fonts.sora700, lineHeight: 18 }}>
-                4
-              </AppText>
-              <AppText variant="labelSm" color={colors.primaryContainer} style={{ fontSize: 10, lineHeight: 12 }}>
-                min
-              </AppText>
-            </View>
+            {counter !== null && (
+              <View style={styles.countdown}>
+                <AppText variant="headlineSm" color={colors.primaryContainer} style={{ fontFamily: fonts.sora700, lineHeight: 18 }}>
+                  {counter}
+                </AppText>
+                <AppText variant="labelSm" color={colors.primaryContainer} style={{ fontSize: 10, lineHeight: 12 }}>
+                  min
+                </AppText>
+              </View>
+            )}
           </View>
+
+          {/* Étapes de la course */}
+          {stepIndex >= 0 && (
+            <View style={styles.steps} accessibilityLabel={`Étape ${stepIndex + 1} sur ${STEPS.length}`}>
+              {STEPS.map((s, i) => (
+                <View key={s.label} style={{ flex: 1, gap: 4 }}>
+                  <View style={[styles.stepBar, { backgroundColor: i <= stepIndex ? colors.primary : colors.surfaceHigh }]}>
+                    {i === stepIndex && r.status === 'ongoing' && <View style={[styles.stepFill, { width: `${Math.round(r.progress * 100)}%` }]} />}
+                  </View>
+                  {!compact && (
+                    <AppText variant="labelSm" color={i === stepIndex ? colors.ink : colors.outline} style={{ fontSize: 9 }} numberOfLines={1}>
+                      {s.label}
+                    </AppText>
+                  )}
+                </View>
+              ))}
+            </View>
+          )}
 
           {/* Chauffeur */}
-          <View style={styles.driverCard}>
-            <View style={styles.between}>
-              <View style={[styles.row, { gap: 12, flex: 1 }]}>
-                <View>
-                  <Avatar name={favoriteDriver.fullName} size={56} />
-                  <View style={styles.online} />
+          {d && (
+            <View style={styles.driverCard}>
+              <View style={styles.between}>
+                <View style={[styles.row, { gap: 12, flex: 1 }]}>
+                  <Avatar name={d.fullName} size={compact ? 48 : 56} />
+                  <View style={{ flex: 1 }}>
+                    <View style={styles.row}>
+                      <AppText variant="headlineSm" color={colors.ink} numberOfLines={1} style={{ fontFamily: fonts.sora700, fontSize: 16, flexShrink: 1 }}>
+                        {shortName(d)}
+                      </AppText>
+                      {d.certified && <Icon name="verified" size={15} color={colors.primaryContainer} />}
+                    </View>
+                    <View style={[styles.row, { gap: 3, marginTop: 2 }]}>
+                      <Icon name="star" size={14} color="#eab308" />
+                      <AppText variant="labelMd" color={colors.ink} style={{ fontFamily: fonts.dm700 }}>
+                        {d.rating.toFixed(2).replace('.', ',')}
+                      </AppText>
+                      <AppText variant="bodySm" color={colors.inkSoft} style={{ opacity: 0.7 }} numberOfLines={1}>
+                        · {d.trips} courses
+                      </AppText>
+                    </View>
+                  </View>
                 </View>
-                <View style={{ flex: 1 }}>
+                {isActive(r) && (
                   <View style={styles.row}>
-                    <AppText variant="headlineSm" color={colors.ink} style={{ fontFamily: fonts.sora700, fontSize: 16 }}>
-                      Koffi T.
-                    </AppText>
-                    <Icon name="verified" size={15} color={colors.primaryContainer} />
+                    <Touchable style={styles.squareBtn} accessibilityLabel="Appeler le chauffeur" onPress={() => router.push('/appel')}>
+                      <Icon name="call" size={20} color={colors.primaryContainer} />
+                    </Touchable>
+                    <Touchable style={styles.squareBtn} accessibilityLabel="Envoyer un message" onPress={() => router.push('/chat')}>
+                      <Icon name="chat" size={20} color={colors.primaryContainer} />
+                    </Touchable>
                   </View>
-                  <View style={[styles.row, { gap: 3, marginTop: 2 }]}>
-                    <Icon name="star" size={14} color="#eab308" />
-                    <AppText variant="labelMd" color={colors.ink} style={{ fontFamily: fonts.dm700 }}>
-                      4.92
-                    </AppText>
-                    <AppText variant="bodySm" color={colors.inkSoft} style={{ opacity: 0.7 }}>
-                      · (850+ courses)
-                    </AppText>
-                  </View>
-                </View>
+                )}
               </View>
-              <View style={styles.row}>
-                <Touchable style={styles.squareBtn} accessibilityLabel="Appeler le chauffeur" onPress={() => router.push('/appel')}>
-                  <Icon name="call" size={20} color={colors.primaryContainer} />
-                </Touchable>
-                <Touchable style={styles.squareBtn} accessibilityLabel="Envoyer un message" onPress={() => router.push('/chat')}>
-                  <Icon name="chat" size={20} color={colors.primaryContainer} />
-                </Touchable>
-              </View>
-            </View>
-            <View style={[styles.between, styles.vehicleRibbon]}>
-              <View style={[styles.row, { flex: 1 }]}>
-                <Icon name="directions-car" size={18} color="rgba(49,46,129,0.6)" />
-                <AppText variant="labelMd" color={colors.ink} numberOfLines={1} style={{ flexShrink: 1 }}>
-                  {favoriteDriver.car}
-                </AppText>
-              </View>
-              <View style={styles.plate}>
-                <AppText variant="labelMd" color={colors.ink} style={{ fontFamily: fonts.sora600, letterSpacing: 1.3 }}>
-                  {favoriteDriver.plate}
-                </AppText>
-              </View>
-            </View>
-          </View>
-
-          {/* Badge partenaire */}
-          <View style={styles.partner}>
-            <View style={styles.partnerIcon}>
-              <Icon name="verified-user" size={16} color="#fff" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <AppText variant="labelMd" color={colors.primaryContainer} style={{ fontFamily: fonts.dm700 }}>
-                Chauffeur Partenaire Vérifié
-              </AppText>
-              <AppText variant="bodySm" color={colors.inkSoft}>
-                Ce chauffeur accepte directement les paiements en {brand.walletName} ({brand.walletUnit}).
-              </AppText>
-            </View>
-          </View>
-
-          {/* Itinéraire + tarif */}
-          <View style={[styles.between, styles.trip]}>
-            <View style={{ flex: 1 }}>
-              <AppText variant="labelSm" color={colors.inkSoft} style={{ opacity: 0.7, fontSize: 10 }}>
-                ITINÉRAIRE PRÉVU
-              </AppText>
-              <View style={[styles.row, { marginTop: 2 }]}>
-                <AppText variant="labelMd" color={colors.ink} style={{ fontFamily: fonts.dm700 }}>
-                  Plateau
-                </AppText>
-                <Icon name="trending-flat" size={14} color="rgba(49,46,129,0.6)" />
-                <AppText variant="labelMd" color={colors.ink} style={{ fontFamily: fonts.dm700 }}>
-                  Marcory Zone 4
-                </AppText>
-              </View>
-            </View>
-            <View style={{ alignItems: 'flex-end' }}>
-              <AppText variant="headlineMd" color={colors.primaryContainer} style={{ fontFamily: fonts.sora700, lineHeight: 22 }}>
-                {amount}
-              </AppText>
-              <Pill background={colors.violetSoft} style={{ borderRadius: 4, paddingHorizontal: 6, paddingVertical: 1, marginTop: 4 }}>
-                <AppText variant="labelSm" color={colors.inkSoft} style={{ fontSize: 10 }}>
-                  = {formatAmount(price)} {brand.walletUnit}
-                </AppText>
-              </Pill>
-            </View>
-          </View>
-
-          {/* Mode de règlement */}
-          <View style={{ gap: 10 }}>
-            <View style={[styles.between, { paddingHorizontal: 4 }]}>
-              <AppText variant="labelLg" color={colors.ink} style={{ fontSize: 14 }}>
-                Mode de règlement
-              </AppText>
-              <AppText variant="labelSm" color={colors.inkSoft} style={{ opacity: 0.6, fontSize: 10 }}>
-                Sélectionnez avant l'arrivée
-              </AppText>
-            </View>
-
-            <PayOption
-              selected={method === 'wallet'}
-              onPress={() => { setMethod('wallet'); setRefused(false); }}
-              icon="account-balance-wallet"
-              title={brand.walletName}
-              badge="RECOMMANDÉ"
-              subtitle={
-                <View style={styles.row}>
-                  <AppText variant="bodySm" color={colors.inkSoft}>
-                    Solde disponible :{' '}
-                    <AppText variant="bodySm" color={colors.ink} style={{ fontFamily: fonts.dm700 }}>
-                      {formatAmount(balance)} {brand.walletUnit}
-                    </AppText>
+              <View style={[styles.between, styles.vehicleRibbon]}>
+                <View style={[styles.row, { flex: 1 }]}>
+                  <Icon name="directions-car" size={18} color="rgba(49,46,129,0.6)" />
+                  <AppText variant="labelMd" color={colors.ink} numberOfLines={1} style={{ flexShrink: 1 }}>
+                    {d.car}
                   </AppText>
-                  <Icon name="check-circle" size={12} color="#16a34a" />
                 </View>
-              }
-            />
-            <PayOption
-              selected={method === 'cash'}
-              onPress={() => { setMethod('cash'); setRefused(false); }}
-              icon="payments"
-              title="Espèces à bord"
-              subtitle={
-                <AppText variant="bodySm" color={colors.inkSoft} style={{ opacity: 0.8 }}>
-                  Prévoir l'appoint pour le chauffeur ({amount})
-                </AppText>
-              }
-            />
-
-            <View style={[styles.row, { alignItems: 'flex-start', paddingHorizontal: 8, marginTop: 4 }]}>
-              <Icon name="info-outline" size={14} color="rgba(49,46,129,0.6)" style={{ marginTop: 2 }} />
-              <AppText variant="bodySm" color={colors.inkSoft} style={{ opacity: 0.75, flex: 1 }}>
-                Note : Si le chauffeur n'a pas de compte certifié, seule l'option Espèces est affichée.
-              </AppText>
+                <View style={styles.plate}>
+                  <AppText variant="labelMd" color={colors.ink} style={{ fontFamily: fonts.sora600, letterSpacing: 1.3 }}>
+                    {d.plate}
+                  </AppText>
+                </View>
+              </View>
             </View>
-          </View>
-
-          <Touchable
-            disabled={confirmed}
-            scale={0.98}
-            onPress={confirm}
-            style={[styles.cta, { backgroundColor: confirmed ? '#16a34a' : method === 'wallet' ? colors.primaryContainer : colors.inkSoft }]}
-          >
-            <Icon name={confirmed ? 'check-circle' : method === 'wallet' ? 'verified-user' : 'handshake'} size={20} color="#fff" />
-            <AppText variant="headlineSm" color="#fff" style={{ fontFamily: fonts.sora700, fontSize: 16, letterSpacing: -0.3 }}>
-              {confirmed
-                ? 'Règlement confirmé'
-                : method === 'wallet'
-                  ? `Confirmer et payer en ${brand.walletName}`
-                  : 'Confirmer le règlement en espèces'}
-            </AppText>
-          </Touchable>
-          {refused && !confirmed && (
-            <AppText variant="labelMd" color="#ba1a1a" style={{ textAlign: 'center' }}>
-              Solde insuffisant : rechargez votre portefeuille ou payez en espèces.
-            </AppText>
           )}
-          {confirmed && (
-            <Touchable scale={0.98} onPress={() => router.push('/navigation')} style={styles.follow}>
+
+          {r.status === 'arrived' && (
+            <Touchable style={[styles.cta, { backgroundColor: colors.secondaryContainer, marginTop: 0 }]} onPress={() => ride.send({ type: 'board' })}>
+              <Icon name="check-circle" size={20} color={colors.onSecondaryFixed} />
+              <AppText variant="headlineSm" color={colors.onSecondaryFixed} style={{ fontSize: 16 }}>
+                Je suis à bord
+              </AppText>
+            </Touchable>
+          )}
+
+          {r.status === 'ongoing' && (
+            <Touchable scale={0.98} onPress={() => router.push('/navigation')} style={[styles.cta, { backgroundColor: colors.secondaryContainer, marginTop: 0 }]}>
               <Icon name="navigation" size={20} color={colors.onSecondaryFixed} />
               <AppText variant="headlineSm" color={colors.onSecondaryFixed} style={{ fontFamily: fonts.sora700, fontSize: 16 }}>
                 Suivre le trajet en direct
               </AppText>
             </Touchable>
           )}
-          {confirmed && (
-            <Touchable
-              scale={0.98}
-              onPress={() => router.push({ pathname: '/evaluation', params: { price: String(price) } })}
-              style={styles.rate}
-            >
-              <Icon name="star" size={20} color={colors.primaryContainer} />
-              <AppText variant="labelLg" color={colors.primaryContainer}>
-                Course terminée ? Noter Koffi
+
+          {d && !d.certified && isActive(r) && (
+            <Notice icon="info-outline">Chauffeur non certifié : la course se règle en espèces.</Notice>
+          )}
+
+          {/* Itinéraire + tarif */}
+          <View style={[styles.between, styles.trip]}>
+            <View style={{ flex: 1 }}>
+              <AppText variant="labelSm" color={colors.inkSoft} style={{ opacity: 0.7, fontSize: 10 }}>
+                ITINÉRAIRE · {r.route.via.toUpperCase()}
+              </AppText>
+              <AppText variant="labelMd" color={colors.ink} style={{ fontFamily: fonts.dm700, marginTop: 2 }} numberOfLines={2}>
+                {[r.pickup, ...r.stops, r.destination].map((p) => p.name).join(' → ')}
+              </AppText>
+            </View>
+            <View style={{ alignItems: 'flex-end' }}>
+              <AppText variant="headlineMd" color={colors.primaryContainer} style={{ fontFamily: fonts.sora700, lineHeight: 22, fontSize: compact ? 17 : 20 }}>
+                {F(r.fare ?? r.quote.total)}
+              </AppText>
+              <AppText variant="labelSm" color={colors.inkSoft} style={{ fontSize: 10, marginTop: 4 }}>
+                {r.fare && r.fare > r.quote.total ? `dont attente ${F(r.fare - r.quote.total)}` : 'Prix garanti'}
+              </AppText>
+            </View>
+          </View>
+
+          {/* Mode de règlement, modifiable jusqu'à l'arrivée */}
+          {isActive(r) && (
+            <View style={{ gap: 10 }}>
+              <AppText variant="labelLg" color={colors.ink} style={{ fontSize: 14, paddingHorizontal: 4 }}>
+                Mode de règlement
+              </AppText>
+              <PayOption
+                selected={r.payment === 'wallet'}
+                disabled={!!d && !d.certified}
+                onPress={() => ride.setPayment('wallet')}
+                icon="account-balance-wallet"
+                title={brand.walletName}
+                subtitle={`Solde : ${formatAmount(balance)} ${brand.walletUnit}${balance < r.quote.total ? ' · insuffisant' : ''}`}
+              />
+              <PayOption selected={r.payment === 'cash'} onPress={() => ride.setPayment('cash')} icon="payments" title="Espèces à bord" subtitle={`Prévoir l’appoint : ${F(r.quote.total)}`} />
+            </View>
+          )}
+
+          {/* Règlement final */}
+          {r.status === 'completed' && r.fare !== null && (
+            <Notice icon={r.paidWith === 'wallet' ? 'check-circle' : 'payments'} tone={r.paidWith === 'wallet' ? 'ok' : 'warn'}>
+              {r.paidWith === 'wallet'
+                ? `${F(r.fare)} débités de votre ${brand.walletName}.`
+                : r.payment === 'wallet'
+                  ? `Solde insuffisant : réglez ${F(r.fare)} en espèces au chauffeur.`
+                  : `Réglez ${F(r.fare)} en espèces au chauffeur.`}
+            </Notice>
+          )}
+          {r.status === 'cancelled' && r.cancelFee > 0 && (
+            <Notice icon="info-outline" tone="warn">
+              {r.paidWith === 'wallet' ? `${F(r.cancelFee)} débités pour annulation tardive.` : `${F(r.cancelFee)} de frais d’annulation restent dus.`}
+            </Notice>
+          )}
+
+          {r.status === 'completed' && d && (
+            <Touchable scale={0.98} disabled={r.rating !== null} onPress={() => router.push('/evaluation')} style={[styles.cta, { backgroundColor: colors.primary }]}>
+              <Icon name="star" size={20} color="#fff" />
+              <AppText variant="headlineSm" color="#fff" style={{ fontSize: 16 }}>
+                {r.rating ? 'Course notée · merci' : `Noter ${firstName}`}
               </AppText>
             </Touchable>
+          )}
+          {r.status === 'no_driver' && (
+            <Touchable
+              scale={0.98}
+              onPress={() => {
+                ride.dismiss();
+                router.replace('/vehicules');
+              }}
+              style={[styles.cta, { backgroundColor: colors.primary }]}
+            >
+              <Icon name="refresh" size={20} color="#fff" />
+              <AppText variant="headlineSm" color="#fff" style={{ fontSize: 16 }}>
+                Changer de véhicule
+              </AppText>
+            </Touchable>
+          )}
+          {!isActive(r) && (
+            <Touchable scale={0.98} onPress={home} style={styles.secondary}>
+              <AppText variant="labelLg" color={colors.primaryContainer}>
+                Retour à l&apos;accueil
+              </AppText>
+            </Touchable>
+          )}
+
+          {canCancel(r) &&
+            (confirmCancel ? (
+              <View style={styles.confirm}>
+                <AppText variant="labelMd" color={colors.ink} style={{ textAlign: 'center' }}>
+                  {fee ? `Annuler maintenant coûte ${F(fee)}.` : 'L’annulation est gratuite.'} Confirmer ?
+                </AppText>
+                <View style={[styles.row, { gap: 8 }]}>
+                  <Touchable style={[styles.half, { backgroundColor: colors.surfaceHigh }]} onPress={() => setConfirmCancel(false)}>
+                    <AppText variant="labelLg">Garder</AppText>
+                  </Touchable>
+                  <Touchable
+                    style={[styles.half, { backgroundColor: '#B42318' }]}
+                    onPress={() => {
+                      setConfirmCancel(false);
+                      ride.cancel();
+                    }}
+                  >
+                    <AppText variant="labelLg" color="#fff">
+                      Annuler
+                    </AppText>
+                  </Touchable>
+                </View>
+              </View>
+            ) : (
+              <Touchable style={styles.secondary} onPress={() => setConfirmCancel(true)}>
+                <AppText variant="labelLg" color="#B42318">
+                  Annuler la course{fee ? ` (${F(fee)})` : ''}
+                </AppText>
+              </Touchable>
+            ))}
+
+          {isActive(r) && (
+            <AppText variant="labelSm" color={colors.outline} style={{ textAlign: 'center' }}>
+              Démo : 1 seconde = 1 minute · attente offerte {FREE_WAIT_MIN} min
+            </AppText>
           )}
         </View>
       </ScrollView>
@@ -315,40 +387,47 @@ export default function ActiveRideScreen() {
   );
 }
 
-function PayOption({ selected, onPress, icon, title, subtitle, badge }: {
+function Notice({ icon, children, tone = 'info' }: { icon: IconName; children: ReactNode; tone?: 'info' | 'ok' | 'warn' }) {
+  const bg = tone === 'ok' ? colors.greenSoft : tone === 'warn' ? '#FEF3C7' : colors.violetSoft;
+  const fg = tone === 'ok' ? '#05603A' : tone === 'warn' ? '#92400E' : colors.inkSoft;
+  return (
+    <View style={[styles.notice, { backgroundColor: bg }]}>
+      <Icon name={icon} size={18} color={fg} />
+      <AppText variant="bodySm" color={fg} style={{ flex: 1 }}>
+        {children}
+      </AppText>
+    </View>
+  );
+}
+
+function PayOption({ selected, disabled, onPress, icon, title, subtitle }: {
   selected: boolean;
+  disabled?: boolean;
   onPress: () => void;
-  icon: 'account-balance-wallet' | 'payments';
+  icon: IconName;
   title: string;
-  subtitle: ReactNode;
-  badge?: string;
+  subtitle: string;
 }) {
   return (
     <Touchable
       accessibilityRole="radio"
-      accessibilityState={{ checked: selected }}
+      accessibilityState={{ checked: selected, disabled }}
+      disabled={disabled}
       scale={0.99}
       onPress={onPress}
-      style={[styles.option, selected ? styles.optionOn : styles.optionOff]}
+      style={[styles.option, selected ? styles.optionOn : styles.optionOff, disabled && { opacity: 0.45 }]}
     >
       <View style={[styles.row, { gap: 12, flex: 1 }]}>
         <View style={[styles.optionIcon, { backgroundColor: selected ? colors.primaryContainer : colors.violetCard }]}>
           <Icon name={icon} size={20} color={selected ? '#fff' : colors.inkSoft} />
         </View>
         <View style={{ flex: 1 }}>
-          <View style={styles.row}>
-            <AppText variant="labelLg" color={colors.ink} style={{ fontSize: 14 }}>
-              {title}
-            </AppText>
-            {badge && (
-              <Pill background={colors.violetSoft} style={{ paddingHorizontal: 8, paddingVertical: 1 }}>
-                <AppText variant="labelSm" color={colors.primaryContainer} style={{ fontSize: 9 }}>
-                  {badge}
-                </AppText>
-              </Pill>
-            )}
-          </View>
-          {subtitle}
+          <AppText variant="labelLg" color={colors.ink} style={{ fontSize: 14 }}>
+            {title}
+          </AppText>
+          <AppText variant="bodySm" color={colors.inkSoft} numberOfLines={1}>
+            {subtitle}
+          </AppText>
         </View>
       </View>
       <View style={[styles.radio, { backgroundColor: selected ? colors.primaryContainer : colors.border }]}>
@@ -358,68 +437,42 @@ function PayOption({ selected, onPress, icon, title, subtitle, badge }: {
   );
 }
 
+
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.violetMist },
+  empty: { alignItems: 'center', justifyContent: 'center', gap: 12 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    gap: 8,
     paddingVertical: 12,
     backgroundColor: 'rgba(247,247,248,0.95)',
     boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
     zIndex: 10,
   },
-  status: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.violetSoft, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 },
-  locator: {
-    position: 'absolute',
-    top: 16,
-    left: 16,
-    right: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 16,
-    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
-  },
-  locatorIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.violetSoft, alignItems: 'center', justifyContent: 'center' },
-  minutes: { backgroundColor: colors.primaryContainer, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-  carMarker: { position: 'absolute', top: '46%', left: 0, right: 0, alignItems: 'center' },
-  carTag: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.ink, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, marginBottom: 4 },
-  car: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.primaryContainer,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 4,
-    borderColor: '#fff',
-    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
-  },
+  status: { backgroundColor: colors.violetSoft, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   sheet: {
     backgroundColor: '#fff',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    paddingHorizontal: 20,
+    marginTop: -16,
     paddingTop: 16,
+    paddingBottom: 8,
     gap: 16,
-    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
+    boxShadow: '0px -2px 10px rgba(16,24,40,0.08)',
   },
   countdown: { width: 48, height: 48, borderRadius: 16, backgroundColor: colors.violetMist, alignItems: 'center', justifyContent: 'center' },
-  driverCard: { backgroundColor: colors.violetCard, borderRadius: 20, padding: 16, gap: 14 },
-  online: { position: 'absolute', right: 4, bottom: 4, width: 12, height: 12, borderRadius: 6, backgroundColor: colors.success, borderWidth: 2, borderColor: '#fff' },
+  steps: { flexDirection: 'row', gap: 4 },
+  stepBar: { height: 4, borderRadius: 2, overflow: 'hidden' },
+  stepFill: { position: 'absolute', left: 0, top: 0, bottom: 0, backgroundColor: colors.secondaryContainer },
+  driverCard: { backgroundColor: colors.violetCard, borderRadius: 16, padding: 16, gap: 14 },
   squareBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   vehicleRibbon: { paddingTop: 10, paddingHorizontal: 4, borderTopWidth: 1, borderTopColor: 'rgba(227,230,235,0.7)' },
   plate: { backgroundColor: '#fff', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
-  partner: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 12, backgroundColor: colors.violetSoft },
-  partnerIcon: { width: 32, height: 32, borderRadius: 8, backgroundColor: colors.primaryContainer, alignItems: 'center', justifyContent: 'center' },
+  notice: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 12 },
   trip: { padding: 16, borderRadius: 16, backgroundColor: colors.violetCard },
   option: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: 14, borderRadius: 16 },
   optionOn: { backgroundColor: '#F5F3FF', borderWidth: 2, borderColor: colors.primaryContainer },
@@ -427,16 +480,8 @@ const styles = StyleSheet.create({
   optionIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   radio: { width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   radioDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#fff' },
-  rate: { height: 48, borderRadius: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.violetSoft },
-  follow: {
-    height: 56,
-    borderRadius: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: colors.secondaryContainer,
-    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
-  },
-  cta: { height: 56, borderRadius: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  cta: { height: 56, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 4 },
+  secondary: { height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.violetSoft },
+  confirm: { gap: 10, padding: 12, borderRadius: 12, backgroundColor: '#FEF3F2' },
+  half: { flex: 1, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 });

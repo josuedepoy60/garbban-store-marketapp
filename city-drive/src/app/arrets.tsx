@@ -1,119 +1,58 @@
 import { router } from 'expo-router';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
 import { CityMap } from '@/components/CityMap';
 import { StackHeader } from '@/components/headers';
-import { AppText, Avatar, Bounce, Icon, Pill, SheetHandle, Touchable } from '@/components/ui';
+import { RouteLayer } from '@/components/RouteLayer';
+import { AppText, Avatar, Icon, Pill, SheetHandle, Touchable, useLayout } from '@/components/ui';
 import { colors, fonts, shadows } from '@/constants/theme';
 import { formatAmount } from '@/data/mock';
+import { MAX_STOPS, useRide } from '@/data/ride';
+import { splitFare, STOP_FEE } from '@/logic/pricing';
 
-const ROUTE = 'M 60 170 C 110 150, 150 215, 192 205 C 235 196, 255 280, 310 262 C 345 250, 362 292, 372 330';
-
-type StopItem = { id: string; label: string; place: string; color: string; tag: string };
-
-const INITIAL_STOPS: StopItem[] = [
-  { id: '1', label: 'Arrêt 1', place: 'Prendre Awa · Angré 8e', color: colors.primaryContainer, tag: 'Angré 8e' },
-  { id: '2', label: 'Arrêt 2', place: 'Prendre Maman · Deux Plateaux', color: colors.tertiary, tag: '2 Plateaux' },
-];
-
-function MapPin({ label, badge, bg, fg, style }: { label: string; badge: ReactNode; bg: string; fg: string; style: object }) {
-  return (
-    <Bounce style={[styles.pinWrap, style]} duration={3000}>
-      <View style={[styles.pin, { backgroundColor: bg }]}>
-        {badge}
-        <AppText variant="labelSm" color={fg} style={{ fontFamily: fonts.sora600, letterSpacing: -0.2 }}>
-          {label}
-        </AppText>
-      </View>
-      <View style={[styles.pinTail, { backgroundColor: bg }]} />
-    </Bounce>
-  );
-}
-
-function PinBadge({ text, bg, fg }: { text: string; bg: string; fg: string }) {
-  return (
-    <View style={[styles.pinBadge, { backgroundColor: bg }]}>
-      <AppText variant="labelSm" color={fg} style={{ fontSize: 10, lineHeight: 12 }}>
-        {text}
-      </AppText>
-    </View>
-  );
-}
+const STOP_COLORS = [colors.blue, colors.tertiary, colors.green];
 
 export default function StopsScreen() {
   const insets = useSafeAreaInsets();
-  const [stops, setStops] = useState(INITIAL_STOPS);
-  const [carpool, setCarpool] = useState(true);
+  const { gutter, mapHeight } = useLayout();
+  const ride = useRide();
+  const { pickup, destination, stops, route, offer } = ride;
+  const [carpool, setCarpool] = useState(stops.length > 0);
 
-  const total = 4800;
+  const total = offer.quote.total;
   const passengers = 1 + stops.length;
+  const full = stops.length >= MAX_STOPS;
 
   return (
     <View style={styles.screen}>
-      <StackHeader title="Suivi de course active" />
+      <StackHeader title="Trajet à plusieurs arrêts" />
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 24 }} showsVerticalScrollIndicator={false}>
-        <View style={{ height: 290 }}>
-          <CityMap style={StyleSheet.absoluteFill} animated={false}>
-            <Defs>
-              <LinearGradient id="route" x1="0" y1="0.1" x2="1" y2="0.9">
-                <Stop offset="0" stopColor="#C8F53A" />
-                <Stop offset="0.35" stopColor="#1F2937" />
-                <Stop offset="0.7" stopColor="#991E50" />
-                <Stop offset="1" stopColor="#111827" />
-              </LinearGradient>
-            </Defs>
-            <Path d={ROUTE} stroke="url(#route)" strokeWidth={12} strokeLinecap="round" fill="none" opacity={0.3} />
-            <Path d={ROUTE} stroke="url(#route)" strokeWidth={4.5} strokeLinecap="round" fill="none" />
+        <View style={{ height: mapHeight(0.3, 190, 280) }}>
+          <CityMap style={StyleSheet.absoluteFill}>
+            <RouteLayer points={[pickup, ...stops, destination]} jam={!!route.jam} />
           </CityMap>
-
-          <MapPin
-            style={{ left: 20, top: 44 }}
-            label="Riviera 2"
-            bg={colors.secondaryContainer}
-            fg={colors.onSecondaryFixed}
-            badge={<PinBadge text="D" bg={colors.onSecondaryFixed} fg={colors.secondaryContainer} />}
-          />
-          {stops.map((s, i) => (
-            <MapPin
-              key={s.id}
-              style={i === 0 ? { left: '38%', top: 70 } : { right: 56, top: 132 }}
-              label={s.tag}
-              bg={s.color}
-              fg={colors.onPrimary}
-              badge={<PinBadge text={String(i + 1)} bg={colors.surfaceLowest} fg={s.color} />}
-            />
-          ))}
-          <MapPin
-            style={{ right: 12, bottom: 40 }}
-            label="Plateau CCIA"
-            bg={colors.primary}
-            fg={colors.onPrimary}
-            badge={<Icon name="flag" size={14} color={colors.onPrimary} />}
-          />
-
-          <View style={styles.eta}>
+          <View style={[styles.eta, { right: gutter }]}>
             <Icon name="schedule" size={18} color={colors.primary} />
             <AppText variant="labelSm" style={{ fontFamily: fonts.sora600 }}>
-              34 min · 14.8 km
+              {route.minutes} min · {route.km.toString().replace('.', ',')} km
             </AppText>
           </View>
         </View>
 
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, { paddingHorizontal: gutter }]}>
           <SheetHandle />
           <View style={styles.between}>
             <View style={{ flex: 1 }}>
-              <AppText variant="headlineSm">Étapes planifiées</AppText>
+              <AppText variant="headlineSm">Étapes du trajet</AppText>
               <AppText variant="bodySm" color={colors.onSurfaceVariant}>
-                Modifiez ou réorganisez l'ordre des arrêts
+                Jusqu’à {MAX_STOPS} arrêts · {formatAmount(STOP_FEE)} F par arrêt
               </AppText>
             </View>
             <Pill background={colors.secondaryContainer}>
               <AppText variant="labelSm" color={colors.onSecondaryFixed}>
-                {stops.length + 2} ARRÊTS
+                {stops.length + 2} POINTS
               </AppText>
             </Pill>
           </View>
@@ -121,9 +60,9 @@ export default function StopsScreen() {
           <View style={styles.stops}>
             <View style={styles.rail} />
 
-            <View style={[styles.stop, styles.stopFixed]}>
+            <Touchable style={[styles.stop, styles.stopFixed]} onPress={() => router.push({ pathname: '/destination', params: { mode: 'pickup' } })}>
               <View style={styles.stopLeft}>
-                <View style={[styles.node, { backgroundColor: colors.secondaryContainer, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' }]}>
+                <View style={[styles.node, { backgroundColor: colors.secondaryContainer }]}>
                   <Icon name="my-location" size={16} color={colors.onSecondaryFixed} />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -131,50 +70,55 @@ export default function StopsScreen() {
                     DÉPART
                   </AppText>
                   <AppText variant="labelLg" numberOfLines={1}>
-                    Ma position · Riviera 2
+                    {pickup.name} · {pickup.area}
                   </AppText>
                 </View>
               </View>
               <View style={[styles.stopAction, { backgroundColor: colors.surfaceContainer }]}>
-                <Icon name="lock" size={18} color={colors.outline} />
+                <Icon name="edit" size={16} color={colors.onSurfaceVariant} />
               </View>
-            </View>
+            </Touchable>
 
-            {stops.map((s, i) => (
-              <View key={s.id} style={[styles.stop, styles.stopEditable]}>
-                <View style={styles.stopLeft}>
-                  <View style={[styles.node, { backgroundColor: s.color }]}>
-                    <AppText variant="labelSm" color={colors.onPrimary} style={{ fontFamily: fonts.sora600 }}>
-                      {i + 1}
-                    </AppText>
+            {stops.map((s, i) => {
+              const color = STOP_COLORS[i % STOP_COLORS.length];
+              return (
+                <View key={s.id} style={[styles.stop, styles.stopEditable]}>
+                  <View style={styles.stopLeft}>
+                    <View style={[styles.node, { backgroundColor: color }]}>
+                      <AppText variant="labelSm" color={colors.onPrimary} style={{ fontFamily: fonts.sora600 }}>
+                        {i + 1}
+                      </AppText>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <AppText variant="labelSm" color={color}>
+                        {`ARRÊT ${i + 1}`}
+                      </AppText>
+                      <AppText variant="labelLg" numberOfLines={1}>
+                        {s.name} · {s.area}
+                      </AppText>
+                    </View>
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <AppText variant="labelSm" color={s.color}>
-                      {`ARRÊT ${i + 1}`}
-                    </AppText>
-                    <AppText variant="labelLg" numberOfLines={1}>
-                      {s.place}
-                    </AppText>
+                  <View style={[styles.row, { gap: 4 }]}>
+                    {stops.length > 1 && (
+                      <Touchable
+                        accessibilityLabel={i === 0 ? 'Descendre l’arrêt' : 'Monter l’arrêt'}
+                        style={styles.stopAction}
+                        onPress={() => ride.moveStop(s.id, i === 0 ? 1 : -1)}
+                      >
+                        <Icon name={i === 0 ? 'arrow-downward' : 'arrow-upward'} size={16} color={colors.onSurfaceVariant} />
+                      </Touchable>
+                    )}
+                    <Touchable accessibilityLabel="Supprimer l’arrêt" style={styles.stopAction} onPress={() => ride.removeStop(s.id)}>
+                      <Icon name="close" size={16} color={colors.onSurfaceVariant} />
+                    </Touchable>
                   </View>
                 </View>
-                <View style={styles.row}>
-                  <Touchable
-                    accessibilityLabel="Supprimer arrêt"
-                    style={styles.stopAction}
-                    onPress={() => setStops((prev) => prev.filter((x) => x.id !== s.id))}
-                  >
-                    <Icon name="close" size={16} color={colors.onSurfaceVariant} />
-                  </Touchable>
-                  <View style={styles.stopAction}>
-                    <Icon name="drag-indicator" size={18} color={colors.outline} />
-                  </View>
-                </View>
-              </View>
-            ))}
+              );
+            })}
 
-            <View style={[styles.stop, styles.stopFixed]}>
+            <Touchable style={[styles.stop, styles.stopFixed]} onPress={() => router.push('/destination')}>
               <View style={styles.stopLeft}>
-                <View style={[styles.node, { backgroundColor: colors.primary, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' }]}>
+                <View style={[styles.node, { backgroundColor: colors.primary }]}>
                   <Icon name="flag" size={18} color={colors.onPrimary} />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -182,20 +126,25 @@ export default function StopsScreen() {
                     ARRIVÉE FINALE
                   </AppText>
                   <AppText variant="labelLg" numberOfLines={1}>
-                    Plateau · Bd de la République
+                    {destination.name} · {destination.area}
                   </AppText>
                 </View>
               </View>
-              <View style={styles.stopAction}>
-                <Icon name="drag-indicator" size={18} color={colors.outline} />
+              <View style={[styles.stopAction, { backgroundColor: colors.surfaceContainer }]}>
+                <Icon name="edit" size={16} color={colors.onSurfaceVariant} />
               </View>
-            </View>
+            </Touchable>
           </View>
 
-          <Touchable style={styles.addStop} scale={0.98}>
+          <Touchable
+            style={[styles.addStop, full && { opacity: 0.5 }]}
+            disabled={full}
+            scale={0.98}
+            onPress={() => router.push({ pathname: '/destination', params: { mode: 'stop' } })}
+          >
             <Icon name="add-circle" size={20} color={colors.primary} />
             <AppText variant="headlineSm" color={colors.primary}>
-              Ajouter un arrêt
+              {full ? `${MAX_STOPS} arrêts maximum` : 'Ajouter un arrêt'}
             </AppText>
           </Touchable>
 
@@ -209,7 +158,7 @@ export default function StopsScreen() {
                 <View style={{ flex: 1 }}>
                   <AppText variant="labelLg">Covoiturage partagé</AppText>
                   <AppText variant="bodySm" color={colors.onSurfaceVariant}>
-                    Diviser les frais automatiquement
+                    Un passager par arrêt, frais partagés
                   </AppText>
                 </View>
               </View>
@@ -226,8 +175,9 @@ export default function StopsScreen() {
                     Moi
                   </AppText>
                 </View>
-                {stops.some((s) => s.id === '1') && <Avatar name="Awa" size={40} radius={20} style={styles.face} />}
-                {stops.some((s) => s.id === '2') && <Avatar name="Maman" size={40} radius={20} style={styles.face} />}
+                {stops.map((s) => (
+                  <Avatar key={s.id} name={s.name} size={40} radius={20} style={styles.face} />
+                ))}
               </View>
               <View style={styles.row}>
                 <Icon name="group" size={18} color={colors.onSurfaceVariant} />
@@ -257,10 +207,10 @@ export default function StopsScreen() {
               <View style={[styles.row, { gap: 8, flex: 1 }]}>
                 <Icon name="payments" size={18} color={colors.secondaryContainer} />
                 <AppText variant="labelMd" color={colors.onPrimary}>
-                  {carpool ? `Soit ${formatAmount(Math.round(total / passengers))} FCFA / pers.` : 'Payé par vous'}
+                  {carpool && passengers > 1 ? `Soit ${formatAmount(splitFare(total, passengers))} FCFA / pers.` : 'Payé par vous'}
                 </AppText>
               </View>
-              {carpool && (
+              {carpool && passengers > 1 && (
                 <Pill background={colors.secondaryContainer} style={{ paddingHorizontal: 8 }}>
                   <AppText variant="labelSm" color={colors.onSecondaryFixed}>
                     Demande groupée
@@ -292,7 +242,6 @@ const styles = StyleSheet.create({
   pinTail: { width: 6, height: 8, borderBottomLeftRadius: 3, borderBottomRightRadius: 3, marginTop: -2 },
   eta: {
     position: 'absolute',
-    right: 16,
     top: 12,
     flexDirection: 'row',
     alignItems: 'center',

@@ -43,7 +43,7 @@ const BLOCKS: [number, number, number, number][] = [
 ];
 
 /** Petite voiture vue du dessus (taxis disponibles autour de l'utilisateur). */
-function Car({ x, y, angle, color = colors.primaryContainer }: { x: number; y: number; angle: number; color?: string }) {
+export function Car({ x, y, angle, color = colors.primaryContainer }: { x: number; y: number; angle: number; color?: string }) {
   return (
     <G transform={`translate(${x}, ${y}) rotate(${angle})`}>
       <Rect x={-6} y={-11} width={12} height={22} rx={4} fill="#fff" />
@@ -55,10 +55,10 @@ function Car({ x, y, angle, color = colors.primaryContainer }: { x: number; y: n
 
 type Props = {
   children?: ReactNode;
-  /** Point bleu « ma position » au carrefour central. */
-  userMarker?: boolean;
-  /** Affiche quelques taxis disponibles autour de l'utilisateur. */
-  cars?: boolean;
+  /** Point bleu « ma position » : au carrefour central, ou à la position donnée. */
+  userMarker?: boolean | { x: number; y: number };
+  /** Taxis disponibles : quelques voitures décoratives, ou les positions données. */
+  cars?: boolean | { x: number; y: number; angle: number }[];
   /** Conservé pour compatibilité : la carte n'est plus animée. */
   animated?: boolean;
   dimmed?: boolean;
@@ -113,7 +113,8 @@ export function CityMap({ children, userMarker = false, cars = false, dimmed = f
           Pont HKB
         </SvgText>
 
-        {cars && (
+        {Array.isArray(cars) && cars.map((c, i) => <Car key={i} {...c} />)}
+        {cars === true && (
           <>
             <Car x={132} y={214} angle={90} />
             <Car x={268} y={226} angle={-90} />
@@ -123,7 +124,7 @@ export function CityMap({ children, userMarker = false, cars = false, dimmed = f
         )}
 
         {userMarker && (
-          <G transform="translate(210, 220)">
+          <G transform={typeof userMarker === 'object' ? `translate(${userMarker.x}, ${userMarker.y})` : 'translate(210, 220)'}>
             <Circle r={22} fill={colors.blue} opacity={0.14} />
             <Circle r={9} fill="#fff" />
             <Circle r={6.5} fill={colors.blue} />

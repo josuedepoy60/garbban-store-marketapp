@@ -157,3 +157,27 @@ export function useCompact() {
   const { width } = useWindowDimensions();
   return width < 360;
 }
+
+/**
+ * Gabarit d'écran selon la taille du téléphone :
+ * - compact : petits Android et iPhone SE (largeur < 360) ;
+ * - short : écrans peu hauts (< 700), où les cartes rétrécissent ;
+ * - large : Plus / Max (≥ 414).
+ */
+export function useLayout() {
+  const { width, height } = useWindowDimensions();
+  const compact = width < 360;
+  const short = height < 700;
+  const large = width >= 414;
+  return {
+    width,
+    height,
+    compact,
+    short,
+    large,
+    /** Marge latérale des écrans. */
+    gutter: compact ? 12 : large ? 20 : 16,
+    /** Hauteur d'une carte en proportion de l'écran, bornée. */
+    mapHeight: (ratio: number, min: number, max: number) => Math.round(Math.min(max, Math.max(min, height * ratio))),
+  };
+}

@@ -34,6 +34,26 @@ npm run typecheck
 
 Palette premium définie dans `src/constants/theme.ts` : noir profond (`primary`) pour les actions, jaune soleil (`secondaryContainer`), vert, bleu et rose en accents, sur des fonds blancs et gris neutres. Chaque grande carte a sa couleur : portefeuille noir/jaune, Gold Club bleu, reçu vert.
 
+## Logique métier et logistique
+
+Le code métier est pur TypeScript, sans interface, dans `src/logic/`, et testé par `npm test` (29 tests, runner natif de Node) :
+
+- `places.ts` : 16 lieux d'Abidjan (GPS réels, rive nord/sud de la lagune) et recherche sans accents.
+- `traffic.ts` : vitesse selon l'heure (pointe 7-10 h et 17-20 h), points noirs (Adjamé, Riviera 2), deux itinéraires à chaque trajet : voie express / Pont HKB (péage 500 F) ou direct / Pont FHB (gratuit, bouchons).
+- `pricing.ts` : grille par catégorie (prise en charge + km + minute, minimum), 300 F par arrêt, majoration offre/demande plafonnée à ×1,5, arrondi à 50 F, attente offerte 3 min puis 50 F/min, annulation gratuite 2 min puis 500 F, points fidélité.
+- `fleet.ts` : flotte de chauffeurs (catégorie, position, statut, note, certification Vela Monnaie) et attribution au plus proche dans un rayon de 8 km ; le favori passe devant s'il arrive au plus 5 min après.
+- `ride.ts` : cycle de vie d'une course, sous forme de machine à états : recherche → acceptée → chauffeur arrivé → en course → terminée, ou annulée / aucun chauffeur.
+- `schedule.ts` : réservation entre 30 min et 7 jours à l'avance, recherche du chauffeur 15 min avant, refus des réservations à moins d'une heure d'écart.
+
+`src/data/ride.tsx` (RideProvider) orchestre le tout :
+
+- il fait avancer la course (démo : 1 s = 1 min) ;
+- il débite le portefeuille à l'arrivée, ou passe en espèces si le solde est insuffisant ;
+- il libère le chauffeur à destination et met à jour sa note ;
+- il enregistre l'historique.
+
+Le portefeuille, la course en cours, l'historique, les réservations et la flotte sont sauvegardés sur l'appareil (AsyncStorage).
+
 ## Style visuel
 
 Sobre, dans l'esprit des apps de VTC réelles : une seule police (DM Sans), aplats de couleur sans dégradés décoratifs, ombres légères, coins modérés, carte de rue plate (`CityMap`) avec les taxis disponibles, barre d'onglets classique. Pas d'animations décoratives (rebonds, halos) ni de textes marketing.

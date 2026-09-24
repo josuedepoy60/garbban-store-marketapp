@@ -8,6 +8,7 @@ import { AppText, Avatar, Icon, Pill, Touchable, type IconName } from '@/compone
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
 import { formatAmount, user } from '@/data/mock';
+import { useRide } from '@/data/ride';
 import { useWallet } from '@/data/wallet';
 
 type Place = { id: string; icon: IconName; label: string; address: string };
@@ -107,6 +108,7 @@ function List({ children }: { children: ReactNode[] }) {
 export default function AccountScreen() {
   const insets = useSafeAreaInsets();
   const { balance } = useWallet();
+  const { loyalty } = useRide();
   const [places, setPlaces] = useState(INITIAL_PLACES);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
@@ -202,7 +204,7 @@ export default function AccountScreen() {
             </AppText>
             <View style={[styles.row, { alignItems: 'baseline', gap: 6 }]}>
               <AppText variant="displayLg" color={colors.onPrimary}>
-                {formatAmount(user.loyaltyPoints)}
+                {formatAmount(loyalty)}
               </AppText>
               <AppText variant="labelLg" color={colors.secondaryContainer}>
                 Points {brand.appName}

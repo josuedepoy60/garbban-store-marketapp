@@ -8,6 +8,8 @@ import Svg, { Circle, Defs, G, Line, LinearGradient, Path, Polygon, Rect, Stop }
 import { AppText, Dot, Icon, PingDot, Pulse, Touchable, type IconName } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { fonts } from '@/constants/theme';
+import { useRide } from '@/data/ride';
+import { arrivalTime } from '@/logic/time';
 
 // Palette sombre du mode conduite (tokens de la maquette « cockpit »).
 const dark = {
@@ -173,6 +175,14 @@ export default function NavigationScreen() {
   const insets = useSafeAreaInsets();
   const [speed, setSpeed] = useState(68);
   const [voice, setVoice] = useState(true);
+  const { current: r, route: draftRoute, destination: draftDest, pickup: draftPickup } = useRide();
+  // Données du trajet en cours ; à défaut, l'itinéraire préparé.
+  const route = r?.route ?? draftRoute;
+  const dest = r?.destination ?? draftDest;
+  const from = r?.pickup ?? draftPickup;
+  const progress = r?.status === 'ongoing' || r?.status === 'completed' ? r.progress : 0;
+  const eta = r?.status === 'ongoing' ? r.eta : route.minutes;
+  const kmLeft = (route.km * (1 - progress)).toFixed(1).replace('.', ',');
   const { height } = useWindowDimensions();
   const mapHeight = Math.round(Math.min(620, Math.max(480, height * 0.72)));
 
@@ -217,10 +227,10 @@ export default function NavigationScreen() {
                     </View>
                   </View>
                   <AppText variant="bodyMd" color={dark.onSurface} numberOfLines={1} style={{ fontFamily: fonts.dm600 }}>
-                    Pont HKB • Direction Plateau CCIA
+                    {route.via} • Direction {dest.name}
                   </AppText>
                   <AppText variant="bodySm" color={dark.onSurfaceVariant} numberOfLines={1}>
-                    Puis continuer tout droit sur 1.8 km
+                    Puis continuer tout droit sur {kmLeft} km
                   </AppText>
                 </View>
               </View>
@@ -229,7 +239,7 @@ export default function NavigationScreen() {
                   <Icon name="straight" size={20} color={dark.lime} />
                 </View>
                 <AppText variant="labelSm" color={dark.onSurfaceVariant} style={{ fontSize: 10, marginTop: 2 }}>
-                  1.8 km
+                  {kmLeft} km
                 </AppText>
               </View>
             </View>
@@ -293,7 +303,7 @@ export default function NavigationScreen() {
             <View style={[styles.between, { alignItems: 'flex-end' }]}>
               <View style={[styles.row, { alignItems: 'baseline', gap: 8 }]}>
                 <AppText variant="currency" color={dark.onSurface} style={{ fontSize: 32, lineHeight: 38 }}>
-                  12:42
+                  {arrivalTime(eta)}
                 </AppText>
                 <AppText variant="labelLg" color={dark.onSurfaceVariant} style={{ fontFamily: fonts.dm600, fontSize: 14 }}>
                   Heure d'arrivée
@@ -301,17 +311,17 @@ export default function NavigationScreen() {
               </View>
               <View style={{ alignItems: 'flex-end' }}>
                 <AppText variant="headlineSm" color={dark.pink} style={{ fontFamily: fonts.sora700, fontSize: 16 }}>
-                  8 min
+                  {eta} min
                 </AppText>
                 <AppText variant="labelSm" color={dark.onSurfaceVariant} style={{ fontFamily: fonts.dm600 }}>
-                  4.2 km restants
+                  {kmLeft} km restants
                 </AppText>
               </View>
             </View>
 
             <View style={{ gap: 6 }}>
               <View style={styles.track}>
-                <View style={styles.trackFill}>
+                <View style={[styles.trackFill, { width: `${Math.max(4, Math.round(progress * 100))}%` }]}>
                   <View style={styles.trackHead} />
                 </View>
               </View>
@@ -319,13 +329,13 @@ export default function NavigationScreen() {
                 <View style={styles.row}>
                   <Dot color={dark.lime} size={6} />
                   <AppText variant="labelSm" color={dark.onSurfaceVariant} style={{ fontSize: 10 }}>
-                    Cocody St-Jean
+                    {from.name}
                   </AppText>
                 </View>
                 <View style={styles.row}>
                   <Dot color={dark.pink} size={6} />
                   <AppText variant="labelSm" color={dark.onSurfaceVariant} style={{ fontSize: 10 }}>
-                    Plateau CCIA
+                    {dest.name}
                   </AppText>
                 </View>
               </View>
@@ -335,12 +345,12 @@ export default function NavigationScreen() {
               <View style={[styles.row, { flex: 1 }]}>
                 <Icon name="speed" size={18} color={dark.onPinkContainer} />
                 <AppText variant="labelSm" color={dark.onPinkContainer} numberOfLines={1} style={{ flexShrink: 1 }}>
-                  Trafic très fluide sur le Pont HKB
+                  {route.jam ? `Bouchon : ${route.jam.name} (+${route.jamDelay} min)` : `Trafic fluide · ${route.via}`}
                 </AppText>
               </View>
               <View style={styles.gainPill}>
                 <AppText variant="labelSm" color={dark.onSurface} style={{ fontSize: 10 }}>
-                  +10 min vs Adjamé
+                  {route.toll ? `Péage ${route.toll} F` : 'Sans péage'}
                 </AppText>
               </View>
             </View>
@@ -367,7 +377,7 @@ export default function NavigationScreen() {
             <Touchable style={styles.parking} scale={0.98}>
               <Icon name="local-parking" size={22} color={dark.onPinkContainer} />
               <AppText variant="headlineSm" color={dark.onPinkContainer} style={{ fontSize: 16 }}>
-                Trouver Parking CCIA
+                Trouver un parking
               </AppText>
             </Touchable>
             <Touchable style={styles.call} accessibilityLabel="Contacter le support">

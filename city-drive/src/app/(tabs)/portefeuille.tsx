@@ -23,6 +23,8 @@ const TX_STYLE: Record<TxKind, { icon: IconName; bg: string; fg: string; tag: st
   course: { icon: 'local-taxi', bg: colors.surfaceContainer, fg: colors.primary, tag: 'Course' },
   recharge: { icon: 'add-card', bg: 'rgba(255,196,0,0.3)', fg: colors.secondary, tag: 'Recharge' },
   peage: { icon: 'toll', bg: colors.surfaceHigh, fg: colors.onSurfaceVariant, tag: 'Péage' },
+  pourboire: { icon: 'favorite', bg: colors.pinkSoft, fg: colors.tertiary, tag: 'Pourboire' },
+  annulation: { icon: 'cancel', bg: colors.surfaceHigh, fg: colors.onSurfaceVariant, tag: 'Annulation' },
 };
 
 function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
@@ -49,7 +51,7 @@ export default function WalletScreen() {
   const [autoPay, setAutoPay] = useState(true);
 
   const op = OPERATORS.find((o) => o.id === operator) ?? OPERATORS[0];
-  const filtered = transactions.filter((t) => filter === 'all' || t.kind === filter);
+  const filtered = transactions.filter((t) => filter === 'all' || (filter === 'recharge' ? t.kind === 'recharge' : t.kind !== 'recharge'));
   const visible = showAll ? filtered : filtered.slice(0, 4);
 
   const doRecharge = () => router.push({ pathname: '/recharge', params: { amount: String(amount), operator: op.id } });
@@ -260,7 +262,7 @@ export default function WalletScreen() {
           <View style={{ gap: 6 }}>
             {visible.map((t) => {
               const s = TX_STYLE[t.kind];
-              const color = t.kind === 'recharge' ? colors.secondary : t.kind === 'course' ? '#ba1a1a' : colors.onSurface;
+              const color = t.kind === 'recharge' ? colors.secondary : t.amount < 0 ? '#ba1a1a' : colors.onSurface;
               return (
                 <View key={t.id} style={styles.tx}>
                   <View style={[styles.row, { gap: 10, flex: 1 }]}>
