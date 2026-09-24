@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { OperatorBadge } from '@/components/OperatorBadge';
 import { AppText, Dot, Icon, Pill, Touchable, useCompact, type IconName } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts, shadows } from '@/constants/theme';
@@ -156,9 +157,7 @@ export default function WalletScreen() {
               const active = o.id === operator;
               return (
                 <Touchable key={o.id} onPress={() => setOperator(o.id)} style={[styles.operator, active && styles.operatorActive]}>
-                  <View style={[styles.operatorIcon, active && { backgroundColor: colors.primary }]}>
-                    <Icon name={o.icon} size={24} color={active ? colors.onPrimary : colors.primary} />
-                  </View>
+                  <OperatorBadge id={o.id} size={44} />
                   <AppText variant="labelSm" numberOfLines={1}>
                     {o.label}
                   </AppText>

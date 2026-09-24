@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { ScrollView, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { OperatorBadge } from '@/components/OperatorBadge';
 import { AppText, Icon, PingDot, Pill, Pulse, Touchable } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts, shadows } from '@/constants/theme';
@@ -158,11 +159,7 @@ export default function ReceiptScreen() {
                 <Icon name="local-taxi" size={20} color={colors.onPrimary} />
               </View>
               <AppText variant="headlineSm">×</AppText>
-              <View style={[styles.logo, { backgroundColor: 'rgba(29,161,242,0.15)' }]}>
-                <AppText variant="headlineSm" color="#0099ff" style={{ fontFamily: fonts.sora700 }}>
-                  {op.label[0]}
-                </AppText>
-              </View>
+              <OperatorBadge id={op.id} size={40} />
             </View>
             <View style={{ alignItems: 'flex-end', gap: 2 }}>
               <Pill background={colors.secondaryContainer} style={{ paddingHorizontal: 10 }}>

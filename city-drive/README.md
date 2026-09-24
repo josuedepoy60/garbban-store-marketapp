@@ -38,6 +38,8 @@ Palette premium définie dans `src/constants/theme.ts` : noir profond (`primary`
 
 Sobre, dans l'esprit des apps de VTC réelles : une seule police (DM Sans), aplats de couleur sans dégradés décoratifs, ombres légères, coins modérés, carte de rue plate (`CityMap`) avec les taxis disponibles, barre d'onglets classique. Pas d'animations décoratives (rebonds, halos) ni de textes marketing.
 
+Icônes : [Phosphor](https://phosphoricons.com) (`phosphor-react-native`) via le composant `Icon`, qui garde les noms Material (`src/components/icons.ts` fait la correspondance). Trait fin par défaut, version pleine pour l'onglet actif, les étoiles et les validations. Les opérateurs Mobile Money (Wave, Orange Money, MTN MoMo, Moov) ont leurs pastilles aux couleurs de la marque (`OperatorBadge`).
+
 ## Adaptation aux écrans
 
 - **Téléphones** : plein écran. Sous 360 px de large (`useCompact`), les éléments secondaires sont masqués ou compactés ; les cartes s'adaptent à la hauteur de l'écran.

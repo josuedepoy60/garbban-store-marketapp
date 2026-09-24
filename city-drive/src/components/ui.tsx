@@ -14,15 +14,25 @@ import {
 } from 'react-native';
 
 import { colors, shadows, type, type TypeVariant } from '@/constants/theme';
+import { FILLED, PHOSPHOR } from './icons';
 
 export type IconName = ComponentProps<typeof MaterialIcons>['name'];
 
-export function Icon({ name, size = 20, color = colors.onSurface, style }: {
+export type IconWeight = 'thin' | 'light' | 'regular' | 'bold' | 'fill' | 'duotone';
+
+/** Icône de l'app (Phosphor), avec repli sur Material si un nom n'est pas encore associé. */
+export function Icon({ name, size = 20, color = colors.onSurface, weight, style }: {
   name: IconName;
   size?: number;
   color?: string;
+  weight?: IconWeight;
   style?: StyleProp<TextStyle>;
 }) {
+  const Phosphor = PHOSPHOR[name];
+  if (Phosphor) {
+    const w = weight ?? (FILLED.has(name) ? 'fill' : size <= 16 ? 'bold' : 'regular');
+    return <Phosphor size={size} color={color} weight={w} style={style as StyleProp<ViewStyle>} />;
+  }
   return <MaterialIcons name={name} size={size} color={color} style={style} />;
 }
 

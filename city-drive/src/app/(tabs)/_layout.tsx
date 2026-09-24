@@ -32,7 +32,7 @@ function AppTabBar({ state, navigation }: BottomTabBarProps) {
             style={styles.item}
             scale={0.94}
           >
-            <Icon name={tab.icon} size={24} color={color} />
+            <Icon name={tab.icon} size={24} color={color} weight={active ? 'fill' : 'regular'} />
             <AppText variant="labelSm" color={color} style={{ fontFamily: active ? fonts.dm700 : fonts.dm600, letterSpacing: 0 }}>
               {tab.label}
             </AppText>

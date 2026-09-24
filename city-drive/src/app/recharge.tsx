@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { OperatorBadge } from '@/components/OperatorBadge';
 import { AppText, Dot, Icon, Pill, Touchable } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts, shadows } from '@/constants/theme';
@@ -150,9 +151,7 @@ export default function RechargeConfirmScreen() {
         <View style={styles.card}>
           <View style={styles.between}>
             <View style={[styles.row, { gap: 10, flex: 1 }]}>
-              <View style={styles.opIcon}>
-                <Icon name={op.icon} size={28} color={colors.primary} />
-              </View>
+              <OperatorBadge id={op.id} size={48} radius={16} />
               <View style={{ flex: 1 }}>
                 <View style={[styles.row, { gap: 6 }]}>
                   <AppText variant="headlineSm">{op.label} CI</AppText>
