@@ -78,11 +78,9 @@ export default function WalletScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 120 }]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 }]} showsVerticalScrollIndicator={false}>
         {/* Carte virtuelle */}
         <View style={styles.card}>
-          <View style={styles.glowLime} />
-          <View style={styles.glowViolet} />
 
           <View style={styles.between}>
             <View style={styles.row}>
@@ -90,11 +88,6 @@ export default function WalletScreen() {
               <AppText variant="headlineSm" color={colors.onPrimary} style={{ letterSpacing: -0.3 }}>
                 {brand.appName.toUpperCase()} PASS
               </AppText>
-              <Pill background="rgba(255,255,255,0.15)" style={{ paddingHorizontal: 8, paddingVertical: 2 }}>
-                <AppText variant="labelSm" color={colors.secondaryContainer}>
-                  GOLD CLUB
-                </AppText>
-              </Pill>
             </View>
             <View style={[styles.row, { opacity: 0.8 }]}>
               <Icon name="contactless" size={20} color={colors.onPrimary} />
@@ -362,20 +355,20 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  header: { backgroundColor: 'rgba(250,250,251,0.92)', boxShadow: '0px 1px 8px rgba(0,0,0,0.04)', zIndex: 10 },
+  header: { backgroundColor: 'rgba(250,250,251,0.92)', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)', zIndex: 10 },
   headerInner: { height: 64, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surfaceContainer, alignItems: 'center', justifyContent: 'center' },
   bell: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   bellDot: { position: 'absolute', top: 10, right: 11, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.secondary },
   avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginLeft: 4 },
   content: { paddingHorizontal: 16, paddingTop: 16, gap: 24 },
-  card: { minHeight: 220, borderRadius: 32, backgroundColor: '#16181D', padding: 24, overflow: 'hidden', boxShadow: '0px 20px 25px -5px rgba(17,24,39,0.35)' },
+  card: { minHeight: 220, borderRadius: 16, backgroundColor: '#16181D', padding: 24, overflow: 'hidden', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   glowLime: { position: 'absolute', right: -48, top: -48, width: 192, height: 192, borderRadius: 96, backgroundColor: 'rgba(255,196,0,0.2)' },
   glowViolet: { position: 'absolute', left: -40, bottom: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(255,122,26,0.35)' },
   cardBtn: {
     flex: 1,
     height: 48,
-    borderRadius: 999,
+    borderRadius: 12,
     backgroundColor: 'rgba(255,255,255,0.15)',
     flexDirection: 'row',
     alignItems: 'center',
@@ -386,9 +379,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingVertical: 8,
-    borderRadius: 32,
+    borderRadius: 16,
     backgroundColor: colors.surfaceLowest,
-    boxShadow: '0px 1px 3px rgba(0,0,0,0.08)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
     gap: 4,
     borderWidth: 2,
     borderColor: 'transparent',
@@ -401,37 +394,37 @@ const styles = StyleSheet.create({
     width: '48.8%',
     flexGrow: 1,
     height: 48,
-    borderRadius: 999,
+    borderRadius: 12,
     paddingHorizontal: 16,
     backgroundColor: colors.surfaceLowest,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    boxShadow: '0px 1px 3px rgba(0,0,0,0.08)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
   },
-  rechargeCta: { height: 52, borderRadius: 999, backgroundColor: colors.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: shadows.primary },
-  pass: { borderRadius: 32, backgroundColor: colors.surfaceLowest, padding: 16, gap: 16, boxShadow: shadows.card },
+  rechargeCta: { height: 52, borderRadius: 12, backgroundColor: colors.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: shadows.primary },
+  pass: { borderRadius: 16, backgroundColor: colors.surfaceLowest, padding: 16, gap: 16, boxShadow: shadows.card },
   passIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center' },
   gauge: { borderRadius: 16, backgroundColor: colors.surfaceLow, padding: 8 },
   gaugeTrack: { height: 8, borderRadius: 4, backgroundColor: colors.surfaceContainer, overflow: 'hidden' },
   gaugeFill: { width: '70%', height: '100%', borderRadius: 4, backgroundColor: colors.primary },
-  softBtn: { height: 46, borderRadius: 999, backgroundColor: colors.surfaceContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  segment: { flexDirection: 'row', backgroundColor: colors.surfaceContainer, padding: 4, borderRadius: 999 },
-  segmentItem: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 999 },
-  segmentActive: { backgroundColor: colors.surfaceLowest, boxShadow: '0px 1px 2px rgba(0,0,0,0.06)' },
+  softBtn: { height: 46, borderRadius: 12, backgroundColor: colors.surfaceContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  segment: { flexDirection: 'row', backgroundColor: colors.surfaceContainer, padding: 4, borderRadius: 12 },
+  segmentItem: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 12 },
+  segmentActive: { backgroundColor: colors.surfaceLowest, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   tx: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 8,
     padding: 16,
-    borderRadius: 32,
+    borderRadius: 16,
     backgroundColor: colors.surfaceLowest,
-    boxShadow: '0px 1px 3px rgba(0,0,0,0.08)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
   },
   txIcon: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  security: { borderRadius: 32, backgroundColor: colors.surfaceLowest, padding: 16, gap: 14, boxShadow: '0px 1px 3px rgba(0,0,0,0.08)' },
+  security: { borderRadius: 16, backgroundColor: colors.surfaceLowest, padding: 16, gap: 14, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   secIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.surfaceContainer, alignItems: 'center', justifyContent: 'center' },
   toggle: { width: 44, height: 24, borderRadius: 12, padding: 2, justifyContent: 'center' },
-  knob: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', boxShadow: '0px 1px 3px rgba(0,0,0,0.2)' },
+  knob: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
 });

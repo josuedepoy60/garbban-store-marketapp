@@ -34,10 +34,14 @@ npm run typecheck
 
 Palette « jeune et réaliste » définie dans `src/constants/theme.ts` : orange taxi d'Abidjan (`primary`) pour les actions, jaune soleil (`secondaryContainer`), vert, bleu et rose en accents, sur des fonds blancs et gris neutres. Chaque grande carte a sa couleur : portefeuille noir/jaune, Gold Club bleu, reçu vert.
 
+## Style visuel
+
+Sobre, dans l'esprit des apps de VTC réelles : une seule police (DM Sans), aplats de couleur sans dégradés décoratifs, ombres légères, coins modérés, carte de rue plate (`CityMap`) avec les taxis disponibles, barre d'onglets classique. Pas d'animations décoratives (rebonds, halos) ni de textes marketing.
+
 ## Adaptation aux écrans
 
 - **Téléphones** : plein écran. Sous 360 px de large (`useCompact`), les éléments secondaires sont masqués ou compactés ; les cartes s'adaptent à la hauteur de l'écran.
-- L'app cible uniquement les **téléphones Android et iPhone** (portrait, `supportsTablet: false`). Pour l'aperçu web, `ResponsiveShell` affiche l'app dans une colonne centrée sur les grands écrans.
+- L'app cible uniquement les **téléphones Android et iPhone** (portrait, `supportsTablet: false`). Pour l'aperçu web, `ResponsiveShell` affiche l'app dans une colonne de 430 px sur les grands écrans.
 
 ## Organisation
 

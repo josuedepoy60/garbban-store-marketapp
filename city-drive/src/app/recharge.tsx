@@ -111,7 +111,6 @@ export default function RechargeConfirmScreen() {
 
         {/* Montant */}
         <View style={styles.hero}>
-          <View style={styles.heroGlow} />
           <Pill background={colors.secondaryContainer} style={styles.offered}>
             <Icon name="stars" size={14} color={colors.onSecondaryFixed} />
             <AppText variant="labelSm" color={colors.onSecondaryFixed}>
@@ -341,13 +340,6 @@ export default function RechargeConfirmScreen() {
             <AppText variant="labelLg">Annuler la transaction</AppText>
           </Touchable>
         )}
-
-        <View style={[styles.row, { justifyContent: 'center', gap: 6 }]}>
-          <Icon name="verified" size={16} color={colors.secondary} />
-          <AppText variant="labelSm" color={colors.onSurfaceVariant} style={{ textAlign: 'center', flexShrink: 1 }}>
-            Paiement chiffré 256-bit certifié BCEAO & {op.label} Côte d'Ivoire
-          </AppText>
-        </View>
       </ScrollView>
     </View>
   );
@@ -357,39 +349,39 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  header: { backgroundColor: 'rgba(250,250,251,0.92)', boxShadow: '0px 1px 8px rgba(17,24,39,0.06)', zIndex: 10 },
+  header: { backgroundColor: 'rgba(250,250,251,0.92)', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)', zIndex: 10 },
   headerInner: { height: 64, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 4 },
   back: { width: 48, height: 48, marginLeft: -8, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   content: { paddingHorizontal: 16, paddingTop: 12, gap: 16 },
-  stepChip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 6, borderRadius: 999, backgroundColor: colors.surfaceHigh },
-  hero: { borderRadius: 32, backgroundColor: colors.surfaceLowest, padding: 24, gap: 4, overflow: 'hidden', boxShadow: '0px 20px 25px -5px rgba(17,24,39,0.06)' },
+  stepChip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 6, borderRadius: 12, backgroundColor: colors.surfaceHigh },
+  hero: { borderRadius: 16, backgroundColor: colors.surfaceLowest, padding: 24, gap: 4, overflow: 'hidden', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   heroGlow: { position: 'absolute', right: -40, bottom: -40, width: 144, height: 144, borderRadius: 72, backgroundColor: 'rgba(255,232,214,0.4)' },
   offered: { position: 'absolute', right: 16, top: 16, paddingHorizontal: 12, paddingVertical: 4 },
   reward: { marginTop: 12, padding: 8, borderRadius: 16, backgroundColor: colors.surfaceLow, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   rewardIcon: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.primaryContainer, alignItems: 'center', justifyContent: 'center' },
-  card: { borderRadius: 32, backgroundColor: colors.surfaceLowest, padding: 16, gap: 8, boxShadow: shadows.card },
+  card: { borderRadius: 16, backgroundColor: colors.surfaceLowest, padding: 16, gap: 8, boxShadow: shadows.card },
   opIcon: { width: 48, height: 48, borderRadius: 16, backgroundColor: colors.surfaceContainer, alignItems: 'center', justifyContent: 'center' },
-  modify: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: colors.surfaceHigh },
+  modify: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, backgroundColor: colors.surfaceHigh },
   phone: { paddingHorizontal: 8, paddingVertical: 8, borderRadius: 16, backgroundColor: colors.surfaceLow },
   projection: { marginTop: 4, padding: 8, borderRadius: 24, backgroundColor: colors.surfaceHigh, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   projIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center' },
-  process: { borderRadius: 32, backgroundColor: colors.surfaceLow, padding: 16, gap: 8 },
+  process: { borderRadius: 16, backgroundColor: colors.surfaceLow, padding: 16, gap: 8 },
   stepNum: { width: 24, height: 24, borderRadius: 12, backgroundColor: colors.primaryContainer, alignItems: 'center', justifyContent: 'center' },
   toggle: { width: 44, height: 24, borderRadius: 12, padding: 2, justifyContent: 'center' },
-  knob: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', boxShadow: '0px 1px 3px rgba(0,0,0,0.2)' },
+  knob: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   pay: {
     height: 56,
-    borderRadius: 999,
+    borderRadius: 12,
     backgroundColor: colors.secondaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingLeft: 24,
     paddingRight: 12,
-    boxShadow: '0px 10px 20px -4px rgba(255,196,0,0.4)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
   },
   payDone: { backgroundColor: colors.primary, boxShadow: shadows.primary },
   payArrow: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.4)', alignItems: 'center', justifyContent: 'center' },
-  cancel: { height: 48, borderRadius: 999, backgroundColor: colors.surfaceHigh, alignItems: 'center', justifyContent: 'center' },
+  cancel: { height: 48, borderRadius: 12, backgroundColor: colors.surfaceHigh, alignItems: 'center', justifyContent: 'center' },
 });

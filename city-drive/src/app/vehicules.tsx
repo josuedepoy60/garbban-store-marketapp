@@ -10,7 +10,7 @@ import { StackHeader } from '@/components/headers';
 import { AppText, Bounce, Dot, Icon, Pill, PingDot, Touchable, type IconName } from '@/components/ui';
 import { VehicleIcon } from '@/components/VehicleIcon';
 import { brand } from '@/constants/brand';
-import { colors, fonts, shadows } from '@/constants/theme';
+import { colors, shadows } from '@/constants/theme';
 import { carModels, formatAmount, vehicles } from '@/data/mock';
 import { useWallet } from '@/data/wallet';
 
@@ -79,11 +79,6 @@ export default function VehiclesScreen() {
                 Trajet direct avec chauffeur vérifié
               </AppText>
             </View>
-            <Pill background={colors.secondaryContainer} style={{ paddingHorizontal: 12, paddingVertical: 4 }}>
-              <AppText variant="labelSm" color={colors.onSecondaryContainer}>
-                {brand.city} Live
-              </AppText>
-            </Pill>
           </View>
 
           <View style={{ gap: 12 }}>
@@ -151,14 +146,9 @@ export default function VehiclesScreen() {
           <View style={{ gap: 10, paddingTop: 4 }}>
             <View style={styles.between}>
               <View style={styles.row}>
-                <Icon name="auto-awesome" size={19} color={colors.primary} />
+                <Icon name="directions-car" size={19} color={colors.primary} />
                 <AppText variant="headlineSm">Choisir un modèle précis</AppText>
               </View>
-              <Pill background={colors.primaryFixed} style={{ paddingHorizontal: 8, paddingVertical: 2 }}>
-                <AppText variant="labelSm" color={colors.primary}>
-                  Exclusivité
-                </AppText>
-              </Pill>
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingVertical: 4 }}>
               {carModels.map((m) => {
@@ -269,10 +259,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.92)',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 999,
+    borderRadius: 12,
     boxShadow: shadows.float,
   },
-  timePill: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surfaceLow, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  timePill: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surfaceLow, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   enRoute: {
     position: 'absolute',
     bottom: 24,
@@ -283,7 +273,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceLowest,
     paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: 999,
+    borderRadius: 12,
     boxShadow: shadows.card,
   },
   content: { paddingHorizontal: 16, gap: 16, marginTop: -8 },
@@ -293,13 +283,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 8,
     padding: 14,
-    borderRadius: 32,
+    borderRadius: 16,
     backgroundColor: colors.surfaceLowest,
-    boxShadow: '0px 1px 3px rgba(0,0,0,0.08)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  vehicleActive: { borderColor: colors.primary, boxShadow: '0px 4px 12px rgba(232,89,12,0.12)' },
+  vehicleActive: { borderColor: colors.primary, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   recommended: {
     position: 'absolute',
     top: -11,
@@ -310,19 +300,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingHorizontal: 10,
     paddingVertical: 2,
-    borderRadius: 999,
+    borderRadius: 12,
   },
   vehicleArt: { width: 64, height: 56, borderRadius: 16, backgroundColor: colors.surfaceLow, padding: 6 },
-  modelChip: { height: 38, paddingHorizontal: 16, borderRadius: 999, backgroundColor: colors.surfaceLowest, justifyContent: 'center', boxShadow: '0px 1px 2px rgba(0,0,0,0.06)' },
+  modelChip: { height: 38, paddingHorizontal: 16, borderRadius: 12, backgroundColor: colors.surfaceLowest, justifyContent: 'center', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   perk: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 16, backgroundColor: colors.surfaceLow },
-  perkIcon: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 2px rgba(0,0,0,0.06)' },
-  checkout: { backgroundColor: colors.surfaceLowest, padding: 16, borderRadius: 24, gap: 14, boxShadow: '0px 10px 30px -6px rgba(22,19,43,0.14)', marginTop: 4 },
+  perkIcon: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  checkout: { backgroundColor: colors.surfaceLowest, padding: 16, borderRadius: 24, gap: 14, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)', marginTop: 4 },
   payIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center' },
   tick: { width: 16, height: 16, borderRadius: 8, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  change: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: colors.surfaceLow },
+  change: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, backgroundColor: colors.surfaceLow },
   cta: {
     height: 56,
-    borderRadius: 999,
+    borderRadius: 12,
     backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',

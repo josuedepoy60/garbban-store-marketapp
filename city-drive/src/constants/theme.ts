@@ -55,8 +55,9 @@ export const colors = {
 };
 
 export const fonts = {
-  sora600: 'Sora_600SemiBold',
-  sora700: 'Sora_700Bold',
+  // Une seule famille (DM Sans) pour un rendu sobre ; les clés « sora » sont gardées pour compatibilité.
+  sora600: 'DMSans_700Bold',
+  sora700: 'DMSans_700Bold',
   dm400: 'DMSans_400Regular',
   dm600: 'DMSans_600SemiBold',
   dm700: 'DMSans_700Bold',
@@ -72,9 +73,9 @@ export const type = {
   bodyLg: { fontFamily: fonts.dm400, fontSize: 17, lineHeight: 26 },
   bodyMd: { fontFamily: fonts.dm400, fontSize: 15, lineHeight: 22 },
   bodySm: { fontFamily: fonts.dm400, fontSize: 13, lineHeight: 18 },
-  labelLg: { fontFamily: fonts.dm700, fontSize: 15, lineHeight: 20, letterSpacing: 0.15 },
-  labelMd: { fontFamily: fonts.dm600, fontSize: 13, lineHeight: 18, letterSpacing: 0.26 },
-  labelSm: { fontFamily: fonts.dm700, fontSize: 11, lineHeight: 14, letterSpacing: 0.44 },
+  labelLg: { fontFamily: fonts.dm700, fontSize: 15, lineHeight: 20, letterSpacing: 0 },
+  labelMd: { fontFamily: fonts.dm600, fontSize: 13, lineHeight: 18, letterSpacing: 0 },
+  labelSm: { fontFamily: fonts.dm700, fontSize: 11, lineHeight: 14, letterSpacing: 0.1 },
 } satisfies Record<string, TextStyle>;
 
 export type TypeVariant = keyof typeof type;
@@ -82,10 +83,10 @@ export type TypeVariant = keyof typeof type;
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, margin: 16 };
 
 export const shadows = {
-  soft: '0px 8px 24px -4px rgba(17, 24, 39, 0.08)',
-  card: '0px 8px 24px -6px rgba(17, 24, 39, 0.10)',
-  float: '0px 14px 32px -6px rgba(22, 19, 43, 0.14)',
-  sheet: '0px -12px 36px rgba(22, 19, 43, 0.08)',
-  primary: '0px 10px 22px -4px rgba(232, 89, 12, 0.35)',
-  lime: '0px 12px 26px -4px rgba(255, 196, 0, 0.45)',
+  soft: '0px 1px 3px rgba(16, 24, 40, 0.08)',
+  card: '0px 1px 3px rgba(16, 24, 40, 0.08)',
+  float: '0px 2px 8px rgba(16, 24, 40, 0.12)',
+  sheet: '0px -2px 10px rgba(16, 24, 40, 0.08)',
+  primary: '0px 1px 2px rgba(16, 24, 40, 0.1)',
+  lime: '0px 1px 2px rgba(16, 24, 40, 0.1)',
 };

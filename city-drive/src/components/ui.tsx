@@ -1,8 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useEffect, useRef, type ComponentProps, type ReactNode } from 'react';
+import { type ComponentProps, type ReactNode } from 'react';
 import {
-  Animated,
-  Easing,
   Image,
   Pressable,
   StyleSheet,
@@ -96,79 +94,28 @@ export function Card({ children, style }: { children: ReactNode; style?: StylePr
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
-// --- Animations -----------------------------------------------------------
+// --- États « en direct » ---------------------------------------------------
+// Volontairement statiques : pas de rebonds ni de halos clignotants, comme dans
+// les apps de VTC réelles. Les noms sont conservés pour ne pas toucher aux écrans.
 
-function useLoop(duration: number, delay = 0) {
-  const value = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    const anim = Animated.loop(
-      Animated.sequence([
-        Animated.delay(delay),
-        Animated.timing(value, { toValue: 1, duration, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
-        Animated.timing(value, { toValue: 0, duration: 0, useNativeDriver: true }),
-      ]),
-    );
-    anim.start();
-    return () => anim.stop();
-  }, [value, duration, delay]);
-  return value;
-}
-
-/** Point qui émet un halo (équivalent de `animate-ping`). */
+/** Point d'état (en direct, disponible…). */
 export function PingDot({ color, size = 8 }: { color: string; size?: number }) {
-  const t = useLoop(1400);
-  return (
-    <View style={{ width: size, height: size }}>
-      <Animated.View
-        style={[
-          StyleSheet.absoluteFill,
-          { borderRadius: size, backgroundColor: color },
-          { opacity: t.interpolate({ inputRange: [0, 1], outputRange: [0.7, 0] }), transform: [{ scale: t.interpolate({ inputRange: [0, 1], outputRange: [1, 2.4] }) }] },
-        ]}
-      />
-      <View style={{ width: size, height: size, borderRadius: size, backgroundColor: color }} />
-    </View>
-  );
+  return <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }} />;
 }
 
-/** Élément qui rebondit doucement (équivalent de `animate-bounce`). */
-export function Bounce({ children, duration = 2800, style }: { children: ReactNode; duration?: number; style?: StyleProp<ViewStyle> }) {
-  const t = useLoop(duration);
-  const translateY = t.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, -6, 0] });
-  return <Animated.View style={[style, { transform: [{ translateY }] }]}>{children}</Animated.View>;
+/** Conteneur simple (ancien élément rebondissant). */
+export function Bounce({ children, style }: { children: ReactNode; duration?: number; style?: StyleProp<ViewStyle> }) {
+  return <View style={style}>{children}</View>;
 }
 
-/** Glisse horizontalement de `from` à `to` en boucle (clouds, véhicules). */
-export function Drift({ children, from, to, duration, delay = 0, style }: {
-  children: ReactNode;
-  from: number;
-  to: number;
-  duration: number;
-  delay?: number;
-  style?: StyleProp<ViewStyle>;
-}) {
-  const t = useLoop(duration, delay);
-  const translateX = t.interpolate({ inputRange: [0, 1], outputRange: [from, to] });
-  return <Animated.View style={[style, { transform: [{ translateX }] }]}>{children}</Animated.View>;
-}
-
-export function Pulse({ children, style }: { children?: ReactNode; style?: StyleProp<ViewStyle> }) {
-  const t = useLoop(2200);
-  return (
-    <Animated.View
-      style={[
-        style,
-        { opacity: t.interpolate({ inputRange: [0, 1], outputRange: [0.6, 0] }), transform: [{ scale: t.interpolate({ inputRange: [0, 1], outputRange: [0.8, 2] }) }] },
-      ]}
-    >
-      {children}
-    </Animated.View>
-  );
+/** Ancien halo pulsé : n'affiche plus rien. */
+export function Pulse(_: { children?: ReactNode; style?: StyleProp<ViewStyle> }) {
+  return null;
 }
 
 const styles = StyleSheet.create({
   circle: { alignItems: 'center', justifyContent: 'center', boxShadow: shadows.soft },
-  pill: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 3, borderRadius: 999 },
+  pill: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 3, borderRadius: 6 },
   handle: { width: 48, height: 6, borderRadius: 3, alignSelf: 'center' },
   card: { backgroundColor: colors.surfaceLowest, borderRadius: 16, padding: 16, boxShadow: shadows.card },
 });

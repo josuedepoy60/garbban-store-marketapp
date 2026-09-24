@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     paddingLeft: 6,
     paddingRight: 16,
     paddingVertical: 4,
-    borderRadius: 999,
+    borderRadius: 12,
     boxShadow: shadows.soft,
   },
   logoMark: {
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondaryContainer,
     paddingHorizontal: 14,
     paddingVertical: 7,
-    borderRadius: 999,
+    borderRadius: 12,
     boxShadow: shadows.soft,
   },
   profile: {
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   stackHeader: {
     backgroundColor: 'rgba(255,255,255,0.95)',
-    boxShadow: '0px 1px 8px rgba(0,0,0,0.04)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
     zIndex: 50,
   },
   stackInner: {

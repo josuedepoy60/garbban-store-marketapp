@@ -1,5 +1,4 @@
 import Constants from 'expo-constants';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Fragment, useState, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
@@ -151,7 +150,7 @@ export default function AccountScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 120 }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 24 }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {/* Profil */}
         <View style={[styles.card, { gap: 16 }]}>
           <View style={[styles.row, { gap: 16 }]}>
@@ -188,18 +187,12 @@ export default function AccountScreen() {
         </View>
 
         {/* Gold Club */}
-        <LinearGradient colors={['#1E3A8A', colors.blue, '#6E9BFF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.gold}>
-          <View style={styles.goldGlow} />
+        <View style={[styles.gold, { backgroundColor: '#1D4ED8' }]}>
           <View style={[styles.between, { flexWrap: 'wrap', rowGap: 8 }]}>
             <Pill background={colors.secondaryContainer} style={{ paddingHorizontal: 12, paddingVertical: 4 }}>
               <Icon name="workspace-premium" size={16} color={colors.onSecondaryFixed} />
               <AppText variant="labelSm" color={colors.onSecondaryFixed}>
                 {brand.appName.toUpperCase()} PASS GOLD CLUB
-              </AppText>
-            </Pill>
-            <Pill background="rgba(255,255,255,0.15)" style={{ paddingHorizontal: 10, paddingVertical: 4 }}>
-              <AppText variant="labelSm" color={colors.onPrimary}>
-                Membre Élite
               </AppText>
             </Pill>
           </View>
@@ -234,7 +227,7 @@ export default function AccountScreen() {
             </AppText>
             <Icon name="arrow-forward" size={18} color={colors.onPrimary} />
           </Touchable>
-        </LinearGradient>
+        </View>
 
         {/* Portefeuille */}
         <View style={[styles.card, { gap: 16 }]}>
@@ -409,9 +402,6 @@ export default function AccountScreen() {
             <AppText variant="labelSm" color={colors.onSurfaceVariant}>
               {brand.appName} v{version} ({brand.city} Build)
             </AppText>
-            <AppText variant="labelSm" color={colors.outline}>
-              Fait avec passion pour le Grand {brand.city}
-            </AppText>
           </View>
         </View>
       </ScrollView>
@@ -423,13 +413,13 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  header: { backgroundColor: 'rgba(255,255,255,0.85)', boxShadow: '0px 1px 8px rgba(17,24,39,0.06)', zIndex: 10 },
+  header: { backgroundColor: 'rgba(255,255,255,0.85)', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)', zIndex: 10 },
   headerInner: { height: 64, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   logo: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   bell: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   avatarSmall: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   content: { paddingHorizontal: 16, paddingTop: 16, gap: 24 },
-  card: { borderRadius: 48, backgroundColor: colors.surfaceLowest, padding: 24, boxShadow: '0px 12px 32px -8px rgba(17,24,39,0.08)' },
+  card: { borderRadius: 16, backgroundColor: colors.surfaceLowest, padding: 24, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   verifiedBadge: {
     position: 'absolute',
     right: -4,
@@ -440,26 +430,26 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondaryContainer,
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0px 4px 6px rgba(0,0,0,0.15)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
   },
-  verifiedPill: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', marginTop: 4, backgroundColor: colors.surfaceContainer, paddingHorizontal: 10, paddingVertical: 2, borderRadius: 999 },
+  verifiedPill: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', marginTop: 4, backgroundColor: colors.surfaceContainer, paddingHorizontal: 10, paddingVertical: 2, borderRadius: 12 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.secondaryContainer },
-  softBtn: { height: 44, borderRadius: 999, backgroundColor: colors.surfaceContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
-  gold: { borderRadius: 48, padding: 24, gap: 16, overflow: 'hidden', boxShadow: '0px 16px 36px -6px rgba(17,24,39,0.28)' },
+  softBtn: { height: 44, borderRadius: 12, backgroundColor: colors.surfaceContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  gold: { borderRadius: 16, padding: 24, gap: 16, overflow: 'hidden', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   goldGlow: { position: 'absolute', right: -48, top: -48, width: 176, height: 176, borderRadius: 88, backgroundColor: 'rgba(255,196,0,0.15)' },
-  perks: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8, borderRadius: 32, backgroundColor: 'rgba(255,255,255,0.1)' },
-  goldBtn: { height: 48, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.15)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  perks: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.1)' },
+  goldBtn: { height: 48, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.15)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   rowIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surfaceContainer, alignItems: 'center', justifyContent: 'center' },
-  recharge: { height: 56, borderRadius: 999, backgroundColor: colors.secondaryContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, boxShadow: '0px 4px 6px -1px rgba(0,0,0,0.1)' },
-  list: { borderRadius: 48, backgroundColor: colors.surfaceLowest, overflow: 'hidden', boxShadow: cardShadow },
+  recharge: { height: 56, borderRadius: 12, backgroundColor: colors.secondaryContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  list: { borderRadius: 16, backgroundColor: colors.surfaceLowest, overflow: 'hidden', boxShadow: cardShadow },
   listRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: 16 },
   divider: { height: 1, marginHorizontal: 16, backgroundColor: 'rgba(232,235,239,0.6)' },
   more: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   menu: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, paddingHorizontal: 16, paddingBottom: 12, marginTop: -4 },
-  menuBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: colors.surfaceContainer },
+  menuBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, backgroundColor: colors.surfaceContainer },
   input: {
     height: 44,
-    borderRadius: 999,
+    borderRadius: 12,
     paddingHorizontal: 16,
     backgroundColor: colors.surfaceContainer,
     fontFamily: fonts.dm400,
@@ -468,6 +458,6 @@ const styles = StyleSheet.create({
     outlineWidth: 0,
   },
   toggle: { width: 48, height: 28, borderRadius: 14, padding: 2, justifyContent: 'center' },
-  knob: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#fff', boxShadow: '0px 1px 2px rgba(0,0,0,0.15)' },
-  logout: { alignSelf: 'stretch', height: 56, borderRadius: 999, backgroundColor: colors.surfaceContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 20 },
+  knob: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#fff', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  logout: { alignSelf: 'stretch', height: 56, borderRadius: 12, backgroundColor: colors.surfaceContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: 20 },
 });

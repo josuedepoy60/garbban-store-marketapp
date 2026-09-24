@@ -3,44 +3,42 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText, Icon, Touchable, type IconName } from '@/components/ui';
-import { colors, shadows } from '@/constants/theme';
+import { colors, fonts } from '@/constants/theme';
 
 const TABS: Record<string, { icon: IconName; label: string }> = {
   index: { icon: 'local-taxi', label: 'Course' },
   trajets: { icon: 'schedule', label: 'Trajets' },
   portefeuille: { icon: 'account-balance-wallet', label: 'Portefeuille' },
-  compte: { icon: 'tune', label: 'Compte' },
+  compte: { icon: 'person-outline', label: 'Compte' },
 };
 
-/** Barre d'onglets flottante en forme de pilule, comme dans les maquettes. */
-function PillTabBar({ state, navigation }: BottomTabBarProps) {
+/** Barre d'onglets classique : pleine largeur, icône + libellé, onglet actif en orange. */
+function AppTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.wrap, { paddingBottom: insets.bottom + 8 }]} pointerEvents="box-none">
-      <View style={styles.bar}>
-        {state.routes.map((route, i) => {
-          const tab = TABS[route.name];
-          if (!tab) return null;
-          const active = state.index === i;
-          return (
-            <Touchable
-              key={route.key}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: active }}
-              accessibilityLabel={tab.label}
-              onPress={() => navigation.navigate(route.name)}
-              style={[styles.item, active && styles.itemActive]}
-            >
-              <Icon name={tab.icon} size={22} color={active ? colors.onPrimary : colors.onSurfaceVariant} />
-              {active && (
-                <AppText variant="labelMd" color={colors.onPrimary}>
-                  {tab.label}
-                </AppText>
-              )}
-            </Touchable>
-          );
-        })}
-      </View>
+    <View style={[styles.bar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+      {state.routes.map((route, i) => {
+        const tab = TABS[route.name];
+        if (!tab) return null;
+        const active = state.index === i;
+        const color = active ? colors.primary : colors.onSurfaceVariant;
+        return (
+          <Touchable
+            key={route.key}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: active }}
+            accessibilityLabel={tab.label}
+            onPress={() => navigation.navigate(route.name)}
+            style={styles.item}
+            scale={0.94}
+          >
+            <Icon name={tab.icon} size={24} color={color} />
+            <AppText variant="labelSm" color={color} style={{ fontFamily: active ? fonts.dm700 : fonts.dm600, letterSpacing: 0 }}>
+              {tab.label}
+            </AppText>
+          </Touchable>
+        );
+      })}
     </View>
   );
 }
@@ -49,7 +47,7 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: colors.surface } }}
-      tabBar={(props) => <PillTabBar {...props} />}
+      tabBar={(props) => <AppTabBar {...props} />}
     >
       <Tabs.Screen name="index" />
       <Tabs.Screen name="trajets" />
@@ -60,26 +58,12 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
-  wrap: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: 16 },
   bar: {
-    height: 64,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.96)',
-    boxShadow: shadows.float,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingHorizontal: 4,
+    backgroundColor: colors.surfaceLowest,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.outlineVariant,
+    paddingTop: 8,
   },
-  item: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 16,
-    borderRadius: 999,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  itemActive: { backgroundColor: colors.primary, boxShadow: '0px 8px 24px -4px rgba(17,24,39,0.24)' },
+  item: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 2, minHeight: 48 },
 });

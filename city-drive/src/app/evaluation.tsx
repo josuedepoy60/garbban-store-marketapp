@@ -89,7 +89,6 @@ export default function RatingScreen() {
       <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 32 }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {/* Trajet terminé */}
         <View style={styles.success}>
-          <View style={styles.glow} />
           <View style={[styles.row, { gap: 8 }]}>
             <View style={styles.verified}>
               <Icon name="verified" size={18} color={colors.onSecondaryContainer} />
@@ -292,13 +291,6 @@ export default function RatingScreen() {
           </View>
         </View>
 
-        <View style={[styles.row, { justifyContent: 'center', gap: 8, paddingHorizontal: 8 }]}>
-          <Icon name="shield" size={16} color={colors.outline} />
-          <AppText variant="bodySm" color={colors.outline} style={{ textAlign: 'center', flexShrink: 1 }}>
-            Avis anonymisé et protégé par les normes de sécurité {brand.appName} Côte d'Ivoire.
-          </AppText>
-        </View>
-
         {error && (
           <AppText variant="labelMd" color="#ba1a1a" style={{ textAlign: 'center' }}>
             {error}
@@ -352,15 +344,14 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  header: { backgroundColor: 'rgba(250,250,251,0.92)', boxShadow: '0px 1px 8px rgba(17,24,39,0.06)', zIndex: 10 },
+  header: { backgroundColor: 'rgba(250,250,251,0.92)', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)', zIndex: 10 },
   headerInner: { height: 64, paddingHorizontal: 8, flexDirection: 'row', alignItems: 'center' },
   headerBtn: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   content: { paddingHorizontal: 16, paddingTop: 8, gap: 16 },
-  success: { borderRadius: 32, backgroundColor: colors.surfaceContainer, padding: 16, overflow: 'hidden' },
-  glow: { position: 'absolute', right: -24, bottom: -24, width: 96, height: 96, borderRadius: 48, backgroundColor: 'rgba(255,196,0,0.2)' },
+  success: { borderRadius: 16, backgroundColor: colors.surfaceContainer, padding: 16, overflow: 'hidden' },
   verified: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center' },
   sep: { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.outlineVariant },
-  card: { borderRadius: 32, backgroundColor: colors.surfaceLowest, padding: 16, boxShadow: '0px 1px 3px rgba(0,0,0,0.06)' },
+  card: { borderRadius: 16, backgroundColor: colors.surfaceLowest, padding: 16, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   avatarRing: { width: 80, height: 80, borderRadius: 40, padding: 4, backgroundColor: colors.surfaceContainer, marginBottom: 8, marginTop: -4 },
   ratingBadge: {
     position: 'absolute',
@@ -372,21 +363,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 999,
+    borderRadius: 12,
   },
   divider: { alignSelf: 'stretch', height: 1, backgroundColor: colors.surfaceContainer, marginVertical: 16 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999, backgroundColor: colors.surfaceContainer },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, backgroundColor: colors.surfaceContainer },
   tips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   tip: { width: '31.5%', flexGrow: 1, height: 56, borderRadius: 16, backgroundColor: colors.surfaceContainer, alignItems: 'center', justifyContent: 'center' },
   tipWide: { width: '64%' },
   tipOn: { backgroundColor: colors.secondaryContainer },
-  advice: { position: 'absolute', top: -10, backgroundColor: colors.primary, paddingHorizontal: 8, paddingVertical: 1, borderRadius: 999 },
-  customTip: { flexDirection: 'row', alignItems: 'center', marginTop: 12, height: 48, borderRadius: 999, paddingHorizontal: 16, backgroundColor: colors.surfaceContainer },
+  advice: { position: 'absolute', top: -10, backgroundColor: colors.primary, paddingHorizontal: 8, paddingVertical: 1, borderRadius: 12 },
+  customTip: { flexDirection: 'row', alignItems: 'center', marginTop: 12, height: 48, borderRadius: 12, paddingHorizontal: 16, backgroundColor: colors.surfaceContainer },
   customInput: { flex: 1, fontFamily: fonts.sora600, fontSize: 15, color: colors.onSurface, paddingVertical: 0, outlineWidth: 0 },
   heart: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surfaceContainer, alignItems: 'center', justifyContent: 'center' },
   toggle: { width: 48, height: 28, borderRadius: 14, padding: 2, justifyContent: 'center' },
-  knob: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#fff', boxShadow: '0px 1px 3px rgba(0,0,0,0.2)' },
+  knob: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#fff', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   note: {
     minHeight: 72,
     borderRadius: 16,
@@ -400,14 +391,14 @@ const styles = StyleSheet.create({
   },
   submit: {
     height: 56,
-    borderRadius: 999,
+    borderRadius: 12,
     backgroundColor: colors.secondaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    boxShadow: '0px 4px 6px -1px rgba(0,0,0,0.1)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
     marginTop: 8,
   },
-  skip: { height: 48, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
+  skip: { height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
 });

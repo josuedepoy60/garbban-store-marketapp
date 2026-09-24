@@ -1,4 +1,3 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
@@ -51,13 +50,12 @@ export default function ScheduleScreen() {
         {/* Résumé du trajet */}
         <View style={styles.px}>
           <View style={styles.routeCard}>
-            <View style={styles.blob} />
             <View style={[styles.row, { gap: 16, alignItems: 'flex-start' }]}>
               <View style={{ alignItems: 'center', paddingTop: 6 }}>
                 <View style={styles.fromDot}>
                   <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#fff' }} />
                 </View>
-                <LinearGradient colors={[colors.primary, colors.outlineVariant, colors.secondaryContainer]} style={styles.timeline} />
+                <View style={[styles.timeline, { backgroundColor: colors.outlineVariant }]} />
                 <View style={styles.toDot}>
                   <View style={{ width: 6, height: 6, borderRadius: 2, backgroundColor: colors.onSecondaryContainer }} />
                 </View>
@@ -134,9 +132,6 @@ export default function ScheduleScreen() {
               <Icon name="schedule" size={18} color={colors.primary} />
               <AppText variant="headlineSm">Heure de prise en charge</AppText>
             </View>
-            <AppText variant="labelSm" color={colors.primary} style={{ fontFamily: fonts.dm600 }}>
-              Créneau optimal
-            </AppText>
           </View>
           <View style={styles.grid}>
             {TIMES.map((t) => {
@@ -276,11 +271,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: 'rgba(255,255,255,0.8)',
-    borderRadius: 999,
+    borderRadius: 12,
     padding: 4,
     boxShadow: shadows.soft,
   },
-  routeCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 32, padding: 16, gap: 16, overflow: 'hidden', boxShadow: '0px 12px 32px -6px rgba(17,24,39,0.09)' },
+  routeCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 16, padding: 16, gap: 16, overflow: 'hidden', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   blob: { position: 'absolute', right: -32, top: -32, width: 112, height: 112, borderRadius: 56, backgroundColor: 'rgba(255,232,214,0.5)' },
   fromDot: { width: 14, height: 14, borderRadius: 7, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', boxShadow: `0px 0px 0px 4px ${colors.primaryFixed}` },
   timeline: { width: 2, height: 40, borderRadius: 1, marginVertical: 2 },
@@ -290,12 +285,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: 'rgba(244,245,247,0.7)',
-    borderRadius: 999,
+    borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 4,
   },
-  specCar: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surfaceLowest, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
-  month: { backgroundColor: colors.surfaceContainer, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
+  specCar: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surfaceLowest, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12 },
+  month: { backgroundColor: colors.surfaceContainer, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12 },
   day: {
     minWidth: 72,
     height: 82,
@@ -303,25 +298,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.85)',
-    boxShadow: '0px 1px 3px rgba(0,0,0,0.06)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
   },
-  dayActive: { minWidth: 76, backgroundColor: colors.primary, transform: [{ scale: 1.03 }], boxShadow: '0px 8px 20px -2px rgba(255,122,26,0.45)' },
+  dayActive: { minWidth: 76, backgroundColor: colors.primary, transform: [{ scale: 1.03 }], boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   dayDot: { width: 6, height: 6, borderRadius: 3, marginTop: 4 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   time: {
     width: '31.5%',
     flexGrow: 1,
     height: 48,
-    borderRadius: 999,
+    borderRadius: 12,
     backgroundColor: 'rgba(255,255,255,0.92)',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    boxShadow: '0px 1px 3px rgba(0,0,0,0.06)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
   },
-  timeActive: { backgroundColor: colors.primaryContainer, borderWidth: 2, borderColor: colors.secondaryContainer, boxShadow: '0px 8px 20px rgba(255,122,26,0.35)' },
-  driverCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 32, padding: 16, gap: 8, boxShadow: '0px 8px 24px -4px rgba(17,24,39,0.07)' },
+  timeActive: { backgroundColor: colors.primaryContainer, borderWidth: 2, borderColor: colors.secondaryContainer, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  driverCard: { backgroundColor: 'rgba(255,255,255,0.92)', borderRadius: 16, padding: 16, gap: 8, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   rating: {
     position: 'absolute',
     right: -4,
@@ -331,30 +326,30 @@ const styles = StyleSheet.create({
     gap: 1,
     backgroundColor: colors.secondaryContainer,
     paddingHorizontal: 4,
-    borderRadius: 999,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: colors.surfaceLowest,
   },
   toggle: { width: 48, height: 28, borderRadius: 14, padding: 2, justifyContent: 'center', marginTop: 4 },
-  knob: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#fff', boxShadow: '0px 1px 3px rgba(0,0,0,0.2)' },
+  knob: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#fff', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   trust: { backgroundColor: 'rgba(244,245,247,0.7)', borderRadius: 16, padding: 8, gap: 4 },
   dock: {
     backgroundColor: 'rgba(255,255,255,0.97)',
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 32,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
     padding: 16,
     gap: 16,
-    boxShadow: '0px -12px 40px rgba(22,19,43,0.08)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
   },
-  payBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.secondaryContainer, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999 },
+  payBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.secondaryContainer, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
   cta: {
     height: 56,
-    borderRadius: 999,
+    borderRadius: 12,
     backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    boxShadow: '0px 14px 30px -6px rgba(255,122,26,0.45)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
   },
 });

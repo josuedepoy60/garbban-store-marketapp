@@ -1,4 +1,3 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
@@ -49,7 +48,7 @@ export default function TransitScreen() {
   return (
     <View style={styles.screen}>
       <TabHeader />
-      <ScrollView contentContainerStyle={{ paddingTop: insets.top + 76, paddingBottom: insets.bottom + 110 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingTop: insets.top + 76, paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
         {/* Sous-en-tête */}
         <View style={[styles.between, styles.px, { paddingBottom: 8 }]}>
           <View style={[styles.row, { gap: 8 }]}>
@@ -236,7 +235,7 @@ export default function TransitScreen() {
 
         {/* Bandeau paiement QR */}
         <View style={styles.px}>
-          <LinearGradient colors={[colors.blue, '#1E3A8A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.banner}>
+          <View style={[styles.banner, { backgroundColor: '#1D4ED8' }]}>
             <View style={styles.qr}>
               <Icon name="qr-code-scanner" size={26} color={colors.secondaryContainer} />
             </View>
@@ -248,22 +247,22 @@ export default function TransitScreen() {
                 Réglez votre place en {brand.walletName} et montez à bord directement avec votre QR Code sans monnaie physique.
               </AppText>
             </View>
-          </LinearGradient>
+          </View>
         </View>
       </ScrollView>
     </View>
   );
 }
 
-const glass = { backgroundColor: 'rgba(255,255,255,0.95)', boxShadow: '0px 1px 3px rgba(0,0,0,0.08)' };
+const glass = { backgroundColor: 'rgba(255,255,255,0.95)', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' };
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   px: { paddingHorizontal: 16 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  mapCard: { height: 288, borderRadius: 32, overflow: 'hidden', backgroundColor: colors.surfaceContainer, boxShadow: '0px 12px 32px -8px rgba(17,24,39,0.12)' },
-  approach: { ...glass, position: 'absolute', top: 12, left: 12, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
+  mapCard: { height: 288, borderRadius: 16, overflow: 'hidden', backgroundColor: colors.surfaceContainer, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  approach: { ...glass, position: 'absolute', top: 12, left: 12, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12 },
   nearest: {
     ...glass,
     position: 'absolute',
@@ -276,16 +275,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 8,
-    boxShadow: '0px 8px 20px -4px rgba(27,24,49,0.1)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.08)',
   },
   pinIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(232,89,12,0.1)', alignItems: 'center', justifyContent: 'center' },
-  itinerary: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surfaceHigh, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 },
-  filter: { height: 36, paddingHorizontal: 14, borderRadius: 999, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.surfaceLowest, boxShadow: '0px 1px 2px rgba(0,0,0,0.06)' },
-  filterActive: { backgroundColor: colors.primary, boxShadow: '0px 4px 12px -2px rgba(255,122,26,0.3)' },
-  count: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 999 },
-  departure: { padding: 16, borderRadius: 32, backgroundColor: colors.surfaceLowest, gap: 12, boxShadow: shadows.card },
+  itinerary: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surfaceHigh, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 },
+  filter: { height: 36, paddingHorizontal: 14, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.surfaceLowest, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  filterActive: { backgroundColor: colors.primary, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  count: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 12 },
+  departure: { padding: 16, borderRadius: 16, backgroundColor: colors.surfaceLowest, gap: 12, boxShadow: shadows.card },
   departureFull: { backgroundColor: 'rgba(244,245,247,0.7)', opacity: 0.8, boxShadow: undefined },
-  book: { height: 40, paddingHorizontal: 20, borderRadius: 999, justifyContent: 'center', boxShadow: '0px 4px 8px rgba(0,0,0,0.1)' },
-  banner: { borderRadius: 32, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14, boxShadow: '0px 12px 28px -6px rgba(17,24,39,0.28)' },
+  book: { height: 40, paddingHorizontal: 20, borderRadius: 12, justifyContent: 'center', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  banner: { borderRadius: 16, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   qr: { width: 48, height: 48, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
 });

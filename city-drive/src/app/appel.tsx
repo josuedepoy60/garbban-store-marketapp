@@ -115,12 +115,6 @@ export default function CallScreen() {
                 Votre numéro réel est anonymisé
               </AppText>
             </View>
-            <View style={styles.row}>
-              <Icon name="graphic-eq" size={15} color={colors.secondary} />
-              <AppText variant="labelSm" color={colors.secondary}>
-                HD Audio
-              </AppText>
-            </View>
           </View>
         </View>
 
@@ -255,31 +249,31 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  header: { backgroundColor: 'rgba(250,250,251,0.92)', boxShadow: '0px 1px 8px rgba(27,24,49,0.04)', zIndex: 10 },
+  header: { backgroundColor: 'rgba(250,250,251,0.92)', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)', zIndex: 10 },
   headerInner: { height: 64, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 8 },
   back: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#00A676' },
   content: { paddingHorizontal: 16, paddingTop: 12, gap: 16 },
-  privacy: { borderRadius: 32, backgroundColor: colors.surfaceLow, padding: 16, gap: 6, boxShadow: '0px 1px 2px rgba(0,0,0,0.05)' },
-  timer: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.secondaryContainer, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
-  stage: { borderRadius: 48, backgroundColor: colors.surfaceContainer, alignItems: 'center', paddingTop: 32, paddingBottom: 24, paddingHorizontal: 16, gap: 4, overflow: 'hidden' },
+  privacy: { borderRadius: 16, backgroundColor: colors.surfaceLow, padding: 16, gap: 6, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  timer: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.secondaryContainer, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 12 },
+  stage: { borderRadius: 16, backgroundColor: colors.surfaceContainer, alignItems: 'center', paddingTop: 32, paddingBottom: 24, paddingHorizontal: 16, gap: 4, overflow: 'hidden' },
   rings: { width: 176, height: 176, alignItems: 'center', justifyContent: 'center' },
-  ring: { position: 'absolute', borderRadius: 999 },
-  bigAvatar: { width: 96, height: 96, borderRadius: 48, overflow: 'hidden', boxShadow: '0px 10px 15px -3px rgba(0,0,0,0.2)' },
+  ring: { position: 'absolute', borderRadius: 100 },
+  bigAvatar: { width: 96, height: 96, borderRadius: 48, overflow: 'hidden', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   ratingBand: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(232,89,12,0.75)' },
   eq: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 24, marginVertical: 8 },
-  eta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4, backgroundColor: colors.primaryFixed, paddingHorizontal: 16, paddingVertical: 4, borderRadius: 999 },
-  mini: { flexDirection: 'row', alignItems: 'center', gap: 16, borderRadius: 32, backgroundColor: colors.surfaceLowest, padding: 16, boxShadow: '0px 1px 2px rgba(0,0,0,0.05)' },
+  eta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4, backgroundColor: colors.primaryFixed, paddingHorizontal: 16, paddingVertical: 4, borderRadius: 12 },
+  mini: { flexDirection: 'row', alignItems: 'center', gap: 16, borderRadius: 16, backgroundColor: colors.surfaceLowest, padding: 16, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   miniMap: { width: 80, height: 80, borderRadius: 24, overflow: 'hidden' },
-  miniCar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 4px 6px rgba(0,0,0,0.15)' },
-  controls: { flexDirection: 'row', justifyContent: 'space-between', borderRadius: 32, backgroundColor: colors.surfaceHigh, padding: 16 },
+  miniCar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  controls: { flexDirection: 'row', justifyContent: 'space-between', borderRadius: 16, backgroundColor: colors.surfaceHigh, padding: 16 },
   control: { flex: 1, alignItems: 'center', gap: 4 },
-  controlCircle: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 2px rgba(0,0,0,0.06)' },
+  controlCircle: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   badge: { position: 'absolute', top: 0, right: 0, width: 16, height: 16, borderRadius: 8, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center' },
   sosBox: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 24, backgroundColor: '#ffdad6' },
-  sosNo: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: '#fff' },
-  sosYes: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: '#ba1a1a' },
-  sos: { height: 56, paddingHorizontal: 16, borderRadius: 999, backgroundColor: '#ffdad6', flexDirection: 'row', alignItems: 'center', gap: 4 },
-  hangUp: { flex: 1, height: 56, borderRadius: 999, backgroundColor: '#ba1a1a', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0px 10px 15px -3px rgba(186,26,26,0.35)' },
+  sosNo: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, backgroundColor: '#fff' },
+  sosYes: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, backgroundColor: '#ba1a1a' },
+  sos: { height: 56, paddingHorizontal: 16, borderRadius: 12, backgroundColor: '#ffdad6', flexDirection: 'row', alignItems: 'center', gap: 4 },
+  hangUp: { flex: 1, height: 56, borderRadius: 12, backgroundColor: '#ba1a1a', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
 });

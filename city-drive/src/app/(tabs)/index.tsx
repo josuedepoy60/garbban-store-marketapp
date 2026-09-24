@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CityMap } from '@/components/CityMap';
 import { TabHeader } from '@/components/headers';
-import { AppText, Avatar, Bounce, Dot, Icon, PingDot, Pill, SheetHandle, Touchable, useCompact, type IconName } from '@/components/ui';
+import { AppText, Avatar, Dot, Icon, Pill, SheetHandle, Touchable, type IconName } from '@/components/ui';
 import { colors, fonts, shadows } from '@/constants/theme';
 import { favoriteDriver, photos, quickPlaces, user } from '@/data/mock';
 
@@ -31,7 +31,6 @@ export default function HomeScreen() {
   const [route, setRoute] = useState('hkb');
   const [alertOpen, setAlertOpen] = useState(true);
   const mapTop = insets.top + 72;
-  const compact = useCompact();
   const { height } = useWindowDimensions();
   // La carte occupe ~55 % de la hauteur d'écran, entre 320 et 470 px.
   const mapH = Math.round(Math.min(470, Math.max(320, height * 0.55)));
@@ -39,81 +38,28 @@ export default function HomeScreen() {
   return (
     <View style={styles.screen}>
       <TabHeader />
-      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 110 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
         {/* Carte */}
         <View style={{ height: mapH + mapTop }}>
-          <CityMap userMarker style={StyleSheet.absoluteFill}>
-            <Path d={JAM_PATH} stroke={JAM_RED} strokeWidth={12} strokeLinecap="round" fill="none" opacity={0.3} />
-            <Path d={JAM_PATH} stroke="#EF4444" strokeWidth={5} strokeDasharray="6 5" strokeLinecap="round" fill="none" />
+          <CityMap userMarker cars style={StyleSheet.absoluteFill}>
+            <Path d={JAM_PATH} stroke={JAM_RED} strokeWidth={6} strokeLinecap="round" fill="none" />
           </CityMap>
-
-          <View style={[styles.jamBadge, { top: mapTop + 46 }]}>
-            <View style={styles.row}>
-              <PingDot color={JAM_RED} />
-              <AppText variant="labelSm" color={JAM_RED}>
-                Bouchon Adjamé (+10 min)
-              </AppText>
-              <Pill background={JAM_RED} style={{ paddingHorizontal: 6, paddingVertical: 1 }}>
-                <AppText variant="labelSm" color="#fff" style={{ fontSize: 8 }}>
-                  SATURÉ
-                </AppText>
-              </Pill>
-            </View>
-            <AppText variant="labelSm" color={colors.onSurfaceVariant} style={{ fontSize: 9, fontFamily: fonts.dm600 }}>
-              Vitesse {'<'} 8 km/h ·{' '}
-              <AppText variant="labelSm" color={JAM_RED} style={{ fontSize: 9 }}>
-                File ininterrompue
-              </AppText>
-            </AppText>
-          </View>
 
           <View style={[styles.mapBar, { top: mapTop }]}>
             <Touchable style={styles.glassPill}>
               <Icon name="location-on" size={18} color={colors.primary} />
-              <AppText variant="labelMd" style={{ fontFamily: fonts.sora600 }}>
+              <AppText variant="labelMd" style={{ fontFamily: fonts.dm700 }}>
                 {user.location}
               </AppText>
               <Icon name="expand-more" size={16} color={colors.onSurfaceVariant} />
             </Touchable>
-            {!compact && (
-              <View style={styles.glassPill}>
-                <PingDot color={colors.secondary} />
-                <AppText variant="labelSm" color={colors.primary}>
-                  HKB FLUIDE
-                </AppText>
-              </View>
-            )}
           </View>
 
-          <View style={[styles.here, { top: mapTop + 112 }]}>
-            <Dot color={colors.primary} />
-            <AppText variant="labelSm">Vous êtes ici</AppText>
-          </View>
-
-          {!compact && (
-          <Bounce style={[styles.mapChip, { top: mapTop + 90, right: 16 }]}>
-            <View style={[styles.chipIcon, { backgroundColor: colors.secondaryContainer }]}>
-              <Icon name="local-taxi" size={14} color={colors.onSecondaryFixed} />
-            </View>
-            <View>
-              <AppText variant="labelSm">Taxi Eco</AppText>
-              <AppText variant="labelSm" color={colors.secondary} style={{ fontFamily: fonts.dm600 }}>
-                2 min · 1 200 F
-              </AppText>
-            </View>
-          </Bounce>
-          )}
-
-          <View style={[styles.mapChip, { top: mapTop + Math.round(mapH * 0.56), left: 12 }]}>
-            <View style={[styles.chipIcon, { backgroundColor: '#FFE58F' }]}>
-              <Icon name="directions-bus" size={14} color="#664600" />
-            </View>
-            <View>
-              <AppText variant="labelSm">Gbaka Adjamé</AppText>
-              <AppText variant="labelSm" color={colors.onSurfaceVariant} style={{ fontFamily: fonts.dm600 }}>
-                6 min · 14 places
-              </AppText>
-            </View>
+          <View style={[styles.jamBadge, { top: mapTop + 48 }]}>
+            <Icon name="traffic" size={14} color={JAM_RED} />
+            <AppText variant="labelSm" color={colors.onSurface}>
+              Bouchon à Adjamé · +10 min
+            </AppText>
           </View>
 
           <Touchable style={[styles.mapChip, styles.driverChip]} onPress={() => router.push('/course')}>
@@ -130,7 +76,7 @@ export default function HomeScreen() {
           </Touchable>
 
           <Touchable style={styles.recenter} accessibilityLabel="Centrer la position">
-            <Icon name="my-location" size={20} color={colors.primary} />
+            <Icon name="my-location" size={20} color={colors.onSurface} />
           </Touchable>
         </View>
 
@@ -358,16 +304,16 @@ export default function HomeScreen() {
   );
 }
 
-const glass = { backgroundColor: 'rgba(255,255,255,0.95)', boxShadow: '0px 10px 24px -4px rgba(17,24,39,0.16)' };
+const glass = { backgroundColor: 'rgba(255,255,255,0.95)', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' };
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   mapBar: { position: 'absolute', left: 16, right: 16, flexDirection: 'row', justifyContent: 'space-between' },
-  glassPill: { ...glass, flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 14, paddingVertical: 6, borderRadius: 999 },
-  here: { ...glass, position: 'absolute', left: '30%', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
-  mapChip: { ...glass, position: 'absolute', flexDirection: 'row', alignItems: 'center', gap: 6, paddingLeft: 6, paddingRight: 12, paddingVertical: 6, borderRadius: 999 },
+  glassPill: { ...glass, flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 14, paddingVertical: 6, borderRadius: 12 },
+  here: { ...glass, position: 'absolute', left: '30%', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  mapChip: { ...glass, position: 'absolute', flexDirection: 'row', alignItems: 'center', gap: 6, paddingLeft: 6, paddingRight: 12, paddingVertical: 6, borderRadius: 12 },
   chipIcon: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   driverChip: { bottom: 24, right: 16 },
   recenter: { ...glass, position: 'absolute', bottom: 24, left: 16, width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
@@ -375,18 +321,18 @@ const styles = StyleSheet.create({
     marginTop: -16,
     marginHorizontal: 12,
     backgroundColor: 'rgba(255,255,255,0.97)',
-    borderRadius: 28,
+    borderRadius: 16,
     padding: 20,
     gap: 16,
     boxShadow: shadows.sheet,
   },
-  search: { height: 56, borderRadius: 999, backgroundColor: colors.surfaceLow, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 10 },
+  search: { height: 56, borderRadius: 12, backgroundColor: colors.surfaceLow, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 10 },
   searchIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(232,89,12,0.1)', alignItems: 'center', justifyContent: 'center' },
   searchInput: { flex: 1, fontFamily: fonts.sora600, fontSize: 17, color: colors.onSurface, paddingVertical: 0 },
   mic: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(229,222,255,0.8)', alignItems: 'center', justifyContent: 'center' },
   shortcuts: { flexDirection: 'row', justifyContent: 'space-between' },
   shortcut: { flex: 1, alignItems: 'center', gap: 6, padding: 4 },
-  shortcutTile: { width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 2px rgba(0,0,0,0.05)' },
+  shortcutTile: { width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   shortcutLabel: { fontFamily: fonts.dm600, textAlign: 'center', letterSpacing: 0 },
   routeRow: { flexDirection: 'row', gap: 8 },
   routeCard: { flex: 1, borderRadius: 16, padding: 10, gap: 4 },
@@ -395,15 +341,15 @@ const styles = StyleSheet.create({
   routeJam: { backgroundColor: 'rgba(255,255,255,0.8)', borderWidth: 2, borderColor: '#f87171' },
   jamBadge: {
     position: 'absolute',
-    left: 12,
-    gap: 2,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderWidth: 2,
-    borderColor: '#DC2626',
-    borderRadius: 16,
+    left: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#fff',
+    borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    boxShadow: '0px 12px 24px -6px rgba(19,36,68,0.3)',
+    boxShadow: '0px 1px 3px rgba(16,24,40,0.12)',
   },
   alert: { borderRadius: 16, padding: 12, gap: 8, backgroundColor: '#fff', borderWidth: 1, borderColor: 'rgba(254,202,202,0.9)', boxShadow: shadows.float },
   alertIcon: { width: 28, height: 28, borderRadius: 10, backgroundColor: '#DC2626', alignItems: 'center', justifyContent: 'center' },
@@ -425,7 +371,7 @@ const styles = StyleSheet.create({
   rebookCta: {
     height: 48,
     gap: 8,
-    borderRadius: 999,
+    borderRadius: 12,
     backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
@@ -434,6 +380,6 @@ const styles = StyleSheet.create({
     paddingRight: 8,
     boxShadow: shadows.primary,
   },
-  rebookPrice: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
-  place: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.surfaceHigh, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999 },
+  rebookPrice: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
+  place: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.surfaceHigh, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12 },
 });

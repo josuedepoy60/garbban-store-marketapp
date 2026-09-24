@@ -1,10 +1,9 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ScrollView, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AppText, Bounce, Icon, PingDot, Pill, Pulse, Touchable } from '@/components/ui';
+import { AppText, Icon, PingDot, Pill, Pulse, Touchable } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts, shadows } from '@/constants/theme';
 import { formatAmount, user } from '@/data/mock';
@@ -79,16 +78,9 @@ export default function ReceiptScreen() {
 
         {/* Célébration */}
         <View style={styles.celebrate}>
-          <Icon name="auto-awesome" size={20} color={colors.secondaryContainer} style={{ position: 'absolute', top: 0, left: 48 }} />
-          <Icon name="hotel-class" size={24} color={colors.primaryContainer} style={{ position: 'absolute', top: 16, right: 40, opacity: 0.8 }} />
-          <Bounce style={{ position: 'absolute', bottom: 70, left: 60 }} duration={1400}>
-            <Icon name="auto-awesome" size={18} color={colors.secondaryContainer} />
-          </Bounce>
-          <Icon name="star" size={20} color={colors.tertiaryFixed} style={{ position: 'absolute', bottom: 80, right: 56 }} />
 
           <View style={styles.badgeWrap}>
-            <Pulse style={[StyleSheet.absoluteFill, { borderRadius: 48, backgroundColor: 'rgba(255,196,0,0.4)' }]} />
-            <View style={[StyleSheet.absoluteFill, { borderRadius: 48, backgroundColor: 'rgba(255,196,0,0.4)', transform: [{ scale: 1.1 }] }]} />
+            <Pulse style={[StyleSheet.absoluteFill, { borderRadius: 16, backgroundColor: 'rgba(255,196,0,0.4)' }]} />
             <View style={styles.badge}>
               <Icon name="check-circle" size={44} color={colors.onSecondaryFixed} />
             </View>
@@ -108,8 +100,7 @@ export default function ReceiptScreen() {
         </View>
 
         {/* Nouveau solde */}
-        <LinearGradient colors={['#006B4C', colors.green, '#1F2937']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
-          <View style={styles.heroGlow} />
+        <View style={[styles.hero, { backgroundColor: '#047857' }]}>
           <View style={styles.between}>
             <View style={styles.row}>
               <AppText variant="labelSm" color={colors.primaryFixed}>
@@ -144,7 +135,7 @@ export default function ReceiptScreen() {
                 +{formatAmount(total)} {brand.walletUnit} crédités au total
               </AppText>
               <AppText variant="bodySm" color={colors.secondaryContainer}>
-                Dont +{formatAmount(bonus)} {brand.walletUnit} bonus Gold Club ⚡
+                Dont +{formatAmount(bonus)} {brand.walletUnit} bonus Gold Club
               </AppText>
             </View>
           </View>
@@ -157,7 +148,7 @@ export default function ReceiptScreen() {
               Nouveau : {formatAmount(balance)} {brand.walletUnit}
             </AppText>
           </View>
-        </LinearGradient>
+        </View>
 
         {/* Reçu détachable */}
         <View style={styles.receipt}>
@@ -276,13 +267,6 @@ export default function ReceiptScreen() {
             Consulter mon portefeuille
           </AppText>
         </Touchable>
-
-        <View style={[styles.row, { justifyContent: 'center', gap: 6, paddingHorizontal: 16 }]}>
-          <Icon name="lock" size={16} color={colors.outline} />
-          <AppText variant="labelSm" color={colors.outline} style={{ textAlign: 'center', flexShrink: 1 }}>
-            Paiement certifié {op.label} Mobile Money & BCEAO Côte d'Ivoire. Traçabilité garantie.
-          </AppText>
-        </View>
       </ScrollView>
     </View>
   );
@@ -293,13 +277,13 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   content: { paddingHorizontal: 16, paddingTop: 8, gap: 16 },
-  roundBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.surfaceContainer, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 2px rgba(0,0,0,0.06)' },
-  statusChip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 4, borderRadius: 999, backgroundColor: colors.surfaceHigh },
+  roundBtn: { width: 48, height: 48, borderRadius: 24, backgroundColor: colors.surfaceContainer, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
+  statusChip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 4, borderRadius: 12, backgroundColor: colors.surfaceHigh },
   celebrate: { alignItems: 'center', gap: 6, paddingVertical: 8 },
   badgeWrap: { width: 96, height: 96, alignItems: 'center', justifyContent: 'center', marginVertical: 4 },
   badge: { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center', boxShadow: shadows.lime },
-  metaPill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 4, borderRadius: 999, backgroundColor: colors.surfaceContainer },
-  hero: { borderRadius: 16, padding: 24, paddingBottom: 0, overflow: 'hidden', boxShadow: '0px 20px 25px -5px rgba(232,89,12,0.2)' },
+  metaPill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 4, borderRadius: 12, backgroundColor: colors.surfaceContainer },
+  hero: { borderRadius: 16, padding: 24, paddingBottom: 0, overflow: 'hidden', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   heroGlow: { position: 'absolute', right: -32, top: -32, width: 176, height: 176, borderRadius: 88, backgroundColor: 'rgba(255,196,0,0.15)' },
   bonusTag: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 8, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)' },
   bolt: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center' },
@@ -313,7 +297,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: 'rgba(255,255,255,0.1)',
   },
-  receipt: { borderRadius: 16, backgroundColor: colors.surfaceLowest, overflow: 'hidden', boxShadow: '0px 10px 15px -3px rgba(27,24,49,0.05)' },
+  receipt: { borderRadius: 16, backgroundColor: colors.surfaceLowest, overflow: 'hidden', boxShadow: '0px 1px 3px rgba(16,24,40,0.08)' },
   receiptHead: { padding: 24, backgroundColor: colors.surfaceLow },
   logo: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   bonusRow: { backgroundColor: colors.surfaceLow, paddingHorizontal: 8, paddingVertical: 6, borderRadius: 24 },
@@ -321,11 +305,11 @@ const styles = StyleSheet.create({
   notch: { width: 24, height: 24, borderRadius: 12, backgroundColor: colors.surface },
   dashes: { flex: 1, marginHorizontal: 4, borderBottomWidth: 2, borderStyle: 'dashed', borderColor: colors.outlineVariant },
   barcode: { width: '100%', height: 48, borderRadius: 24, backgroundColor: colors.surfaceLow, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
-  halfBtn: { flex: 1, height: 48, borderRadius: 999, backgroundColor: colors.surfaceHigh, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  halfBtn: { flex: 1, height: 48, borderRadius: 12, backgroundColor: colors.surfaceHigh, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   mail: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 24, backgroundColor: colors.surfaceLow },
   primary: {
     height: 56,
-    borderRadius: 999,
+    borderRadius: 12,
     backgroundColor: colors.secondaryContainer,
     flexDirection: 'row',
     alignItems: 'center',
@@ -333,5 +317,5 @@ const styles = StyleSheet.create({
     gap: 8,
     boxShadow: shadows.lime,
   },
-  secondary: { height: 48, borderRadius: 999, backgroundColor: colors.surfaceContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  secondary: { height: 48, borderRadius: 12, backgroundColor: colors.surfaceContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
 });
