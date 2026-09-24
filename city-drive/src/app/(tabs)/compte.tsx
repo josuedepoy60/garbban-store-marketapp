@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText, Avatar, Icon, Pill, Touchable, type IconName } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
-import { formatAmount, photos, user } from '@/data/mock';
+import { formatAmount, user } from '@/data/mock';
 import { useWallet } from '@/data/wallet';
 
 type Place = { id: string; icon: IconName; label: string; address: string };
@@ -155,7 +155,7 @@ export default function AccountScreen() {
         <View style={[styles.card, { gap: 16 }]}>
           <View style={[styles.row, { gap: 16 }]}>
             <View>
-              <Avatar uri={photos.profile} size={80} radius={40} />
+              <Avatar name={user.name} size={80} radius={40} />
               <View style={styles.verifiedBadge}>
                 <Icon name="verified" size={16} color={colors.onSecondaryFixed} />
               </View>

@@ -8,7 +8,7 @@ import { CityMap } from '@/components/CityMap';
 import { AppText, Avatar, CircleButton, Icon, PingDot, Pill, Pulse, SheetHandle, Touchable, useCompact } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
-import { favoriteDriver, formatAmount, photos } from '@/data/mock';
+import { favoriteDriver, formatAmount } from '@/data/mock';
 import { useWallet } from '@/data/wallet';
 
 type Method = 'wallet' | 'cash';
@@ -132,7 +132,7 @@ export default function ActiveRideScreen() {
             <View style={styles.between}>
               <View style={[styles.row, { gap: 12, flex: 1 }]}>
                 <View>
-                  <Avatar uri={photos.koffiDriving} size={56} />
+                  <Avatar name={favoriteDriver.fullName} size={56} />
                   <View style={styles.online} />
                 </View>
                 <View style={{ flex: 1 }}>

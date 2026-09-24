@@ -8,7 +8,7 @@ import { CityMap } from '@/components/CityMap';
 import { StackHeader } from '@/components/headers';
 import { AppText, Avatar, Bounce, Icon, Pill, SheetHandle, Touchable } from '@/components/ui';
 import { colors, fonts, shadows } from '@/constants/theme';
-import { formatAmount, photos } from '@/data/mock';
+import { formatAmount } from '@/data/mock';
 
 const ROUTE = 'M 60 170 C 110 150, 150 215, 192 205 C 235 196, 255 280, 310 262 C 345 250, 362 292, 372 330';
 
@@ -226,8 +226,8 @@ export default function StopsScreen() {
                     Moi
                   </AppText>
                 </View>
-                {stops.some((s) => s.id === '1') && <Avatar uri={photos.awa} size={40} radius={20} style={styles.face} />}
-                {stops.some((s) => s.id === '2') && <Avatar uri={photos.maman} size={40} radius={20} style={styles.face} />}
+                {stops.some((s) => s.id === '1') && <Avatar name="Awa" size={40} radius={20} style={styles.face} />}
+                {stops.some((s) => s.id === '2') && <Avatar name="Maman" size={40} radius={20} style={styles.face} />}
               </View>
               <View style={styles.row}>
                 <Icon name="group" size={18} color={colors.onSurfaceVariant} />

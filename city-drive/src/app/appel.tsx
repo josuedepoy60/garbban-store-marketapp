@@ -7,7 +7,7 @@ import { CityMap } from '@/components/CityMap';
 import { AppText, Avatar, Icon, PingDot, Pulse, Touchable, type IconName } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
-import { favoriteDriver, photos } from '@/data/mock';
+import { favoriteDriver } from '@/data/mock';
 
 const BAR_HEIGHTS = [12, 24, 16, 20, 8, 16, 20];
 
@@ -125,7 +125,7 @@ export default function CallScreen() {
             <View style={[styles.ring, { width: 144, height: 144, backgroundColor: 'rgba(255,196,0,0.3)' }]} />
             <View style={[styles.ring, { width: 112, height: 112, backgroundColor: 'rgba(255,210,170,0.4)' }]} />
             <View style={styles.bigAvatar}>
-              <Avatar uri={photos.koffi} size={96} radius={48} />
+              <Avatar name={favoriteDriver.fullName} size={96} radius={48} />
               <View style={styles.ratingBand}>
                 <AppText variant="labelSm" color={colors.onPrimary}>
                   4.9 ★

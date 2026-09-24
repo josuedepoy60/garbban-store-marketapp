@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText, Avatar, Icon, Touchable, type IconName } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
-import { favoriteDriver, photos } from '@/data/mock';
+import { favoriteDriver } from '@/data/mock';
 
 type Message =
   | { id: string; from: 'driver' | 'me'; text: string; time: string }
@@ -77,7 +77,7 @@ export default function ChatScreen() {
       <View style={styles.driver}>
         <View style={[styles.row, { gap: 8, flex: 1 }]}>
           <View>
-            <Avatar uri={photos.koffi} size={48} radius={24} />
+            <Avatar name={favoriteDriver.fullName} size={48} radius={24} />
             <View style={styles.online} />
           </View>
           <View style={{ flex: 1 }}>
@@ -169,7 +169,7 @@ export default function ChatScreen() {
             </View>
           ) : (
             <View key={m.id} style={[styles.row, { alignItems: 'flex-end', gap: 6, maxWidth: '86%' }]}>
-              <Avatar uri={photos.koffi} size={24} radius={12} style={{ marginBottom: 4 }} />
+              <Avatar name={favoriteDriver.fullName} size={24} radius={12} style={{ marginBottom: 4 }} />
               <View style={[styles.bubble, styles.theirs]}>
                 {'voice' in m ? (
                   <>

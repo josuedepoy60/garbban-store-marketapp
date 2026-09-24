@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText, Avatar, CircleButton, Icon, PingDot, Touchable } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts, shadows } from '@/constants/theme';
-import { favoriteDriver, photos } from '@/data/mock';
+import { favoriteDriver } from '@/data/mock';
 
 const WEEKDAYS = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'];
 const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
@@ -154,7 +154,7 @@ export default function ScheduleScreen() {
             <View style={[styles.between, { alignItems: 'flex-start' }]}>
               <View style={[styles.row, { gap: 8, flex: 1 }]}>
                 <View>
-                  <Avatar uri={photos.koffi} size={52} radius={26} style={{ borderWidth: 2, borderColor: colors.primaryFixed }} />
+                  <Avatar name={favoriteDriver.fullName} size={52} radius={26} style={{ borderWidth: 2, borderColor: colors.primaryFixed }} />
                   <View style={styles.rating}>
                     <Icon name="star" size={11} color={colors.onSecondaryContainer} />
                     <AppText variant="labelSm" color={colors.onSecondaryContainer} style={{ fontSize: 10 }}>

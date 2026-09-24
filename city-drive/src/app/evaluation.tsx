@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText, Avatar, Icon, Pill, Touchable, type IconName } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
-import { favoriteDriver, formatAmount, photos } from '@/data/mock';
+import { favoriteDriver, formatAmount } from '@/data/mock';
 import { useWallet } from '@/data/wallet';
 
 const RATING_LABELS = ['', 'Décevant', 'Passable', 'Bien', 'Très bon trajet', 'Exceptionnel !'];
@@ -122,7 +122,7 @@ export default function RatingScreen() {
         {/* Chauffeur + note */}
         <View style={[styles.card, { alignItems: 'center' }]}>
           <View style={styles.avatarRing}>
-            <Avatar uri={photos.koffi} size={72} radius={36} />
+            <Avatar name={favoriteDriver.fullName} size={72} radius={36} />
             <View style={styles.ratingBadge}>
               <Icon name="star" size={12} color={colors.secondaryContainer} />
               <AppText variant="labelSm" color={colors.onPrimary}>

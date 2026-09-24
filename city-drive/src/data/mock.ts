@@ -1,28 +1,5 @@
 // Données de démonstration reprises des maquettes, en attendant le branchement d'un backend.
 
-const img = (id: string) => `https://lh3.googleusercontent.com/aida-public/${id}`;
-
-export const photos = {
-  profile: img(
-    'AB6AXuDjo5gKRh6ZtWr1VG1_RP1yINl8rOBrKfJyH2w0VpsgXT6GOl7EjLVLJLSoUFUkOTmh0vXhHIneC_U44eYqmKAyTXMmARZM3x55VP9KwNZSQUPhn1Amj3zHCfZlnqicuKl5025JGVuH4Zm7LBanh31NVq2Dtsx33ydTiiwtgVlUIuJYVfWtjvmkLLH5dHpc5IAlubr3CLRQGR1BWNVau4aqVnVMP5L_46x-gHTmLZk9u4fanjufd73D',
-  ),
-  user: img(
-    'AB6AXuAyS-D64MAnvm9qmo8OX8AgEndvZ0z1-26li-sWyVRymK6LI1Da_wu0pxoiEHsVhDKj2x9PZXgtlvbOo14RlwAa7tqwRKNPcN5jgwL53t4at-CxaNHrEXoqvOjCeMx1u7AQ70LPSZLxXt0vD54bUmjZFV3mOU7CU76-XhHjVN03Vv7J10lpzZTqOXgOZ2keylTLMb0jf5NjVrhnwr-HkA7lOjx509eWJ-UjhNILvTtKp9p3ebvsT2gl',
-  ),
-  koffi: img(
-    'AB6AXuAzFoWNyTVcpnjvhbQpt0pD_mXFzbh-ZluysV7XqwGbmdSdKRCN9-WAI14KNod2D9rUZNHMsDHlNImhn-dcuPk-kwTRViimWahZNj6-Lm15q7M0oczsYgd0dyd7pwfiLBYNHaL8S2JXREC8E66Cofd3SmpEHe2LXESlsEy9z1EYw5VTzrA29jWBs2QNIQ6TDA_bORNm8mo1HKPpkG9e9O3pah87LNNyraaKioHFzMBT3gkzWVauwj_q',
-  ),
-  koffiDriving: img(
-    'AB6AXuC8a-X9E_HN87cGPCGfaiMN22ckfnJZCvoAeAuL5YjVNLS0XCUbqyQyOmeeIakcOiz6-F6DnzoppS9U1R90V8s-W2AFY18-xaUrng6xbMBYMghEvnlf0zLUAqmJ8eMbdgjxfD8jADC0hFbUnIID3WghGOvwNbIiXBq9a7AtP6I2Uer_IQ4k8bZNM5ZEoXNxqNEIuAFx5gVo4qXdbkj9GLJBAVVUqTaisOyn_cFMcJZNLWz2Td3gnLTm',
-  ),
-  awa: img(
-    'AB6AXuCsA8i-_X_KIa8QqZzyHFZB3Fc4Wurnq60H1uH3vVmh3RDqwTZRWYFjr9MpNAIzVvvDjIpI5Ph4XEED6VZaCBKeYwYlgUp9PiGuJEVDgd6eGFZ-UAJwABWON060HHTgBy2BG0HGOXqLA5bPa5lfY1EHuxriYxS4YFSk86V8v2BVQGs-Uu14Gewu42W60SP1UlQp4pBmehofntmD2uvG-ev_350aKX6pPfAs5QCORVugQmw13CQcBpfc',
-  ),
-  maman: img(
-    'AB6AXuD7H6FRaOxm5A1SFhDZSGtBiXhCjH0FitPeB1fXtD-GKgaPb0qxgRIoZsp1F2VAHM2kIVMgurD4heSH8xIqMFO8XJ8V3DZ0dc3c8psxO05CyR75E2GKkqdiDAw_XMpfCfXIYTlDA-MOhFNsawnyBr4PjZ5olePqAVyjhQMcsHERezTcEpq8cG6FqUXlQ-my1i5i4XxN80EwLdUaUDIVusOUXO6FfSqTP8bvtcOZ6TBOmFiuegdWG_UZ',
-  ),
-};
-
 export const user = {
   name: 'Jean-Philippe Kouassi',
   phone: '+225 07 48 92 89 24',

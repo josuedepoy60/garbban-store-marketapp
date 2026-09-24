@@ -1,7 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { type ComponentProps, type ReactNode } from 'react';
 import {
-  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -78,10 +77,33 @@ export function Dot({ color, size = 8, style }: { color: string; size?: number; 
   return <View style={[{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }, style]} />;
 }
 
-export function Avatar({ uri, size = 48, radius = 16, style }: { uri: string; size?: number; radius?: number; style?: StyleProp<ViewStyle> }) {
+// Couleurs possibles des avatars ; chaque nom garde toujours la même.
+const AVATAR_COLORS = [colors.primaryContainer, colors.blue, colors.green, colors.tertiary, '#7C4DFF', '#0E7490'];
+
+export function initialsOf(name: string) {
+  const parts = name.trim().split(/[\s-]+/).filter(Boolean);
+  const letters = parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : (parts[0] ?? '?').slice(0, 2);
+  return letters.toUpperCase();
+}
+
+function colorOf(name: string) {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
+/** Avatar à initiales (en attendant les vraies photos de profil). */
+export function Avatar({ name, size = 48, radius, style }: { name: string; size?: number; radius?: number; style?: StyleProp<ViewStyle> }) {
   return (
-    <View style={[{ width: size, height: size, borderRadius: radius, overflow: 'hidden', backgroundColor: colors.primaryContainer }, style]}>
-      <Image source={{ uri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+    <View
+      style={[
+        { width: size, height: size, borderRadius: radius ?? size / 2, backgroundColor: colorOf(name), alignItems: 'center', justifyContent: 'center' },
+        style,
+      ]}
+    >
+      <Text style={{ color: '#fff', fontFamily: type.labelLg.fontFamily, fontSize: Math.round(size * 0.38), lineHeight: Math.round(size * 0.46) }}>
+        {initialsOf(name)}
+      </Text>
     </View>
   );
 }

@@ -8,7 +8,7 @@ import { CityMap } from '@/components/CityMap';
 import { TabHeader } from '@/components/headers';
 import { AppText, Avatar, Dot, Icon, Pill, SheetHandle, Touchable, type IconName } from '@/components/ui';
 import { colors, fonts, shadows } from '@/constants/theme';
-import { favoriteDriver, photos, quickPlaces, user } from '@/data/mock';
+import { favoriteDriver, quickPlaces, user } from '@/data/mock';
 
 const SHORTCUTS: { icon: IconName; label: string; bg: string; fg: string; to: '/arrets' | '/programmer' | '/trajets' | '/vehicules' }[] = [
   { icon: 'alt-route', label: 'Plusieurs arrêts', bg: colors.blueSoft, fg: colors.blue, to: '/arrets' },
@@ -63,7 +63,7 @@ export default function HomeScreen() {
           </View>
 
           <Touchable style={[styles.mapChip, styles.driverChip]} onPress={() => router.push('/course')}>
-            <Avatar uri={photos.koffi} size={28} radius={14} />
+            <Avatar name={favoriteDriver.fullName} size={28} radius={14} />
             <View>
               <View style={styles.row}>
                 <Icon name="star" size={13} color={colors.star} />
@@ -249,7 +249,7 @@ export default function HomeScreen() {
             </View>
             <View style={[styles.row, { gap: 12 }]}>
               <View>
-                <Avatar uri={photos.koffi} size={48} />
+                <Avatar name={favoriteDriver.fullName} size={48} />
                 <View style={styles.onlineDot} />
               </View>
               <View style={{ flex: 1 }}>
