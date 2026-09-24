@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { colors } from '@/constants/theme';
+import { WalletProvider } from '@/data/wallet';
 
 export default function RootLayout() {
   const [loaded] = useFonts({ Sora_600SemiBold, Sora_700Bold, DMSans_400Regular, DMSans_600SemiBold, DMSans_700Bold });
@@ -14,6 +15,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
+      <WalletProvider>
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surface } }}>
         <Stack.Screen name="(tabs)" />
@@ -23,6 +25,7 @@ export default function RootLayout() {
         <Stack.Screen name="course" />
         <Stack.Screen name="navigation" options={{ contentStyle: { backgroundColor: '#131316' } }} />
       </Stack>
+      </WalletProvider>
     </SafeAreaProvider>
   );
 }

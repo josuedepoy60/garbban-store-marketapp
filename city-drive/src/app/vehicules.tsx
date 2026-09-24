@@ -11,10 +11,11 @@ import { AppText, Bounce, Dot, Icon, Pill, PingDot, Touchable, type IconName } f
 import { VehicleIcon } from '@/components/VehicleIcon';
 import { brand } from '@/constants/brand';
 import { colors, fonts, shadows } from '@/constants/theme';
-import { carModels, formatAmount, user, vehicles } from '@/data/mock';
+import { carModels, formatAmount, vehicles } from '@/data/mock';
+import { useWallet } from '@/data/wallet';
 
 const PAYMENT_METHODS: { name: string; icon: IconName; detail: string }[] = [
-  { name: brand.walletName, icon: 'toll', detail: `Solde disponible : ${formatAmount(user.balance)} ${brand.walletUnit}` },
+  { name: brand.walletName, icon: 'toll', detail: '' },
   { name: 'Wave', icon: 'phone-iphone', detail: 'Paiement mobile' },
   { name: 'Orange Money', icon: 'phone-android', detail: 'Paiement mobile' },
   { name: 'Espèces', icon: 'payments', detail: 'À régler au chauffeur' },
@@ -27,7 +28,9 @@ export default function VehiclesScreen() {
   const [payment, setPayment] = useState(0);
 
   const vehicle = vehicles.find((v) => v.id === selected) ?? vehicles[0];
+  const { balance } = useWallet();
   const method = PAYMENT_METHODS[payment];
+  const methodDetail = payment === 0 ? `Solde disponible : ${formatAmount(balance)} ${brand.walletUnit}` : method.detail;
 
   return (
     <View style={styles.screen}>
@@ -216,7 +219,7 @@ export default function VehiclesScreen() {
                     </View>
                   </View>
                   <AppText variant="bodySm" color={colors.onSurfaceVariant} numberOfLines={1}>
-                    {method.detail}
+                    {methodDetail}
                   </AppText>
                 </View>
               </View>

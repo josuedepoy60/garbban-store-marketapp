@@ -22,7 +22,8 @@ npm run typecheck
 | `/course` | Course active : chauffeur en approche, règlement |
 | `/programmer` | Programmer une course (jour, heure, chauffeur préféré) |
 | `/navigation` | Navigation GPS en mode sombre : guidage virage par virage, vocal, compteur de vitesse, SOS |
-| `/portefeuille`, `/compte` | Provisoires, en attente de maquettes |
+| `/portefeuille` (onglet) | Carte Pass, recharge Mobile Money (Wave, Orange, MTN, Moov), pass domicile-travail, historique filtrable, sécurité |
+| `/compte` | Provisoire, en attente de maquette |
 
 ## Organisation
 

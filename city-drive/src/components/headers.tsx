@@ -4,12 +4,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { brand } from '@/constants/brand';
 import { colors, shadows } from '@/constants/theme';
-import { formatAmount, user } from '@/data/mock';
+import { formatAmount } from '@/data/mock';
+import { useWallet } from '@/data/wallet';
 import { AppText, CircleButton, Icon, Touchable } from './ui';
 
 /** En-tête flottant des onglets : logo, solde et profil. */
 export function TabHeader() {
   const insets = useSafeAreaInsets();
+  const { balance } = useWallet();
   return (
     <View style={[styles.tabHeader, { paddingTop: insets.top + 12 }]} pointerEvents="box-none">
       <View style={styles.logoPill}>
@@ -29,7 +31,7 @@ export function TabHeader() {
         <Touchable style={styles.balance} onPress={() => router.navigate('/portefeuille')}>
           <Icon name="toll" size={16} color={colors.onSecondaryFixed} />
           <AppText variant="labelMd" color={colors.onSecondaryFixed}>
-            {formatAmount(user.balance)} {brand.walletUnit}
+            {formatAmount(balance)} {brand.walletUnit}
           </AppText>
         </Touchable>
         <Touchable style={styles.profile} onPress={() => router.navigate('/compte')} accessibilityLabel="Profil">

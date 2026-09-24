@@ -8,7 +8,8 @@ import { CityMap } from '@/components/CityMap';
 import { AppText, Avatar, CircleButton, Icon, PingDot, Pill, Pulse, SheetHandle, Touchable } from '@/components/ui';
 import { brand } from '@/constants/brand';
 import { colors, fonts } from '@/constants/theme';
-import { favoriteDriver, formatAmount, photos, user } from '@/data/mock';
+import { favoriteDriver, formatAmount, photos } from '@/data/mock';
+import { useWallet } from '@/data/wallet';
 
 type Method = 'wallet' | 'cash';
 
@@ -18,6 +19,16 @@ export default function ActiveRideScreen() {
   const price = Number(params.price) || 3200;
   const [method, setMethod] = useState<Method>('wallet');
   const [confirmed, setConfirmed] = useState(false);
+  const [refused, setRefused] = useState(false);
+  const { balance, pay } = useWallet();
+
+  const confirm = () => {
+    if (method === 'wallet' && !pay(price, 'Plateau ➔ Marcory Zone 4', 'Chauffeur Koffi A.')) {
+      setRefused(true);
+      return;
+    }
+    setConfirmed(true);
+  };
 
   const amount = `${formatAmount(price)} FCFA`;
 
@@ -219,7 +230,7 @@ export default function ActiveRideScreen() {
 
             <PayOption
               selected={method === 'wallet'}
-              onPress={() => setMethod('wallet')}
+              onPress={() => { setMethod('wallet'); setRefused(false); }}
               icon="account-balance-wallet"
               title={brand.walletName}
               badge="RECOMMANDÉ"
@@ -228,7 +239,7 @@ export default function ActiveRideScreen() {
                   <AppText variant="bodySm" color={colors.inkSoft}>
                     Solde disponible :{' '}
                     <AppText variant="bodySm" color={colors.ink} style={{ fontFamily: fonts.dm700 }}>
-                      {formatAmount(user.balance)} {brand.walletUnit}
+                      {formatAmount(balance)} {brand.walletUnit}
                     </AppText>
                   </AppText>
                   <Icon name="check-circle" size={12} color="#16a34a" />
@@ -237,7 +248,7 @@ export default function ActiveRideScreen() {
             />
             <PayOption
               selected={method === 'cash'}
-              onPress={() => setMethod('cash')}
+              onPress={() => { setMethod('cash'); setRefused(false); }}
               icon="payments"
               title="Espèces à bord"
               subtitle={
@@ -258,7 +269,7 @@ export default function ActiveRideScreen() {
           <Touchable
             disabled={confirmed}
             scale={0.98}
-            onPress={() => setConfirmed(true)}
+            onPress={confirm}
             style={[styles.cta, { backgroundColor: confirmed ? '#16a34a' : method === 'wallet' ? colors.primaryContainer : colors.inkSoft }]}
           >
             <Icon name={confirmed ? 'check-circle' : method === 'wallet' ? 'verified-user' : 'handshake'} size={20} color="#fff" />
@@ -270,6 +281,11 @@ export default function ActiveRideScreen() {
                   : 'Confirmer le règlement en espèces'}
             </AppText>
           </Touchable>
+          {refused && !confirmed && (
+            <AppText variant="labelMd" color="#ba1a1a" style={{ textAlign: 'center' }}>
+              Solde insuffisant : rechargez votre portefeuille ou payez en espèces.
+            </AppText>
+          )}
           {confirmed && (
             <Touchable scale={0.98} onPress={() => router.push('/navigation')} style={styles.follow}>
               <Icon name="navigation" size={20} color={colors.onSecondaryFixed} />
