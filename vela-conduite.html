@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#07080f">
+  <title>Vela Taxi · Mode Conduite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07080f;
+      --panel: #10121c;
+      --panel-2: #181b29;
+      --line: rgba(255, 255, 255, 0.08);
+      --fg: #f3f5ff;
+      --muted: #8b90a8;
+      --lime: #c6ff3d;
+      --lime-ink: #1a2400;
+      --violet: #7c4dff;
+      --violet-2: #a58bff;
+      --pink: #ff3d8b;
+      --red: #ff3b3b;
+      --green: #2ee27a;
+      --amber: #ffb020;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      background: #020308;
+      color: var(--fg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ---------- Device frame ---------- */
+    .phone {
+      position: relative;
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      max-height: 932px;
+      background: var(--bg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 500px) {
+      .phone {
+        height: 900px;
+        border-radius: 44px;
+        border: 10px solid #1a1c26;
+        box-shadow: 0 40px 120px rgba(124, 77, 255, 0.25), 0 0 0 1px #2a2d3a;
+      }
+    }
+
+    /* ---------- Map ---------- */
+    .map {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .map svg { width: 100%; height: 100%; display: block; }
+
+    .route-glow { animation: dash 1.6s linear infinite; }
+
+    @keyframes dash { to { stroke-dashoffset: -40; } }
+
+    /* ---------- Top maneuver banner ---------- */
+    .top {
+      position: relative;
+      z-index: 5;
+      padding: 14px 14px 0;
+    }
+
+    .maneuver {
+      background: rgba(12, 14, 22, 0.92);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 14px;
+      display: flex;
+      gap: 12px;
+    }
+
+    .turn-box {
+      flex: 0 0 auto;
+      width: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .turn-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      background: var(--lime);
+      color: var(--lime-ink);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 24px rgba(198, 255, 61, 0.45);
+    }
+
+    .next-turn {
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .maneuver-body { flex: 1; min-width: 0; }
+
+    .dist-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .dist { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+
+    .lane-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 99px;
+      background: rgba(198, 255, 61, 0.14);
+      color: var(--lime);
+      border: 1px solid rgba(198, 255, 61, 0.35);
+    }
+
+    .instr { font-size: 16px; font-weight: 600; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .top-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 99px;
+      background: rgba(12, 14, 22, 0.9);
+      border: 1px solid var(--line);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .pill.off { color: var(--muted); }
+
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--pink);
+      box-shadow: 0 0 0 0 rgba(255, 61, 139, 0.7);
+      animation: pulse 1.4s infinite;
+    }
+
+    .pill.off .dot { background: var(--muted); animation: none; }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 61, 139, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(255, 61, 139, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 61, 139, 0); }
+    }
+
+    /* ---------- HUD ---------- */
+    .hud {
+      position: relative;
+      z-index: 4;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .speedo {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .gauge {
+      position: relative;
+      width: 108px;
+      height: 108px;
+      border-radius: 50%;
+      background: rgba(10, 12, 20, 0.88);
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 30px rgba(198, 255, 61, 0.15);
+    }
+
+    .gauge svg { position: absolute; inset: 0; }
+
+    .gauge .speed { font-size: 36px; font-weight: 700; line-height: 1; text-align: center; }
+
+    .gauge .unit { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-align: center; }
+
+    .limit {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #fff;
+      border: 6px solid var(--red);
+      color: #111;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1;
+      position: relative;
+    }
+
+    .limit small {
+      position: absolute;
+      bottom: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 8px;
+      color: var(--muted);
+      letter-spacing: 0.8px;
+    }
+
+    .traffic-chip {
+      position: absolute;
+      left: 14px;
+      bottom: 134px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 99px;
+      background: rgba(46, 226, 122, 0.15);
+      border: 1px solid rgba(46, 226, 122, 0.4);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .fabs {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .fab {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: rgba(12, 14, 22, 0.9);
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .fab.on { background: var(--lime); color: var(--lime-ink); }
+
+    /* ---------- Cockpit ---------- */
+    .cockpit {
+      position: relative;
+      z-index: 5;
+      background: linear-gradient(180deg, rgba(16, 18, 28, 0.96), #0b0c14);
+      border-top: 1px solid var(--line);
+      border-radius: 26px 26px 0 0;
+      padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
+    }
+
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; }
+
+    .metric b { display: block; font-size: 22px; font-weight: 700; }
+
+    .metric b.eta { color: var(--lime); }
+
+    .metric span { font-size: 11px; color: var(--muted); }
+
+    .progress { margin-top: 12px; }
+
+    .bar {
+      height: 6px;
+      border-radius: 99px;
+      background: var(--panel-2);
+      overflow: hidden;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      width: 58%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--violet), var(--lime));
+      box-shadow: 0 0 12px rgba(198, 255, 61, 0.5);
+    }
+
+    .bar-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+    .fluid-banner {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 8px 8px 12px;
+      border-radius: 14px;
+      background: rgba(255, 61, 139, 0.14);
+      border: 1px solid rgba(255, 61, 139, 0.4);
+      font-size: 12px;
+      font-weight: 600;
+      color: #ff8cbb;
+    }
+
+    .gain { background: #000; color: var(--lime); border-radius: 99px; padding: 4px 9px; font-size: 11px; white-space: nowrap; }
+
+    /* ---------- Live share banner ---------- */
+    .share-banner {
+      margin-top: 10px;
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: rgba(46, 226, 122, 0.08);
+      border: 1px solid rgba(46, 226, 122, 0.35);
+      display: none;
+    }
+
+    .share-banner.on { display: block; animation: slideIn 0.3s ease; }
+
+    @keyframes slideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .share-head { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--green); }
+
+    .live-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--green);
+      animation: livePulse 1.4s infinite;
+    }
+
+    @keyframes livePulse {
+      0% { box-shadow: 0 0 0 0 rgba(46, 226, 122, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(46, 226, 122, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(46, 226, 122, 0); }
+    }
+
+    .share-timer { margin-left: auto; color: var(--muted); font-weight: 500; }
+
+    .share-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+
+    .share-with { font-size: 13px; min-width: 0; }
+
+    .share-with strong { font-weight: 700; }
+
+    .send-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 11px;
+      border-radius: 99px;
+      background: #25d366;
+      color: #04220f;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .share-foot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+    .share-foot a, .link-btn { color: var(--lime); font-weight: 600; text-decoration: underline; margin-left: auto; font-size: 11px; }
+
+    /* ---------- Quick action grid ---------- */
+    .grid {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .qa {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 2px;
+      border-radius: 16px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      font-size: 11px;
+      font-weight: 600;
+      min-height: 72px;
+      transition: transform 0.1s, background 0.2s;
+    }
+
+    .qa:active { transform: scale(0.95); }
+
+    .qa .ic { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; }
+
+    .qa.voice .ic { color: var(--lime); }
+
+    .qa.share .ic {
+      color: var(--lime);
+      background: rgba(198, 255, 61, 0.12);
+      box-shadow: 0 0 16px rgba(198, 255, 61, 0.45);
+    }
+
+    .qa.share.active { background: rgba(198, 255, 61, 0.12); border-color: rgba(198, 255, 61, 0.5); color: var(--lime); }
+
+    .qa.sos { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 0 18px rgba(255, 59, 59, 0.45); }
+
+    .final { display: flex; gap: 10px; margin-top: 12px; }
+
+    .park {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 54px;
+      border-radius: 18px;
+      background: var(--violet);
+      font-weight: 700;
+      font-size: 15px;
+      box-shadow: 0 8px 24px rgba(124, 77, 255, 0.4);
+    }
+
+    .park .p { width: 26px; height: 26px; border-radius: 8px; background: #fff; color: var(--violet); display: grid; place-items: center; font-weight: 700; }
+
+    .call {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: var(--lime);
+      color: var(--lime-ink);
+      display: grid;
+      place-items: center;
+    }
+
+    /* ---------- Share sheet ---------- */
+    .scrim {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+
+    .scrim.open { opacity: 1; pointer-events: auto; }
+
+    .sheet {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 21;
+      background: var(--panel);
+      border-radius: 26px 26px 0 0;
+      border-top: 1px solid var(--line);
+      padding: 10px 16px calc(18px + env(safe-area-inset-bottom));
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      max-height: 86%;
+      overflow-y: auto;
+    }
+
+    .sheet.open { transform: none; }
+
+    .grabber { width: 40px; height: 4px; border-radius: 99px; background: #333849; margin: 0 auto 12px; }
+
+    .sheet h2 { font-size: 20px; }
+
+    .sheet .lead { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+    .contacts { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+
+    .contact {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      text-align: left;
+      width: 100%;
+    }
+
+    .contact.sel { border-color: var(--lime); background: rgba(198, 255, 61, 0.07); }
+
+    .avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #111; flex: 0 0 auto; }
+
+    .contact .info { flex: 1; min-width: 0; }
+
+    .contact .info b { display: block; font-size: 14px; }
+
+    .contact .info span { font-size: 12px; color: var(--muted); }
+
+    .check {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid #3a3f52;
+      display: grid; place-items: center;
+      color: var(--lime-ink);
+    }
+
+    .contact.sel .check { background: var(--lime); border-color: var(--lime); }
+
+    .contact:not(.sel) .check svg { display: none; }
+
+    .opts { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+
+    .opt { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; padding: 10px 12px; border-radius: 14px; background: var(--panel-2); }
+
+    .opt small { display: block; color: var(--muted); font-size: 11px; }
+
+    .switch { position: relative; width: 42px; height: 24px; flex: 0 0 auto; }
+
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .switch span { position: absolute; inset: 0; border-radius: 99px; background: #333849; transition: 0.2s; }
+
+    .switch span::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: 0.2s; }
+
+    .switch input:checked + span { background: var(--lime); }
+
+    .switch input:checked + span::after { transform: translateX(18px); background: var(--lime-ink); }
+
+    .sheet-cta { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+
+    .btn-primary { height: 52px; border-radius: 16px; background: var(--lime); color: var(--lime-ink); font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-ghost { height: 46px; border-radius: 16px; border: 1px solid var(--line); font-weight: 600; font-size: 14px; }
+
+    .btn-danger { height: 46px; border-radius: 16px; background: rgba(255, 59, 59, 0.12); color: #ff7a7a; border: 1px solid rgba(255, 59, 59, 0.35); font-weight: 600; font-size: 14px; }
+
+    .link-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: #0b0c14;
+      border: 1px dashed #333849;
+      font-size: 12px;
+    }
+
+    .link-box code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--violet-2); }
+
+    .link-box button { color: var(--lime); font-weight: 700; font-size: 12px; }
+
+    /* ---------- Toast ---------- */
+    .toast {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      z-index: 40;
+      transform: translate(-50%, -110%);
+      background: #fff;
+      color: #111;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 99px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: transform 0.3s;
+      white-space: nowrap;
+      max-width: 92%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toast.show { transform: translate(-50%, 18px); }
+
+    /* ---------- Compact (réduit) ---------- */
+    .phone.compact .grid,
+    .phone.compact .final,
+    .phone.compact .fluid-banner,
+    .phone.compact .progress { display: none; }
+
+    @media (max-height: 760px) {
+      .fluid-banner { display: none; }
+      .gauge { width: 92px; height: 92px; }
+      .gauge .speed { font-size: 30px; }
+      .traffic-chip { bottom: 118px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+
+  <!-- ===== Map (vue perspective nocturne d'Abidjan) ===== -->
+  <div class="map" aria-hidden="true">
+    <svg viewBox="0 0 430 900" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#05060c"/>
+          <stop offset="1" stop-color="#0c0f1c"/>
+        </linearGradient>
+        <linearGradient id="lagoon" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#0b1d3a"/>
+          <stop offset="1" stop-color="#071329"/>
+        </linearGradient>
+        <linearGradient id="routeGrad" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0" stop-color="#c6ff3d"/>
+          <stop offset="1" stop-color="#ffe14d"/>
+        </linearGradient>
+        <radialGradient id="beam" cx="0.5" cy="1" r="1">
+          <stop offset="0" stop-color="#ffe14d" stop-opacity="0.55"/>
+          <stop offset="1" stop-color="#ffe14d" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="6" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <rect width="430" height="900" fill="url(#sky)"/>
+
+      <!-- Lagune Ébrié -->
+      <path d="M0 330 C 90 300, 170 360, 260 330 S 400 290, 430 310 L430 520 C 360 540, 290 500, 210 530 S 70 560, 0 540 Z" fill="url(#lagoon)"/>
+      <path d="M40 420 q 30 -8 60 0 M 260 440 q 30 -8 60 0 M 150 470 q 30 -8 60 0" stroke="#17325e" stroke-width="2" fill="none" opacity="0.6"/>
+
+      <!-- Îlots / quartiers -->
+      <g fill="#131729" stroke="#1d2238" stroke-width="1">
+        <rect x="20" y="120" width="60" height="40" rx="4"/>
+        <rect x="95" y="90" width="50" height="60" rx="4"/>
+        <rect x="300" y="100" width="80" height="50" rx="4"/>
+        <rect x="320" y="170" width="60" height="60" rx="4"/>
+        <rect x="30" y="200" width="70" height="50" rx="4"/>
+        <rect x="20" y="600" width="80" height="60" rx="4"/>
+        <rect x="320" y="600" width="90" height="70" rx="4"/>
+        <rect x="30" y="700" width="60" height="60" rx="4"/>
+        <rect x="330" y="700" width="70" height="60" rx="4"/>
+      </g>
+
+      <!-- Tours du Plateau -->
+      <g fill="#1a1f36" stroke="#2a3150">
+        <rect x="170" y="70" width="18" height="60"/>
+        <rect x="192" y="50" width="22" height="80"/>
+        <rect x="218" y="80" width="16" height="50"/>
+        <rect x="238" y="60" width="20" height="70"/>
+      </g>
+      <g fill="#ffd66b" opacity="0.7">
+        <rect x="196" y="60" width="3" height="3"/><rect x="204" y="70" width="3" height="3"/>
+        <rect x="242" y="72" width="3" height="3"/><rect x="174" y="84" width="3" height="3"/>
+        <rect x="222" y="94" width="3" height="3"/><rect x="250" y="100" width="3" height="3"/>
+      </g>
+
+      <!-- Routes secondaires -->
+      <g stroke="#1f2440" stroke-width="6" fill="none" stroke-linecap="round">
+        <path d="M0 260 L 430 240"/>
+        <path d="M0 620 L 430 640"/>
+        <path d="M90 900 L 150 560"/>
+        <path d="M340 900 L 300 560"/>
+        <path d="M60 0 L 120 300"/>
+      </g>
+
+      <!-- Pont Général de Gaulle (secondaire) -->
+      <path d="M90 560 L 130 300" stroke="#2b3152" stroke-width="10" fill="none"/>
+
+      <!-- Pont HKB (itinéraire actif) -->
+      <path d="M250 560 L 235 300" stroke="#2b3152" stroke-width="14" fill="none"/>
+
+      <!-- Tracé GPS néon -->
+      <path d="M215 900 C 215 780, 250 680, 250 560 L 235 300 C 232 230, 215 180, 205 130"
+            stroke="url(#routeGrad)" stroke-width="10" fill="none" stroke-linecap="round" filter="url(#glow)" opacity="0.9"/>
+      <path class="route-glow" d="M215 900 C 215 780, 250 680, 250 560 L 235 300 C 232 230, 215 180, 205 130"
+            stroke="#fff" stroke-width="2" fill="none" stroke-dasharray="6 14" opacity="0.7"/>
+
+      <!-- Destination -->
+      <circle cx="205" cy="130" r="9" fill="#7c4dff" stroke="#fff" stroke-width="3"/>
+
+      <!-- Libellés quartiers -->
+      <g font-family="Space Grotesk, sans-serif" font-size="12" font-weight="600" fill="#5d6488" letter-spacing="2">
+        <text x="180" y="40">PLATEAU</text>
+        <text x="310" y="90">COCODY</text>
+        <text x="20" y="690">TREICHVILLE</text>
+        <text x="40" y="370" fill="#2e4d80" font-size="11">LAGUNE ÉBRIÉ</text>
+        <text x="262" y="380" fill="#c6ff3d" font-size="10" letter-spacing="1">PONT HKB</text>
+      </g>
+
+      <!-- Véhicule + cône de phares -->
+      <g transform="translate(222 690)">
+        <path d="M0 0 L -40 -120 L 40 -120 Z" fill="url(#beam)"/>
+        <circle r="22" fill="#c6ff3d" opacity="0.15"/>
+        <path d="M0 -16 L 12 12 L 0 6 L -12 12 Z" fill="#c6ff3d" stroke="#1a2400" stroke-width="2" stroke-linejoin="round"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ===== Bandeau de manœuvre ===== -->
+  <div class="top">
+    <div class="maneuver">
+      <div class="turn-box">
+        <div class="turn-icon" aria-hidden="true">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V11a4 4 0 0 1 4-4h9"/><path d="M15 3l4 4-4 4"/></svg>
+        </div>
+        <div class="next-turn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          Puis
+        </div>
+      </div>
+      <div class="maneuver-body">
+        <div class="dist-row">
+          <span class="dist mono" id="dist">150 m</span>
+          <span class="lane-badge">2 voies de droite</span>
+        </div>
+        <div class="instr">Pont HKB • Direction Plateau</div>
+        <div class="sub">Puis continuer tout droit sur 1.8 km</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="pill" id="voicePill" aria-pressed="true">
+        <span class="dot"></span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+        <span id="voiceLabel">Guidage vocal actif</span>
+      </button>
+      <button class="pill" id="collapseBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>
+        <span id="collapseLabel">Réduire</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== HUD ===== -->
+  <div class="hud">
+    <div class="traffic-chip">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
+      Pont HKB fluide
+    </div>
+
+    <div class="speedo">
+      <div class="gauge">
+        <svg viewBox="0 0 108 108" aria-hidden="true">
+          <circle cx="54" cy="54" r="48" stroke="#1d2133" stroke-width="6" fill="none" stroke-dasharray="226 302" transform="rotate(135 54 54)" stroke-linecap="round"/>
+          <circle id="speedArc" cx="54" cy="54" r="48" stroke="#c6ff3d" stroke-width="6" fill="none" stroke-dasharray="192 302" transform="rotate(135 54 54)" stroke-linecap="round" style="filter: drop-shadow(0 0 6px #c6ff3d)"/>
+        </svg>
+        <div>
+          <div class="speed mono" id="speed">68</div>
+          <div class="unit">KM/H</div>
+        </div>
+      </div>
+      <div class="limit mono">80<small>MAX AUTORISÉ</small></div>
+    </div>
+
+    <div class="fabs">
+      <button class="fab" data-toggle title="Vue 3D / Isométrique" aria-label="Basculer vue 3D">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>
+      </button>
+      <button class="fab on" data-toggle title="Couches trafic / feux" aria-label="Couches trafic">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="2" width="8" height="20" rx="3"/><circle cx="12" cy="7" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="17" r="1.6" fill="currentColor"/></svg>
+      </button>
+      <button class="fab" id="recenter" title="Recentrer GPS" aria-label="Recentrer GPS">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== Cockpit ===== -->
+  <div class="cockpit">
+    <div class="metrics">
+      <div class="metric"><b class="eta mono">12:42</b><span>Arrivée</span></div>
+      <div class="metric"><b class="mono" id="remTime">8 min</b><span>Restant</span></div>
+      <div class="metric"><b class="mono" id="remDist">4.2 km</b><span>Distance</span></div>
+    </div>
+
+    <div class="progress">
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="bar-labels"><span>Cocody St-Jean</span><span>Plateau CCIA</span></div>
+    </div>
+
+    <div class="fluid-banner">
+      <span>Trafic très fluide sur le Pont HKB</span>
+      <span class="gain">+10 min vs Adjamé</span>
+    </div>
+
+    <!-- Bannière partage de trajet en direct -->
+    <div class="share-banner" id="shareBanner" role="status" aria-live="polite">
+      <div class="share-head">
+        <span class="live-dot"></span>
+        Partage de trajet en direct actif
+        <span class="share-timer mono" id="shareTimer">00:00</span>
+      </div>
+      <div class="share-row">
+        <div class="share-with">Partagé avec : <strong id="shareNames">Aminata K. (Mère)</strong></div>
+        <button class="send-btn" id="sendLinkBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-3.3-.8-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.7 1.2 1.6 2 1.1 1 2 1.3 2.3 1.4.3.1.4.1.6-.1l.8-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4z"/></svg>
+          WhatsApp / SMS
+        </button>
+      </div>
+      <div class="share-foot">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        Position GPS chiffrée de bout en bout jusqu'à Plateau CCIA
+        <button class="link-btn" id="manageShare">Gérer</button>
+      </div>
+    </div>
+
+    <!-- Grille 1-tap -->
+    <div class="grid">
+      <button class="qa" id="reportBtn">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffb020" stroke-width="2" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01" stroke-linecap="round"/></svg></span>
+        Signaler
+      </button>
+      <button class="qa voice" id="voiceBtn">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg></span>
+        Guidage
+      </button>
+      <button class="qa" id="avoidBtn">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a58bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 21V11l6-6 6 6v10"/><path d="M12 5V2"/></svg></span>
+        Évitement
+      </button>
+      <button class="qa share" id="shareBtn" aria-haspopup="dialog">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+        <span id="shareBtnLabel">Partager</span>
+      </button>
+      <button class="qa sos" id="sosBtn">
+        <span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5h.01"/></svg></span>
+        SOS Vela
+      </button>
+    </div>
+
+    <div class="final">
+      <button class="park" id="parkBtn"><span class="p">P</span>Trouver Parking CCIA</button>
+      <button class="call" id="callBtn" aria-label="Appel rapide">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== Feuille de partage ===== -->
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="grabber"></div>
+    <h2 id="sheetTitle">Partager mon trajet en direct</h2>
+    <p class="lead">Vos proches suivent votre position en temps réel jusqu'à Plateau CCIA. Le lien expire automatiquement à l'arrivée.</p>
+
+    <div class="contacts" id="contacts"></div>
+
+    <div class="opts">
+      <label class="opt">
+        <div>Alerter si arrêt prolongé<small>Notification au proche après 5 min d'immobilité</small></div>
+        <span class="switch"><input type="checkbox" id="optStop" checked><span></span></span>
+      </label>
+      <label class="opt">
+        <div>Prévenir à l'arrivée<small>Message automatique « Bien arrivé·e à Plateau CCIA »</small></div>
+        <span class="switch"><input type="checkbox" id="optArrive" checked><span></span></span>
+      </label>
+    </div>
+
+    <div class="link-box">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>
+      <code id="shareLink"></code>
+      <button id="copyLink">Copier</button>
+    </div>
+
+    <div class="sheet-cta">
+      <button class="btn-primary" id="startShare">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        <span id="startShareLabel">Démarrer le partage</span>
+      </button>
+      <button class="btn-danger" id="stopShare" hidden>Arrêter le partage</button>
+      <button class="btn-ghost" id="closeSheet">Annuler</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+  (function () {
+    const $ = (id) => document.getElementById(id);
+
+    const CONTACTS = [
+      { id: 'aminata', name: 'Aminata K.', rel: 'Mère', phone: '+225 07 00 00 00 01', color: '#c6ff3d' },
+      { id: 'yao', name: 'Yao B.', rel: 'Frère', phone: '+225 05 00 00 00 02', color: '#a58bff' },
+      { id: 'awa', name: 'Awa D.', rel: 'Amie', phone: '+225 01 00 00 00 03', color: '#ff8cbb' }
+    ];
+
+    const state = {
+      selected: new Set(['aminata']),
+      sharing: false,
+      startedAt: 0,
+      token: '',
+      timer: null
+    };
+
+    // ---------- Toast ----------
+    let toastTimer;
+    function toast(msg) {
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    // ---------- Contacts ----------
+    function renderContacts() {
+      const box = $('contacts');
+      box.innerHTML = '';
+      CONTACTS.forEach((c) => {
+        const btn = document.createElement('button');
+        btn.className = 'contact' + (state.selected.has(c.id) ? ' sel' : '');
+        btn.type = 'button';
+        btn.setAttribute('aria-pressed', state.selected.has(c.id));
+        btn.innerHTML =
+          '<span class="avatar" style="background:' + c.color + '">' + c.name[0] + '</span>' +
+          '<span class="info"><b>' + c.name + ' (' + c.rel + ')</b><span>' + c.phone + '</span></span>' +
+          '<span class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg></span>';
+        btn.addEventListener('click', () => {
+          if (state.selected.has(c.id)) state.selected.delete(c.id);
+          else state.selected.add(c.id);
+          renderContacts();
+          updateSheet();
+          if (state.sharing) updateBanner();
+        });
+        box.appendChild(btn);
+      });
+    }
+
+    function selectedContacts() {
+      return CONTACTS.filter((c) => state.selected.has(c.id));
+    }
+
+    function namesLabel() {
+      const list = selectedContacts();
+      if (list.length === 0) return '—';
+      if (list.length === 1) return list[0].name + ' (' + list[0].rel + ')';
+      return list[0].name + ' (' + list[0].rel + ') +' + (list.length - 1);
+    }
+
+    // ---------- Share link ----------
+    function newToken() {
+      const bytes = new Uint8Array(9);
+      (window.crypto || window.msCrypto).getRandomValues(bytes);
+      return Array.from(bytes, (b) => b.toString(36).padStart(2, '0')).join('').slice(0, 12);
+    }
+
+    function shareUrl() {
+      return 'https://vela.ci/suivi/' + state.token;
+    }
+
+    function shareMessage() {
+      return 'Je suis en route vers Plateau CCIA avec Vela Taxi (arrivée prévue 12:42). ' +
+        'Suis mon trajet en direct : ' + shareUrl();
+    }
+
+    // ---------- Sheet ----------
+    function openSheet() {
+      if (!state.token) state.token = newToken();
+      $('shareLink').textContent = shareUrl();
+      renderContacts();
+      updateSheet();
+      $('scrim').classList.add('open');
+      $('sheet').classList.add('open');
+      $('startShare').focus();
+    }
+
+    function closeSheet() {
+      $('scrim').classList.remove('open');
+      $('sheet').classList.remove('open');
+      $('shareBtn').focus();
+    }
+
+    function updateSheet() {
+      const n = state.selected.size;
+      $('startShare').disabled = n === 0;
+      $('startShareLabel').textContent = state.sharing
+        ? 'Mettre à jour (' + n + ')'
+        : n > 1 ? 'Démarrer le partage (' + n + ')' : 'Démarrer le partage';
+      $('stopShare').hidden = !state.sharing;
+    }
+
+    // ---------- Banner ----------
+    function updateBanner() {
+      $('shareNames').textContent = namesLabel();
+      $('shareBanner').classList.toggle('on', state.sharing);
+      $('shareBtn').classList.toggle('active', state.sharing);
+      $('shareBtnLabel').textContent = state.sharing ? 'Partagé' : 'Partager';
+    }
+
+    function tick() {
+      const s = Math.floor((Date.now() - state.startedAt) / 1000);
+      const mm = String(Math.floor(s / 60)).padStart(2, '0');
+      const ss = String(s % 60).padStart(2, '0');
+      $('shareTimer').textContent = mm + ':' + ss;
+    }
+
+    function startSharing() {
+      if (state.selected.size === 0) return;
+      const wasSharing = state.sharing;
+      state.sharing = true;
+      if (!wasSharing) {
+        state.startedAt = Date.now();
+        tick();
+        state.timer = setInterval(tick, 1000);
+      }
+      updateBanner();
+      closeSheet();
+      toast(wasSharing ? 'Destinataires mis à jour' : 'Trajet partagé avec ' + namesLabel());
+    }
+
+    function stopSharing() {
+      state.sharing = false;
+      clearInterval(state.timer);
+      state.token = '';
+      updateBanner();
+      closeSheet();
+      toast('Partage de trajet arrêté · lien désactivé');
+    }
+
+    async function sendLink() {
+      const text = shareMessage();
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'Mon trajet Vela en direct', text: text, url: shareUrl() });
+          return;
+        } catch (e) {
+          if (e && e.name === 'AbortError') return;
+        }
+      }
+      const first = selectedContacts()[0];
+      const phone = first ? first.phone.replace(/\D/g, '') : '';
+      window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
+    }
+
+    async function copyLink() {
+      try {
+        await navigator.clipboard.writeText(shareUrl());
+        toast('Lien de suivi copié');
+      } catch (e) {
+        toast('Copie impossible — sélectionnez le lien');
+      }
+    }
+
+    // ---------- Wiring ----------
+    $('shareBtn').addEventListener('click', openSheet);
+    $('manageShare').addEventListener('click', openSheet);
+    $('closeSheet').addEventListener('click', closeSheet);
+    $('scrim').addEventListener('click', closeSheet);
+    $('startShare').addEventListener('click', startSharing);
+    $('stopShare').addEventListener('click', stopSharing);
+    $('sendLinkBtn').addEventListener('click', sendLink);
+    $('copyLink').addEventListener('click', copyLink);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && $('sheet').classList.contains('open')) closeSheet();
+    });
+
+    // Guidage vocal
+    let voiceOn = true;
+    function toggleVoice() {
+      voiceOn = !voiceOn;
+      $('voicePill').classList.toggle('off', !voiceOn);
+      $('voicePill').setAttribute('aria-pressed', voiceOn);
+      $('voiceLabel').textContent = voiceOn ? 'Guidage vocal actif' : 'Guidage vocal coupé';
+      toast(voiceOn ? 'Guidage vocal réactivé' : 'Guidage vocal coupé');
+    }
+    $('voicePill').addEventListener('click', toggleVoice);
+    $('voiceBtn').addEventListener('click', toggleVoice);
+
+    // Réduire
+    $('collapseBtn').addEventListener('click', () => {
+      const compact = $('phone').classList.toggle('compact');
+      $('collapseLabel').textContent = compact ? 'Agrandir' : 'Réduire';
+    });
+
+    // Boutons flottants
+    document.querySelectorAll('[data-toggle]').forEach((b) =>
+      b.addEventListener('click', () => b.classList.toggle('on'))
+    );
+    $('recenter').addEventListener('click', () => toast('Position GPS recentrée'));
+
+    $('reportBtn').addEventListener('click', () => toast('Signalement : choisissez un incident'));
+    $('avoidBtn').addEventListener('click', () => toast('Itinéraire d’évitement : aucun meilleur trajet'));
+    $('parkBtn').addEventListener('click', () => toast('Recherche de parkings près du CCIA…'));
+    $('callBtn').addEventListener('click', () => toast('Appel du chauffeur…'));
+    $('sosBtn').addEventListener('click', () => {
+      if (confirm('Déclencher SOS Vela ? Vos proches et le centre Vela seront alertés avec votre position.')) {
+        if (!state.sharing && state.selected.size) startSharing();
+        toast('SOS Vela envoyé · position partagée');
+      }
+    });
+
+    // Simulation de conduite (vitesse / distance)
+    let dist = 150;
+    let km = 4.2;
+    let progress = 58;
+    setInterval(() => {
+      const speed = 62 + Math.round(Math.random() * 12);
+      $('speed').textContent = speed;
+      $('speedArc').setAttribute('stroke-dasharray', Math.round((speed / 95) * 226) + ' 302');
+      dist = dist <= 10 ? 150 : dist - 10;
+      $('dist').textContent = dist + ' m';
+      km = Math.max(0.1, km - 0.01);
+      $('remDist').textContent = km.toFixed(1) + ' km';
+      $('remTime').textContent = Math.max(1, Math.round(km / 0.525)) + ' min';
+      progress = Math.min(99, progress + 0.14);
+      $('barFill').style.width = progress + '%';
+    }, 1500);
+  })();
+</script>
+</body>
+</html>
