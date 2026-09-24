@@ -1,827 +1,1795 @@
 <!DOCTYPE html>
-<html class="dark" lang="fr">
+<html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f12">
 <title>Vela Chauffeur</title>
-<meta name="theme-color" content="#131316">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0..1,0&display=block" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    darkMode: "class",
-    theme: { extend: {
-      colors: {
-        "surface-container-lowest": "#0e0e11", "surface": "#131316", "surface-container-low": "#1b1b1e",
-        "surface-container": "#1f1f22", "surface-container-high": "#2a2a2d", "surface-container-highest": "#353438",
-        "surface-variant": "#353438", "on-surface": "#e4e1e6", "on-surface-variant": "#c4c9ae", "outline": "#8e937b",
-        "primary": "#ffffff", "on-primary": "#283500", "primary-container": "#c6f338", "on-primary-container": "#556d00",
-        "primary-fixed": "#c6f338", "primary-fixed-dim": "#abd611", "on-primary-fixed": "#161f00",
-        "secondary": "#ffb1c5", "secondary-container": "#8e1347", "on-secondary-container": "#ff9bb7",
-        "tertiary-container": "#e4dfff", "tertiary-fixed": "#e4dfff", "on-tertiary-fixed": "#170065",
-        "on-tertiary-container": "#6050d1", "error": "#ffb4ab"
-      },
-      borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
-      spacing: { "space-xs": "0.25rem", "space-sm": "0.5rem", "space-md": "1rem", "space-lg": "1.5rem", "space-xl": "2rem",
-                 "gutter": "1rem", "gutter-mobile": "0.75rem", "margin-mobile": "1rem", "margin": "1.5rem" },
-      fontFamily: {
-        "currency-display": ["Sora", "system-ui", "sans-serif"], "headline-xl-mobile": ["Sora", "system-ui", "sans-serif"],
-        "headline-md": ["Sora", "system-ui", "sans-serif"], "headline-sm": ["Sora", "system-ui", "sans-serif"],
-        "body-md": ["DM Sans", "system-ui", "sans-serif"], "body-sm": ["DM Sans", "system-ui", "sans-serif"],
-        "label-lg": ["DM Sans", "system-ui", "sans-serif"], "label-md": ["DM Sans", "system-ui", "sans-serif"],
-        "label-sm": ["DM Sans", "system-ui", "sans-serif"]
-      },
-      fontSize: {
-        "currency-display": ["32px", { lineHeight: "38px", fontWeight: "700" }],
-        "headline-xl-mobile": ["28px", { lineHeight: "34px", fontWeight: "700" }],
-        "headline-md": ["20px", { lineHeight: "28px", fontWeight: "600" }],
-        "headline-sm": ["16px", { lineHeight: "22px", fontWeight: "600" }],
-        "body-md": ["15px", { lineHeight: "22px", fontWeight: "400" }],
-        "body-sm": ["13px", { lineHeight: "18px", fontWeight: "400" }],
-        "label-lg": ["14px", { lineHeight: "18px", fontWeight: "700" }],
-        "label-md": ["12px", { lineHeight: "16px", fontWeight: "600" }],
-        "label-sm": ["10px", { lineHeight: "14px", fontWeight: "600" }]
-      }
-    } }
-  };
-</script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: dark; }
+  :root {
+    color-scheme: dark;
+    --bg: #0f0f12;
+    --s1: #17171b;
+    --s2: #1f1f24;
+    --s3: #2a2a30;
+    --s4: #36363e;
+    --line: rgba(255, 255, 255, 0.07);
+    --fg: #ece9ef;
+    --mut: #b7bba5;
+    --dim: #8e937b;
+    --lime: #c6f338;
+    --lime-2: #abd611;
+    --ink: #161f00;
+    --pink: #ffb1c5;
+    --pink-deep: #8e1347;
+    --violet: #6050d1;
+    --violet-soft: #c7bfff;
+    --red: #ff5a52;
+    --green: #3ddc84;
+    --amber: #ffb020;
+    --wa: #25d366;
+    --display: 'Sora', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --r-sm: 8px;
+    --r: 12px;
+    --r-lg: 20px;
+    --nav-h: 64px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font: 15px/1.45 var(--body);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    font-variant-numeric: tabular-nums;
+    overscroll-behavior-y: none;
+  }
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 0; background: none; padding: 0; }
+  button:disabled { cursor: not-allowed; opacity: .45; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; border-radius: 6px; }
   [hidden] { display: none !important; }
-  html, body { background: #131316; color: #e4e1e6; }
-  body { margin: 0; overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; font-variant-numeric: tabular-nums; }
-  .app { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; background: #131316; }
-  .bar { position: sticky; z-index: 50; }
-  .top-bar { top: env(safe-area-inset-top, 0px); }
-  .bottom-bar { bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .material-symbols-outlined { font-family: 'Material Symbols Outlined'; font-weight: normal; font-style: normal; line-height: 1;
-    letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; direction: ltr;
-    -webkit-font-feature-settings: 'liga'; font-feature-settings: 'liga'; -webkit-font-smoothing: antialiased; }
-  .fill { font-variation-settings: 'FILL' 1; }
-  .pin { caret-color: #c6f338; }
-  .pin:focus { outline: 2px solid #c6f338; outline-offset: 0; }
-  button:focus-visible, a:focus-visible { outline: 2px solid #c6f338; outline-offset: 2px; }
-  .toast { transform: translate(-50%, -150%); transition: transform .3s; }
-  .toast.show { transform: translate(-50%, 12px); }
-  .screen { animation: in .25s ease; }
-  @keyframes in { from { opacity: .4; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  h1, h2, h3 { font-family: var(--display); margin: 0; font-weight: 600; text-wrap: balance; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  .ic { flex: 0 0 auto; display: block; }
+
+  /* ---------- Layout shell ---------- */
+  .app { display: flex; min-height: 100%; }
+  .side { display: none; }
+  .shell { flex: 1; min-width: 0; display: flex; flex-direction: column; min-height: 100vh; }
+  .top {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    height: 60px; padding-inline: 16px;
+    background: rgba(15, 15, 18, 0.86); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-l { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .top-l h1 { font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .top-r { display: flex; align-items: center; gap: 6px; }
+  .icon-btn { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; position: relative; color: var(--mut); }
+  .icon-btn:hover { color: var(--fg); background: var(--s2); }
+  .badge-dot { position: absolute; top: 7px; right: 7px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px; background: var(--pink); color: #3f001b; font-size: 10px; font-weight: 700; display: grid; place-items: center; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 600 13px var(--display); flex: 0 0 auto; }
+  .av-driver { background: linear-gradient(135deg, var(--violet), var(--pink-deep)); color: #fff; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--dim); flex: 0 0 auto; }
+  .status-dot.on { background: var(--lime); box-shadow: 0 0 0 0 rgba(198, 243, 56, .6); animation: ping 1.8s infinite; }
+  @keyframes ping { 70% { box-shadow: 0 0 0 8px rgba(198, 243, 56, 0); } 100% { box-shadow: 0 0 0 0 rgba(198, 243, 56, 0); } }
+
+  main { flex: 1; width: 100%; max-width: 1180px; margin: 0 auto; padding: 16px 16px calc(var(--nav-h) + 24px + env(safe-area-inset-bottom, 0px)); }
+
+  .tabbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: rgba(23, 23, 27, 0.94); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--line);
+  }
+  .tabbar-in { height: var(--nav-h); display: flex; justify-content: space-around; align-items: center; max-width: 560px; margin: 0 auto; }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 64px; padding: 6px 4px; color: var(--dim); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; position: relative; }
+  .tab.on { color: var(--lime); }
+  .tab .badge-dot { top: 0; right: 12px; }
+
+  /* ---------- Generic components ---------- */
+  .stack { display: flex; flex-direction: column; gap: 14px; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .between { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .wrap { flex-wrap: wrap; }
+  .grow { flex: 1; min-width: 0; }
+  .card { background: var(--s1); border-radius: var(--r-lg); padding: 16px; display: flex; flex-direction: column; gap: 12px; position: relative; overflow: hidden; }
+  .inset { background: var(--s2); border-radius: var(--r); padding: 10px 12px; }
+  .muted { color: var(--mut); }
+  .dim { color: var(--dim); }
+  .small { font-size: 13px; }
+  .tiny { font-size: 11px; }
+  .label { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); }
+  .trunc { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .num { font-family: var(--display); font-weight: 700; letter-spacing: -0.02em; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; white-space: nowrap; background: var(--s3); }
+  .chip-lime { background: var(--lime); color: var(--ink); }
+  .chip-pink { background: rgba(142, 19, 71, .45); color: var(--pink); }
+  .chip-violet { background: rgba(96, 80, 209, .25); color: var(--violet-soft); }
+  .chip-green { background: rgba(61, 220, 132, .14); color: var(--green); }
+  .chip-red { background: rgba(255, 90, 82, .15); color: var(--red); }
+  .chip-amber { background: rgba(255, 176, 32, .15); color: var(--amber); }
+  .tile-ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; flex: 0 0 auto; }
+  .t-pink { background: rgba(142, 19, 71, .4); color: var(--pink); }
+  .t-violet { background: rgba(96, 80, 209, .25); color: var(--violet-soft); }
+  .t-lime { background: rgba(198, 243, 56, .14); color: var(--lime); }
+  .t-red { background: rgba(255, 90, 82, .15); color: var(--red); }
+  .t-grey { background: var(--s3); color: var(--mut); }
+
+  .btn { height: 48px; padding: 0 18px; border-radius: var(--r); display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 14.5px; background: var(--s3); color: var(--fg); transition: filter .15s, transform .1s; text-decoration: none; white-space: nowrap; }
+  .btn:hover:not(:disabled) { filter: brightness(1.12); }
+  .btn:active:not(:disabled) { transform: scale(.98); }
+  .btn-lg { height: 56px; font-size: 15.5px; }
+  .btn-sm { height: 36px; padding: 0 12px; font-size: 13px; border-radius: 10px; }
+  .btn-block { width: 100%; }
+  .btn-lime { background: var(--lime); color: var(--ink); box-shadow: 0 6px 22px rgba(198, 243, 56, .22); }
+  .btn-violet { background: var(--violet); color: #fff; }
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-ghost { background: transparent; border: 1px solid var(--s4); }
+  .btn-wa { background: var(--wa); color: #04220f; }
+  .link { color: var(--lime); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; }
+
+  .switch { position: relative; width: 50px; height: 30px; flex: 0 0 auto; border-radius: 99px; background: var(--s4); transition: background .2s; }
+  .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--mut); transition: transform .2s, background .2s; }
+  .switch[aria-checked="true"] { background: var(--lime); }
+  .switch[aria-checked="true"]::after { transform: translateX(20px); background: var(--ink); }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 12px; font-weight: 700; color: var(--mut); }
+  .input { height: 48px; width: 100%; border-radius: var(--r); background: var(--s2); border: 1px solid var(--s4); padding: 0 14px; outline: none; }
+  .input:focus { border-color: var(--lime); }
+  .input.err { border-color: var(--red); }
+  .err-msg { color: var(--red); font-size: 12.5px; font-weight: 500; }
+  .seg { display: flex; background: var(--s2); border-radius: 12px; padding: 4px; gap: 4px; }
+  .seg button { flex: 1; height: 38px; border-radius: 9px; font-weight: 700; font-size: 13px; color: var(--mut); }
+  .seg button.on { background: var(--s4); color: var(--fg); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kv { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .kv b { font-size: 14px; }
+
+  /* ---------- Home ---------- */
+  .hello h2 { font-size: 21px; }
+  .earn { background: var(--lime); color: #3b4d00; }
+  .earn .big { font: 700 36px/1.05 var(--display); color: var(--ink); letter-spacing: -0.03em; }
+  .earn .sub { background: rgba(22, 31, 0, .08); border-radius: var(--r); padding: 10px 12px; display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-weight: 700; font-size: 13px; color: var(--ink); }
+  .earn .chip { background: rgba(22, 31, 0, .12); color: var(--ink); }
+  .glow { position: absolute; border-radius: 50%; filter: blur(34px); pointer-events: none; }
+  .mission-strip { background: linear-gradient(120deg, rgba(96, 80, 209, .35), rgba(142, 19, 71, .3)); border: 1px solid rgba(199, 191, 255, .25); }
+  .mapbox { position: relative; border-radius: var(--r); overflow: hidden; background: #0d0f16; }
+  .mapbox > svg { display: block; width: 100%; height: 100%; }
+  .map-over { position: absolute; left: 10px; right: 10px; display: flex; justify-content: space-between; gap: 8px; pointer-events: none; }
+  .map-over > * { pointer-events: auto; }
+  .pill-glass { background: rgba(14, 14, 17, .82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+  .home-grid { display: grid; gap: 14px; }
+  .empty { text-align: center; padding: 26px 16px; color: var(--mut); display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+  /* ---------- Offer / mission ---------- */
+  .split { display: flex; flex-direction: column; gap: 14px; }
+  .split-map { height: 260px; margin: -16px -16px 0; border-radius: 0; }
+  .split-body { margin-top: -34px; position: relative; z-index: 2; background: var(--s1); border-radius: 24px 24px var(--r-lg) var(--r-lg); padding: 18px 16px; display: flex; flex-direction: column; gap: 14px; }
+  .handle { width: 44px; height: 4px; border-radius: 99px; background: var(--s4); margin: -6px auto 0; }
+  .timer { position: relative; width: 48px; height: 48px; display: grid; place-items: center; flex: 0 0 auto; }
+  .timer svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .timer span { font: 700 13px var(--display); }
+  .legs { display: flex; flex-direction: column; }
+  .leg { display: flex; gap: 12px; }
+  .leg-rail { display: flex; flex-direction: column; align-items: center; padding-top: 4px; }
+  .leg-dot { width: 14px; height: 14px; border-radius: 50%; flex: 0 0 auto; }
+  .leg-line { width: 2px; flex: 1; min-height: 22px; background: var(--s4); margin: 4px 0; }
+  .leg-body { flex: 1; min-width: 0; padding-bottom: 12px; }
+  .money { font: 700 30px/1.1 var(--display); letter-spacing: -0.02em; }
+  .steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .step { display: flex; gap: 12px; position: relative; padding-bottom: 16px; }
+  .step:last-child { padding-bottom: 0; }
+  .step::before { content: ''; position: absolute; left: 13px; top: 30px; bottom: 2px; width: 2px; background: var(--s4); }
+  .step:last-child::before { display: none; }
+  .step.done::before { background: var(--lime); }
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; flex: 0 0 auto; background: var(--s3); color: var(--dim); position: relative; z-index: 1; }
+  .step.done .step-dot { background: var(--lime); color: var(--ink); }
+  .step.now .step-dot { background: var(--pink-deep); color: var(--pink); box-shadow: 0 0 0 5px rgba(255, 177, 197, .14); }
+  .step.now .step-t { color: var(--pink); }
+  .step-t { font-weight: 700; }
+  .pins { display: flex; gap: 10px; }
+  .pins input { flex: 1; min-width: 0; height: 60px; border-radius: var(--r); background: var(--bg); border: 1px solid var(--s4); text-align: center; font: 700 28px var(--display); color: var(--fg); outline: none; caret-color: var(--lime); }
+  .pins input:focus { border-color: var(--lime); }
+  .pins.bad input { border-color: var(--red); animation: shake .3s; }
+  @keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+  .summary-hero { text-align: center; padding: 28px 16px; }
+  .summary-hero .money { font-size: 40px; color: var(--lime); }
+  .check-big { width: 64px; height: 64px; border-radius: 50%; background: var(--lime); color: var(--ink); display: grid; place-items: center; margin: 0 auto 12px; }
+
+  /* ---------- Lists ---------- */
+  .list { display: flex; flex-direction: column; }
+  .li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .li:last-child { border-bottom: 0; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .stat { background: var(--s1); border-radius: var(--r); padding: 12px; display: flex; flex-direction: column; gap: 2px; }
+  .stat b { font: 700 20px var(--display); }
+  .filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+  .filters button { height: 34px; padding: 0 14px; border-radius: 99px; background: var(--s2); font-weight: 700; font-size: 13px; color: var(--mut); white-space: nowrap; }
+  .filters button.on { background: var(--fg); color: var(--bg); }
+
+  /* ---------- Sheet ---------- */
+  .scrim { position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, .6); opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 61;
+    max-height: 90vh; overflow-y: auto;
+    background: var(--s1); border-radius: 24px 24px 0 0;
+    padding: 12px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+    transform: translateY(105%); transition: transform .28s cubic-bezier(.2, .8, .2, 1);
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .sheet.open { transform: none; }
+  .sheet h2 { font-size: 20px; }
+  .opt-row { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: var(--r); background: var(--s2); border: 1px solid transparent; width: 100%; text-align: left; }
+  .opt-row.sel { border-color: var(--lime); background: rgba(198, 243, 56, .06); }
+  .tick { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--s4); display: grid; place-items: center; flex: 0 0 auto; color: var(--ink); }
+  .opt-row.sel .tick { background: var(--lime); border-color: var(--lime); }
+  .opt-row:not(.sel) .tick svg { display: none; }
+  .linkbox { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: var(--r); border: 1px dashed var(--s4); background: var(--bg); font-size: 12.5px; }
+  .linkbox code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--violet-soft); user-select: all; }
+
+  /* ---------- Toast & offer banner ---------- */
+  .toast { position: fixed; left: 50%; top: 0; z-index: 90; transform: translate(-50%, -120%); transition: transform .3s; max-width: min(92vw, 460px); background: var(--fg); color: var(--bg); border-radius: 14px; padding: 11px 16px; font-weight: 700; font-size: 13.5px; box-shadow: 0 12px 34px rgba(0, 0, 0, .45); text-align: center; }
+  .toast.show { transform: translate(-50%, calc(12px + env(safe-area-inset-top, 0px))); }
+  .obanner { position: fixed; left: 50%; bottom: calc(var(--nav-h) + 12px + env(safe-area-inset-bottom, 0px)); z-index: 40; transform: translateX(-50%); width: min(94vw, 460px); background: var(--s2); border: 1px solid rgba(198, 243, 56, .35); border-radius: 16px; padding: 10px 10px 10px 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 14px 40px rgba(0, 0, 0, .5); animation: rise .3s ease; }
+  @keyframes rise { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+  /* ---------- Drive mode ---------- */
+  .drive { position: fixed; inset: 0; z-index: 50; background: #07080d; display: flex; flex-direction: column; overflow: hidden; }
+  .d-left { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .d-map { position: absolute; inset: 0; perspective: 900px; }
+  .d-map-in { position: absolute; inset: -8%; transition: transform .6s ease; transform-origin: 50% 70%; }
+  .d-map.tilt .d-map-in { transform: rotateX(38deg) scale(1.25); }
+  .d-map svg { width: 100%; height: 100%; display: block; }
+  .d-top { position: relative; z-index: 3; padding: calc(12px + env(safe-area-inset-top, 0px)) 12px 0; display: flex; flex-direction: column; gap: 8px; max-width: 560px; }
+  .man { background: rgba(14, 14, 17, .92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--line); border-radius: 20px; padding: 12px; display: flex; gap: 12px; }
+  .man-ic { width: 62px; height: 62px; border-radius: 16px; background: var(--lime); color: var(--ink); display: grid; place-items: center; flex: 0 0 auto; box-shadow: 0 0 24px rgba(198, 243, 56, .35); }
+  .man-d { font: 700 28px/1 var(--display); letter-spacing: -0.02em; }
+  .man-t { font-weight: 700; font-size: 16px; margin-top: 4px; }
+  .d-pills { display: flex; justify-content: space-between; gap: 8px; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 12px; border-radius: 99px; background: rgba(14, 14, 17, .9); border: 1px solid var(--line); font-size: 12.5px; font-weight: 700; }
+  .pdot { width: 8px; height: 8px; border-radius: 50%; background: var(--pink); animation: pk 1.4s infinite; }
+  .pill.off .pdot { background: var(--dim); animation: none; }
+  .pill.off { color: var(--dim); }
+  @keyframes pk { 0% { box-shadow: 0 0 0 0 rgba(255, 177, 197, .7); } 70% { box-shadow: 0 0 0 8px rgba(255, 177, 197, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 177, 197, 0); } }
+  .d-mid { position: relative; z-index: 3; flex: 1; min-height: 120px; }
+  .speedo { position: absolute; left: 12px; bottom: 12px; display: flex; align-items: flex-end; gap: 8px; }
+  .gauge { width: 100px; height: 100px; border-radius: 50%; background: rgba(10, 10, 14, .9); border: 1px solid var(--line); position: relative; display: grid; place-items: center; }
+  .gauge svg { position: absolute; inset: 0; }
+  .gauge b { font: 700 34px/1 var(--display); display: block; text-align: center; }
+  .gauge small { display: block; text-align: center; font-size: 10px; letter-spacing: .15em; color: var(--dim); }
+  .limit { width: 52px; height: 52px; border-radius: 50%; background: #fff; border: 6px solid #e53935; color: #111; display: grid; place-items: center; font: 700 17px var(--display); }
+  .fabs { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 10px; }
+  .fab { width: 46px; height: 46px; border-radius: 14px; background: rgba(14, 14, 17, .92); border: 1px solid var(--line); display: grid; place-items: center; }
+  .fab.on { background: var(--lime); color: var(--ink); }
+  .fab-txt { font: 700 13px var(--display); }
+  .traffic-chip { position: absolute; left: 12px; bottom: 124px; }
+  .cockpit { position: relative; z-index: 4; background: linear-gradient(180deg, rgba(23, 23, 27, .97), #111114); border-top: 1px solid var(--line); border-radius: 24px 24px 0 0; padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 10px; }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; }
+  .metrics b { font: 700 21px var(--display); display: block; }
+  .bar { height: 6px; border-radius: 99px; background: var(--s3); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--violet), var(--lime)); }
+  .qa-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .qa { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px 2px; min-height: 68px; border-radius: 14px; background: var(--s2); font-size: 11px; font-weight: 700; text-align: center; }
+  .qa.on { background: rgba(198, 243, 56, .12); color: var(--lime); box-shadow: inset 0 0 0 1px rgba(198, 243, 56, .5); }
+  .qa.sos { background: var(--red); color: #fff; }
+  .share-live { border-radius: 14px; padding: 10px 12px; background: rgba(61, 220, 132, .08); border: 1px solid rgba(61, 220, 132, .35); display: flex; flex-direction: column; gap: 6px; }
+  .live { width: 9px; height: 9px; border-radius: 50%; background: var(--green); animation: lv 1.4s infinite; flex: 0 0 auto; }
+  @keyframes lv { 0% { box-shadow: 0 0 0 0 rgba(61, 220, 132, .7); } 70% { box-shadow: 0 0 0 8px rgba(61, 220, 132, 0); } 100% { box-shadow: 0 0 0 0 rgba(61, 220, 132, 0); } }
+  .sos-live { border-radius: 14px; padding: 10px 12px; background: rgba(255, 90, 82, .14); border: 1px solid rgba(255, 90, 82, .5); color: #ffb4ab; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-height: 740px) {
+    .gauge { width: 84px; height: 84px; }
+    .gauge b { font-size: 28px; }
+    .traffic-chip { bottom: 106px; }
+    .qa { min-height: 58px; padding: 8px 2px; }
+    #dAlert { display: none !important; }
+  }
+  @media (max-width: 360px) {
+    .qa { font-size: 10px; }
+    .man-ic { width: 52px; height: 52px; }
+    .man-d { font-size: 24px; }
+  }
+  @media (min-width: 720px) {
+    main { padding: 24px 24px calc(var(--nav-h) + 32px); }
+    .home-grid { grid-template-columns: 1fr 1fr; }
+    .home-grid .span-2 { grid-column: 1 / -1; }
+    .sheet { left: 50%; right: auto; bottom: 50%; width: 480px; border-radius: 24px; transform: translate(-50%, 60%) scale(.96); opacity: 0; transition: transform .22s, opacity .22s; pointer-events: none; padding-bottom: 20px; }
+    .sheet.open { transform: translate(-50%, 50%); opacity: 1; pointer-events: auto; }
+    .split-map { height: 320px; margin: 0; border-radius: var(--r-lg); }
+    .split-body { margin-top: 0; border-radius: var(--r-lg); }
+    .handle { display: none; }
+  }
+  @media (min-width: 1024px) {
+    .tabbar { display: none; }
+    .obanner { bottom: 24px; left: calc(50% + 130px); }
+    main { padding: 28px 32px 40px; }
+    .side { display: flex; flex-direction: column; gap: 6px; width: 260px; flex: 0 0 auto; position: sticky; top: 0; height: 100vh; padding: 20px 14px; background: var(--s1); border-right: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 18px; }
+    .brand-mark { width: 36px; height: 36px; border-radius: 10px; background: var(--lime); color: var(--ink); display: grid; place-items: center; font: 700 17px var(--display); }
+    .side-link { display: flex; align-items: center; gap: 12px; height: 46px; padding: 0 12px; border-radius: 12px; color: var(--mut); font-weight: 700; width: 100%; text-align: left; position: relative; }
+    .side-link:hover { background: var(--s2); color: var(--fg); }
+    .side-link.on { background: rgba(198, 243, 56, .1); color: var(--lime); }
+    .side-link .badge-dot { position: static; margin-left: auto; }
+    .side-foot { margin-top: auto; }
+    .top .menu-avatar { display: none; }
+    .home-grid { grid-template-columns: repeat(3, 1fr); }
+    .home-grid .span-2 { grid-column: span 2; }
+    .home-grid .span-3 { grid-column: 1 / -1; }
+    .split { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, 1fr); align-items: start; gap: 20px; }
+    .split-map { height: calc(100vh - 150px); min-height: 420px; position: sticky; top: 84px; }
+    .drive { flex-direction: row; }
+    .d-left { min-width: 0; }
+    .cockpit { width: 400px; flex: 0 0 auto; border-radius: 0; border-top: 0; border-left: 1px solid var(--line); overflow-y: auto; justify-content: flex-start; }
+    .d-top { padding: 20px 20px 0; }
+    .speedo { left: 20px; bottom: 20px; }
+    .traffic-chip { left: 20px; bottom: 136px; }
+    .fabs { right: 20px; }
+  }
+  @media (min-width: 1024px) and (max-width: 1180px) {
+    .side { width: 220px; }
+    .obanner { left: calc(50% + 110px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
 
-<div class="app flex flex-col font-body-md text-body-md text-on-surface antialiased">
+<div class="app">
+  <!-- Navigation latérale (ordinateur) -->
+  <aside class="side" aria-label="Navigation">
+    <div class="brand"><div class="brand-mark">V</div><div><b style="font-family:var(--display)">Vela Chauffeur</b><div class="tiny dim">City+ · Vela Taxi</div></div></div>
+    <nav id="sideNav" class="stack" style="gap:4px"></nav>
+    <div class="side-foot card" id="sideFoot" style="background:var(--s2)"></div>
+  </aside>
 
-  <!-- ===== En-tête commun ===== -->
-  <header class="bar top-bar bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.35)]">
-    <div class="h-16 px-gutter flex items-center justify-between">
-      <div class="flex items-center gap-space-sm min-w-0">
-        <button id="backBtn" class="w-11 h-11 -ml-2 flex items-center justify-center text-on-surface hover:text-primary-container" aria-label="Retour" hidden>
-          <span class="material-symbols-outlined text-[24px]">arrow_back</span>
-        </button>
-        <div id="liveDot" class="w-2.5 h-2.5 rounded-full bg-primary-container animate-pulse"></div>
-        <h1 id="pageTitle" class="font-headline-sm text-headline-sm tracking-tight truncate">Accueil</h1>
+  <div class="shell">
+    <header class="top">
+      <div class="top-l">
+        <button class="icon-btn" id="backBtn" data-action="back" aria-label="Retour" hidden></button>
+        <span class="status-dot" id="topDot"></span>
+        <h1 id="title">Accueil</h1>
       </div>
-      <div class="flex items-center gap-space-sm">
-        <button id="notifBtn" class="relative w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface" aria-label="Notifications">
-          <span class="material-symbols-outlined text-[22px]">notifications</span>
-          <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-secondary"></span>
-        </button>
-        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div>
+      <div class="top-r">
+        <button class="icon-btn" data-action="notifs" aria-label="Notifications" id="bellBtn"></button>
+        <button class="avatar av-driver menu-avatar" data-action="go" data-view="profile" aria-label="Profil">KT</button>
       </div>
-    </div>
-  </header>
-
-  <main class="flex-1 flex flex-col w-full">
-
-    <!-- =========================================================
-         ÉCRAN 1 · ACCUEIL CHAUFFEUR
-         ========================================================= -->
-    <section class="screen flex flex-col px-margin-mobile pt-space-sm pb-space-lg gap-space-md" data-screen="accueil" data-title="Accueil">
-      <div class="flex items-center justify-between gap-space-sm">
-        <div class="flex items-center gap-space-sm min-w-0">
-          <div class="relative shrink-0">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-on-tertiary-container to-secondary-container flex items-center justify-center font-headline-sm text-headline-sm">KT</div>
-            <div class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-primary-container ring-2 ring-surface" id="avatarDot"></div>
-          </div>
-          <div class="min-w-0">
-            <div class="flex items-center gap-space-xs">
-              <span class="font-headline-md text-headline-md tracking-tight truncate">Bonsoir, Koffi</span>
-              <span class="material-symbols-outlined fill text-[16px] text-primary-container">verified</span>
-            </div>
-            <p class="font-body-sm text-body-sm text-on-surface-variant truncate">City Drive · Chauffeur-livreur</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded-full shrink-0">
-          <span class="material-symbols-outlined text-[15px] text-primary-container">near_me</span>
-          <span class="font-label-sm text-label-sm text-on-surface-variant">HD</span>
-          <span class="w-px h-3 bg-surface-container-highest mx-1"></span>
-          <span class="material-symbols-outlined text-[15px] text-on-surface-variant">battery_charging_full</span>
-          <span class="font-label-sm text-label-sm">94%</span>
-        </div>
-      </div>
-
-      <div class="bg-surface-container-low rounded-xl p-space-sm flex items-center justify-between gap-space-sm">
-        <div class="flex items-center gap-space-sm min-w-0">
-          <button id="statusToggle" role="switch" aria-checked="true" aria-label="Disponibilité"
-                  class="relative inline-flex h-8 w-14 shrink-0 rounded-full bg-primary-container p-0.5 transition-colors">
-            <span id="statusKnob" class="h-7 w-7 translate-x-6 rounded-full bg-on-primary-container shadow-md transition flex items-center justify-center">
-              <span id="statusPing" class="w-2 h-2 rounded-full bg-primary-container animate-ping"></span>
-            </span>
-          </button>
-          <div class="min-w-0">
-            <div class="flex items-center gap-1.5">
-              <span id="statusDot" class="w-2 h-2 rounded-full bg-primary-container"></span>
-              <span id="statusLabel" class="font-label-lg text-label-lg">En ligne</span>
-            </div>
-            <p id="statusSub" class="font-label-sm text-label-sm text-on-surface-variant truncate">Prêt pour nouvelles courses</p>
-          </div>
-        </div>
-        <div class="bg-surface-container-high px-space-sm py-1.5 rounded-lg flex items-center gap-1 shrink-0">
-          <span class="material-symbols-outlined text-[15px] text-primary-container">location_on</span>
-          <span class="font-label-md text-label-md">Cocody · Riviera</span>
-        </div>
-      </div>
-
-      <div class="bg-primary-container text-on-primary-container rounded-xl p-space-md shadow-xl relative overflow-hidden">
-        <div class="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-on-primary-container/10 blur-xl pointer-events-none"></div>
-        <div class="relative flex flex-col gap-space-sm">
-          <div class="flex items-center justify-between">
-            <span class="font-label-md text-label-md tracking-wider uppercase">Gains aujourd'hui</span>
-            <span class="bg-on-primary-container/15 px-2.5 py-0.5 rounded-full flex items-center gap-1 font-label-sm text-label-sm">
-              <span class="material-symbols-outlined text-[14px]">trending_up</span>+18% vs hier
-            </span>
-          </div>
-          <div class="flex items-baseline gap-1.5">
-            <span id="earnings" class="font-currency-display text-currency-display tracking-tight">18 500</span>
-            <span class="font-headline-sm text-headline-sm">FCFA</span>
-          </div>
-          <div class="bg-on-primary-container/10 rounded-lg p-space-sm flex items-center justify-between gap-2 flex-wrap">
-            <span class="flex items-center gap-2 font-label-md text-label-md"><span class="material-symbols-outlined text-[18px]">checkroom</span><span id="countCity">8</span> livraisons City+</span>
-            <span class="flex items-center gap-2 font-label-md text-label-md"><span class="material-symbols-outlined text-[18px]">local_taxi</span><span id="countVela">4</span> courses Vela</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-44 h-44 rounded-full bg-on-tertiary-container/10 blur-2xl pointer-events-none"></div>
-        <div class="flex items-center justify-between relative">
-          <span class="bg-on-tertiary-container/20 text-tertiary-fixed px-space-sm py-0.5 rounded-full flex items-center gap-1.5 font-label-sm text-label-sm uppercase tracking-wide">
-            <span class="material-symbols-outlined text-[15px]">sync_alt</span>Compte Vela lié
-          </span>
-          <button class="text-tertiary-fixed flex items-center gap-0.5 font-label-sm text-label-sm hover:opacity-80" data-toast="Conversion 42 300 VM → FCFA disponible sans frais">
-            Convertir<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
-          </button>
-        </div>
-        <div class="relative flex flex-col gap-0.5">
-          <span class="font-body-sm text-body-sm text-on-surface-variant">Solde disponible</span>
-          <div class="flex items-baseline gap-2">
-            <span id="vmBalance" class="font-headline-xl-mobile text-headline-xl-mobile">42 300</span>
-            <span class="font-headline-sm text-headline-sm text-tertiary-fixed">VM</span>
-          </div>
-        </div>
-        <div class="bg-surface-container rounded-lg p-space-sm flex items-center gap-space-sm relative">
-          <span class="material-symbols-outlined text-tertiary-fixed text-[20px] shrink-0">account_balance_wallet</span>
-          <p class="font-body-sm text-body-sm text-on-surface-variant">Disponible pour conversion directe FCFA sans frais ou dépenses super-app.</p>
-        </div>
-      </div>
-
-      <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm">
-        <div class="flex items-center justify-between gap-2">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-secondary-container/40 flex items-center justify-center text-secondary"><span class="material-symbols-outlined text-[18px]">shopping_bag</span></div>
-            <div>
-              <h2 class="font-headline-sm text-headline-sm leading-tight">Livraisons City+</h2>
-              <span class="font-body-sm text-body-sm text-on-surface-variant">Mode &amp; Colis express</span>
-            </div>
-          </div>
-          <span id="pendingBadge" class="bg-secondary-container/30 text-secondary px-2.5 py-1 rounded-full font-label-sm text-label-sm uppercase tracking-wider shrink-0">2 en attente</span>
-        </div>
-        <div class="bg-surface-container rounded-lg p-space-sm flex items-center gap-2">
-          <span class="material-symbols-outlined text-[18px] text-secondary shrink-0">storefront</span>
-          <div class="min-w-0">
-            <p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Point relais assigné</p>
-            <p class="font-label-md text-label-md truncate">Angré 8e Tranche · Boutique N°14</p>
-          </div>
-        </div>
-        <button class="w-full bg-surface-container-high hover:bg-surface-container-highest py-3 rounded-lg flex items-center justify-center gap-2" data-go="offre-city">
-          <span class="font-label-lg text-label-lg">Voir les missions</span><span class="material-symbols-outlined text-[16px] text-secondary">arrow_forward</span>
-        </button>
-      </div>
-
-      <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm">
-        <div class="flex items-center justify-between gap-2">
-          <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-lg bg-tertiary-container/20 flex items-center justify-center text-tertiary-fixed"><span class="material-symbols-outlined text-[18px]">local_taxi</span></div>
-            <div>
-              <h2 class="font-headline-sm text-headline-sm leading-tight">Courses taxi Vela</h2>
-              <span class="font-body-sm text-body-sm text-on-surface-variant">Forte demande active</span>
-            </div>
-          </div>
-          <span class="bg-primary-container text-on-primary-container px-2.5 py-1 rounded-full font-label-md text-label-md shrink-0">x1.3 Surge</span>
-        </div>
-        <div class="bg-surface-container rounded-lg p-space-sm flex items-center justify-between gap-2">
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="material-symbols-outlined text-[18px] text-primary-container shrink-0">whatshot</span>
-            <div class="min-w-0">
-              <p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Hotspots identifiés</p>
-              <p class="font-label-md text-label-md truncate">Cocody Ambassades &amp; Plateau</p>
-            </div>
-          </div>
-          <span class="font-label-sm text-label-sm text-primary-container shrink-0">+950 F / course</span>
-        </div>
-        <button class="w-full bg-surface-container-high hover:bg-surface-container-highest py-3 rounded-lg flex items-center justify-center gap-2" data-go="offre-taxi">
-          <span class="font-label-lg text-label-lg">Ouvrir le radar des courses</span><span class="material-symbols-outlined text-[16px] text-primary-container">radar</span>
-        </button>
-      </div>
-
-      <div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-sm">
-        <div class="flex items-center justify-between gap-2">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-[20px] text-on-surface-variant">map</span>
-            <h3 class="font-headline-sm text-headline-sm">Zones à forte affluence</h3>
-          </div>
-          <span class="font-label-sm text-label-sm text-on-surface-variant">Rafraîchi à l'instant</span>
-        </div>
-        <div class="w-full h-36 rounded-lg relative overflow-hidden bg-surface-container-lowest flex items-end p-space-sm">
-          <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 144" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <defs><filter id="heatBlur"><feGaussianBlur stdDeviation="14"/></filter></defs>
-            <path d="M0 110 C 80 90, 160 130, 260 105 S 380 80, 400 90 L400 144 L0 144Z" fill="#0f2140"/>
-            <g stroke="#2a2a2d" stroke-width="5" fill="none" stroke-linecap="round">
-              <path d="M0 40 L400 55"/><path d="M120 0 L150 144"/><path d="M290 0 L270 144"/><path d="M0 80 C 120 70, 250 60, 400 20"/>
-            </g>
-            <g filter="url(#heatBlur)">
-              <circle cx="150" cy="50" r="34" fill="#c6f338" opacity=".55"/>
-              <circle cx="280" cy="42" r="26" fill="#ffb1c5" opacity=".5"/>
-              <circle cx="60" cy="70" r="20" fill="#6050d1" opacity=".6"/>
-            </g>
-            <g font-family="DM Sans, sans-serif" font-size="10" font-weight="600" fill="#8e937b" letter-spacing="1.5">
-              <text x="160" y="22">COCODY</text><text x="300" y="75">RIVIERA</text><text x="16" y="30">PLATEAU</text>
-            </g>
-          </svg>
-          <div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/30 to-transparent"></div>
-          <div class="relative w-full flex items-center justify-between gap-2">
-            <div class="flex items-center gap-1.5 bg-surface-container-lowest/80 backdrop-blur-md px-2.5 py-1 rounded-md min-w-0">
-              <span class="w-2 h-2 rounded-full bg-primary-container animate-pulse shrink-0"></span>
-              <span class="font-label-sm text-label-sm truncate">Affluence max : Boulevard Latrille</span>
-            </div>
-            <button class="w-8 h-8 rounded-md bg-surface-container-high/90 flex items-center justify-center shrink-0" data-go="offre-taxi" aria-label="Aller vers la zone">
-              <span class="material-symbols-outlined text-[18px]">navigation</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================
-         ÉCRAN 2 · NOUVELLE LIVRAISON CITY+
-         ========================================================= -->
-    <section class="screen flex flex-col" data-screen="offre-city" data-title="Nouvelle livraison" hidden>
-      <div class="relative w-full h-[300px] bg-surface-container-lowest overflow-hidden">
-        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <path d="M-20 170 Q90 150 140 200 T280 180 T420 230" fill="none" stroke="#2a2a2d" stroke-linecap="round" stroke-width="8"/>
-          <path d="M80 -20 Q110 120 160 170 T240 340" fill="none" stroke="#2a2a2d" stroke-linecap="round" stroke-width="12"/>
-          <path d="M210 -10 L190 330" fill="none" stroke="#353438" stroke-dasharray="6 6" stroke-width="4"/>
-          <path d="M40 300 C110 230 180 170 320 120" fill="none" stroke="#1f1f22" stroke-width="16"/>
-          <path d="M40 300 C110 230 180 170 320 120" fill="none" stroke="#353438" stroke-dasharray="8 8" stroke-width="2"/>
-          <path d="M120 100 C160 110 170 180 270 210" fill="none" stroke="#ffb1c5" stroke-dasharray="7 5" stroke-linecap="round" stroke-width="4"/>
-          <text x="236" y="146" font-family="DM Sans, sans-serif" font-size="9" fill="#8e937b" letter-spacing="1">BD HASSAN II</text>
-        </svg>
-        <div class="absolute left-[30%] top-[33%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-          <div class="relative flex items-center justify-center">
-            <span class="absolute w-10 h-10 rounded-full bg-secondary opacity-30 animate-ping"></span>
-            <div class="w-9 h-9 rounded-full bg-secondary-container flex items-center justify-center shadow-lg"><span class="material-symbols-outlined text-secondary text-[20px]">shopping_bag</span></div>
-          </div>
-          <span class="mt-1 px-2 py-0.5 rounded-full bg-surface-container-high/90 font-label-sm text-label-sm text-secondary uppercase tracking-wider">Collecte</span>
-        </div>
-        <div class="absolute left-[67%] top-[70%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-          <div class="relative flex items-center justify-center">
-            <span class="absolute w-8 h-8 rounded-full bg-primary-fixed opacity-25 animate-pulse"></span>
-            <div class="w-9 h-9 rounded-full bg-surface-container-highest flex items-center justify-center shadow-lg"><span class="material-symbols-outlined text-primary-fixed text-[20px]">home</span></div>
-          </div>
-          <span class="mt-1 px-2 py-0.5 rounded-full bg-surface-container-high/90 font-label-sm text-label-sm uppercase tracking-wider">Riviera 3</span>
-        </div>
-        <div class="absolute top-4 left-4 right-4 flex items-center justify-between">
-          <span class="flex items-center gap-space-xs px-3 py-1.5 rounded-full bg-surface-container-high/90 backdrop-blur-sm font-label-md text-label-md">
-            <span class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span>Cocody · Fluide
-          </span>
-          <span class="px-2.5 py-1 rounded-full bg-surface-container-high/90 font-label-md text-label-md text-on-surface-variant">Zone 04</span>
-        </div>
-      </div>
-
-      <div class="-mt-6 relative z-10 bg-surface-container-low rounded-t-[28px] shadow-2xl px-margin-mobile pt-space-xs pb-space-lg flex flex-col gap-space-md">
-        <div class="w-12 h-1 rounded-full bg-surface-variant mx-auto my-1"></div>
-        <div class="flex items-center justify-between gap-2">
-          <span class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary-container/40 font-label-sm text-label-sm text-secondary tracking-wider">
-            <span class="material-symbols-outlined text-[16px]">local_mall</span>NOUVELLE LIVRAISON · CITY+
-          </span>
-          <div class="relative w-11 h-11 flex items-center justify-center shrink-0">
-            <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="15" fill="none" stroke="#2a2a2d" stroke-width="2.5"/>
-              <circle id="cityRing" cx="18" cy="18" r="15" fill="none" stroke="#c6f338" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="94.25" stroke-dashoffset="0" style="transition: stroke-dashoffset 1s linear"/>
-            </svg>
-            <span id="cityCount" class="absolute font-label-md text-label-md">28s</span>
-          </div>
-        </div>
-        <div class="flex items-center justify-between rounded-xl bg-surface-container p-space-md gap-2">
-          <div class="flex flex-col">
-            <span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-wider">Rémunération nette</span>
-            <span class="font-headline-xl-mobile text-headline-xl-mobile text-primary-fixed tracking-tight">+1 500 FCFA</span>
-          </div>
-          <div class="flex flex-col items-end">
-            <span class="px-2 py-0.5 rounded bg-surface-variant font-label-sm text-label-sm">6.0 km total</span>
-            <span class="font-body-sm text-body-sm text-outline mt-1">~17 min</span>
-          </div>
-        </div>
-        <div class="flex flex-col gap-space-sm bg-surface-container-high rounded-xl p-space-md">
-          <div class="flex items-start gap-space-md">
-            <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-secondary text-[18px]">storefront</span></div>
-            <div class="flex flex-col min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <span class="font-label-sm text-label-sm text-secondary uppercase">Collecte magasin</span>
-                <span class="font-label-sm text-label-sm text-on-surface-variant">1.8 km · 5 min</span>
-              </div>
-              <span class="font-headline-sm text-headline-sm truncate">City+ Point Relais · Cocody Angré</span>
-              <span class="font-body-sm text-body-sm text-on-surface-variant truncate">Angle Bd Latrille, Station Total</span>
-            </div>
-          </div>
-          <div class="ml-4 w-0.5 h-3 bg-surface-variant"></div>
-          <div class="flex items-start gap-space-md">
-            <div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-primary text-[18px]">person_pin_circle</span></div>
-            <div class="flex flex-col min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <span class="font-label-sm text-label-sm text-primary-fixed uppercase">Livraison client</span>
-                <span class="font-label-sm text-label-sm text-on-surface-variant">4.2 km · 12 min</span>
-              </div>
-              <span class="font-headline-sm text-headline-sm truncate">Aya K. · Riviera 3</span>
-              <span class="font-body-sm text-body-sm text-on-surface-variant truncate">Carrefour Duncan, Résidence Les Oliviers</span>
-            </div>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-space-sm">
-          <div class="flex items-center gap-2.5 rounded-lg bg-surface-container p-2.5 min-w-0">
-            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">checkroom</span>
-            <div class="flex flex-col min-w-0"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Contenu</span><span class="font-label-md text-label-md truncate">2 articles prêt-à-porter</span></div>
-          </div>
-          <div class="flex items-center gap-2.5 rounded-lg bg-surface-container p-2.5 min-w-0">
-            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">fitness_center</span>
-            <div class="flex flex-col min-w-0"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Charge</span><span class="font-label-md text-label-md truncate">Léger &lt; 2 kg</span></div>
-          </div>
-        </div>
-        <div class="flex items-center gap-space-md rounded-xl bg-surface-container-high p-space-md">
-          <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-secondary text-[20px]">verified</span></div>
-          <div class="flex flex-col min-w-0">
-            <span class="font-label-md text-label-md">Commande déjà réglée sur City+</span>
-            <span class="font-body-sm text-body-sm text-secondary">Aucun encaissement en espèces auprès de la cliente.</span>
-          </div>
-        </div>
-        <div class="flex items-center gap-space-sm">
-          <button id="cityDecline" class="w-28 h-14 rounded-xl bg-surface-container-high active:bg-surface-variant flex items-center justify-center font-label-lg text-label-lg text-outline">Refuser</button>
-          <button id="cityAccept" class="flex-1 h-14 rounded-xl bg-primary-container flex items-center justify-center gap-2 shadow-lg shadow-primary-container/20 font-label-lg text-label-lg text-on-primary-fixed">
-            <span class="material-symbols-outlined text-[22px]">flash_on</span><span>Accepter la livraison</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================
-         ÉCRAN 3 · LIVRAISON EN COURS (code de remise)
-         ========================================================= -->
-    <section class="screen flex flex-col" data-screen="livraison" data-title="Course en direct" hidden>
-      <div class="px-gutter pt-space-sm pb-space-sm flex items-center justify-between gap-2">
-        <div class="flex items-center gap-space-sm flex-wrap">
-          <span class="px-space-sm py-1 rounded-full bg-secondary/15 text-secondary font-label-md text-label-md tracking-wider">#CP-20417</span>
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
-            <span class="w-1.5 h-1.5 rounded-full bg-primary-fixed animate-pulse"></span>City+ Mode Express
-          </span>
-        </div>
-        <div class="flex items-center gap-space-xs">
-          <button class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center active:scale-95" aria-label="Appeler la cliente" data-toast="Aya K. · +225 07 00 00 00 00"><span class="material-symbols-outlined text-[20px]">phone</span></button>
-          <button class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center active:scale-95" aria-label="Message SMS" data-toast="SMS envoyé : « J'arrive dans 8 min »"><span class="material-symbols-outlined text-[20px]">chat_bubble_outline</span></button>
-        </div>
-      </div>
-      <div class="px-gutter flex flex-col gap-space-md pb-space-lg">
-        <div class="relative w-full h-[142px] rounded-xl overflow-hidden bg-surface-container-lowest">
-          <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 142" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <g stroke="#2a2a2d" stroke-width="6" fill="none" stroke-linecap="round"><path d="M0 40 L400 60"/><path d="M90 0 L130 142"/><path d="M300 0 L280 142"/></g>
-            <path d="M40 130 C 120 110, 180 60, 330 40" stroke="#c6f338" stroke-width="4" fill="none" stroke-linecap="round" opacity=".9"/>
-            <circle cx="330" cy="40" r="6" fill="#ffb1c5" stroke="#131316" stroke-width="2"/>
-          </svg>
-          <div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/90 via-surface-container-lowest/20 to-transparent"></div>
-          <div class="absolute top-2.5 left-2.5 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container-lowest/90">
-            <span class="material-symbols-outlined text-primary-fixed text-[18px]">navigation</span>
-            <span class="font-headline-sm text-headline-sm">1,8 km <span class="font-body-sm text-body-sm text-on-surface-variant">· 8 min</span></span>
-          </div>
-          <div class="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between gap-2">
-            <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-surface-container-high/90 font-label-sm text-label-sm truncate"><span class="w-2 h-2 rounded-full bg-primary-fixed shrink-0"></span>Boulevard Mitterrand fluide</span>
-            <span class="px-2.5 py-1 rounded-md bg-surface-container-high/90 font-label-sm text-label-sm text-primary-fixed shrink-0">Arrivée 14:32</span>
-          </div>
-        </div>
-
-        <div class="rounded-xl bg-surface-container p-space-md flex flex-col gap-space-sm">
-          <div class="flex items-start justify-between gap-space-sm">
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-11 h-11 rounded-full bg-gradient-to-br from-secondary to-secondary-container flex items-center justify-center font-headline-sm text-headline-sm text-surface shrink-0">AK</div>
-              <div class="min-w-0">
-                <div class="flex items-center gap-1.5"><span class="font-headline-sm text-headline-sm truncate">Aya K.</span><span class="material-symbols-outlined fill text-primary-fixed text-[16px]" title="Client VIP City+">verified</span></div>
-                <p class="font-body-sm text-body-sm text-secondary truncate">Commande Mode Luxe City+</p>
-              </div>
-            </div>
-            <span class="flex items-center gap-1 text-primary-fixed font-label-md text-label-md bg-surface-container-high px-2 py-1 rounded-md"><span class="material-symbols-outlined fill text-[15px]">star</span>4.95</span>
-          </div>
-          <div class="rounded-lg bg-surface-container-low p-2.5 flex items-start gap-2.5">
-            <span class="material-symbols-outlined text-secondary text-[20px] shrink-0">location_on</span>
-            <div class="min-w-0 flex-1">
-              <span class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider">Adresse de livraison</span>
-              <p class="font-body-md text-body-md font-semibold truncate">Riviera 3, Villa 42, Rue des Jardins</p>
-              <p class="font-body-sm text-body-sm text-on-surface-variant truncate">Portail blanc · Sonner à l'interphone B</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="rounded-xl bg-surface-container p-space-md">
-          <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant block mb-3">Statut de l'acheminement</span>
-          <ol class="relative flex flex-col gap-4">
-            <li class="flex items-start gap-3">
-              <span class="w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[16px]">check</span></span>
-              <div class="flex-1 flex items-start justify-between gap-2"><div><p class="font-headline-sm text-headline-sm">Colis récupéré au relais Angré</p><p class="font-body-sm text-body-sm text-on-surface-variant">Boutique partenaire certifiée</p></div><span class="font-label-md text-label-md text-primary-fixed">14:15</span></div>
-            </li>
-            <li class="flex items-start gap-3" id="step2">
-              <span id="step2Icon" class="w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center shrink-0 ring-4 ring-secondary/20"><span class="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></span></span>
-              <div class="flex-1 flex items-start justify-between gap-2"><div><p class="font-headline-sm text-headline-sm text-secondary">En route vers la cliente</p><p class="font-body-sm text-body-sm text-on-surface-variant">Approche de la Riviera 3</p></div><span class="font-label-md text-label-md text-secondary">14:32</span></div>
-            </li>
-            <li class="flex items-start gap-3" id="step3">
-              <span id="step3Icon" class="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center shrink-0"><span class="w-2 h-2 rounded-full bg-outline"></span></span>
-              <div class="flex-1 flex items-start justify-between gap-2"><div><p id="step3Title" class="font-headline-sm text-headline-sm text-on-surface-variant">Remise avec code de sécurité</p><p class="font-body-sm text-body-sm text-on-surface-variant/70">Signature numérique City+</p></div><span id="step3Time" class="font-label-md text-label-md text-on-surface-variant">Étape 3</span></div>
-            </li>
-          </ol>
-        </div>
-
-        <div class="rounded-xl bg-surface-container-high p-space-md flex flex-col gap-space-sm relative overflow-hidden">
-          <div class="absolute -top-12 -right-12 w-28 h-28 bg-secondary/10 rounded-full blur-2xl pointer-events-none"></div>
-          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-secondary text-[22px]">pin</span><h2 class="font-headline-sm text-headline-sm">Code de confirmation client</h2></div>
-          <p class="font-body-sm text-body-sm text-on-surface-variant">Demandez le code à 4 chiffres reçu par la cliente dans son application City+. Exemple : <b class="text-on-surface">8421</b>.</p>
-          <div class="flex items-center gap-2.5 pt-2" id="pinRow">
-            <input id="pin1" class="pin flex-1 min-w-0 h-14 rounded-lg bg-surface-container-lowest text-center font-currency-display text-currency-display text-on-surface" inputmode="numeric" maxlength="1" value="8" aria-label="Chiffre 1">
-            <input id="pin2" class="pin flex-1 min-w-0 h-14 rounded-lg bg-surface-container-lowest text-center font-currency-display text-currency-display text-on-surface" inputmode="numeric" maxlength="1" value="4" aria-label="Chiffre 2">
-            <input id="pin3" class="pin flex-1 min-w-0 h-14 rounded-lg bg-surface-container-lowest text-center font-currency-display text-currency-display text-on-surface" inputmode="numeric" maxlength="1" value="2" aria-label="Chiffre 3">
-            <input id="pin4" class="pin flex-1 min-w-0 h-14 rounded-lg bg-surface-container-lowest text-center font-currency-display text-currency-display text-primary-fixed" inputmode="numeric" maxlength="1" value="" aria-label="Chiffre 4">
-          </div>
-          <p id="pinMsg" class="font-label-md text-label-md text-error" hidden>Code incorrect. Vérifiez avec la cliente puis réessayez.</p>
-          <div class="flex items-center justify-between text-on-surface-variant pt-1 font-label-sm text-label-sm gap-2">
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[15px] text-primary-fixed">lock</span>Garantie anti-fraude active</span>
-            <button class="text-secondary hover:underline underline-offset-2" data-toast="Support City+ : un agent vous rappelle sous 2 min">Problème de code ?</button>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <button id="confirmDelivery" class="w-full h-14 rounded-xl bg-primary-container text-on-primary-fixed font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-lg disabled:opacity-40 disabled:cursor-not-allowed" disabled>
-            <span class="material-symbols-outlined text-[22px]">check_circle</span><span>Confirmer la livraison</span>
-          </button>
-          <p class="flex items-center justify-center gap-2 text-on-surface-variant font-label-sm text-label-sm text-center">
-            <span class="material-symbols-outlined text-[14px]">account_balance_wallet</span>Crédit instantané de 2 800 FCFA sur votre portefeuille Vela
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================
-         ÉCRAN 4 · NOUVELLE COURSE VELA TAXI
-         ========================================================= -->
-    <section class="screen flex flex-col" data-screen="offre-taxi" data-title="Nouvelle course" hidden>
-      <div class="relative w-full h-[300px] overflow-hidden bg-surface-container-lowest">
-        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-          <defs>
-            <filter id="taxiGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-            <linearGradient id="taxiRoute" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#abd611"/><stop offset=".45" stop-color="#c7bfff"/><stop offset="1" stop-color="#c6f338"/></linearGradient>
-          </defs>
-          <path d="M0 150 C 90 120, 170 180, 260 150 S 380 110, 400 130 L400 220 C 330 240, 260 200, 180 230 S 60 250, 0 230 Z" fill="#0f2140"/>
-          <text x="20" y="200" font-family="DM Sans, sans-serif" font-size="9" fill="#2e4d80" letter-spacing="2">LAGUNE ÉBRIÉ</text>
-          <g stroke="#2a2a2d" stroke-width="6" fill="none" stroke-linecap="round"><path d="M0 60 L400 40"/><path d="M40 0 L90 150"/><path d="M340 300 L320 220"/><path d="M0 270 L400 260"/></g>
-          <path d="M150 140 L215 225" stroke="#353438" stroke-width="12"/>
-          <path d="M125 75 Q160 130 195 160 T265 245" fill="none" opacity=".35" stroke="#6050d1" stroke-linecap="round" stroke-width="8"/>
-          <path d="M125 75 Q160 130 195 160 T265 245" fill="none" filter="url(#taxiGlow)" stroke="url(#taxiRoute)" stroke-dasharray="6 4" stroke-width="3"/>
-          <text x="210" y="178" font-family="DM Sans, sans-serif" font-size="9" font-weight="700" fill="#c6f338" letter-spacing="1">PONT HKB</text>
-        </svg>
-        <div class="absolute inset-0 bg-gradient-to-b from-surface/70 via-transparent to-surface pointer-events-none"></div>
-        <div class="absolute left-[31%] top-[25%] -translate-x-1/2 -translate-y-1/2 flex items-center">
-          <div class="relative w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center shadow-lg">
-            <span class="absolute w-8 h-8 rounded-full bg-primary-fixed-dim/20 animate-ping"></span>
-            <span class="w-2.5 h-2.5 rounded-full bg-primary-fixed"></span>
-          </div>
-          <span class="ml-1.5 px-2 py-0.5 rounded-full bg-surface-container-high/90 font-label-sm text-label-sm text-primary-fixed uppercase tracking-wider whitespace-nowrap">Plateau · 4 min</span>
-        </div>
-        <div class="absolute left-[66%] top-[81%] -translate-x-1/2 -translate-y-1/2 flex items-center flex-row-reverse">
-          <div class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center shadow-xl"><span class="material-symbols-outlined text-[15px] text-tertiary-fixed">flag</span></div>
-          <span class="mr-1.5 px-2 py-0.5 rounded-full bg-surface-container-high/90 font-label-sm text-label-sm uppercase tracking-wider whitespace-nowrap">Zone 4 · 9.7 km</span>
-        </div>
-        <div class="absolute top-space-md right-space-md flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-surface-container-high/95 shadow-md">
-          <span class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse"></span>
-          <span class="font-label-sm text-label-sm uppercase tracking-wide">Trafic fluide Pont HKB</span>
-        </div>
-      </div>
-
-      <div class="relative -mt-6 rounded-t-xl bg-surface-container-low shadow-[0_-12px_32px_rgba(0,0,0,0.7)] px-margin-mobile pt-space-md pb-space-lg flex flex-col gap-space-md">
-        <div class="flex items-center justify-between gap-2">
-          <span class="inline-flex items-center gap-space-xs px-2.5 py-1 rounded-full bg-tertiary-container/15 font-label-md text-label-md text-tertiary-fixed tracking-wider uppercase">
-            <span class="material-symbols-outlined text-[14px]">local_taxi</span>Nouvelle course · Vela Taxi
-          </span>
-          <span class="flex items-center gap-space-xs px-2 py-1 rounded-full bg-surface-container-highest shrink-0">
-            <svg class="w-5 h-5 -rotate-90" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
-              <circle id="taxiRing" cx="18" cy="18" r="15.9" fill="none" stroke="#abd611" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="100 100" pathLength="100"/>
-            </svg>
-            <span id="taxiCount" class="font-label-md text-label-md text-primary-fixed">22s</span>
-          </span>
-        </div>
-        <div class="flex items-end justify-between gap-2">
-          <div class="flex flex-col">
-            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Tarif garanti</span>
-            <span class="flex items-baseline gap-space-xs"><span class="font-currency-display text-currency-display tracking-tight">3 200</span><span class="font-headline-sm text-headline-sm text-primary-fixed">FCFA</span></span>
-          </div>
-          <div class="flex flex-col items-end">
-            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Estimation trajet</span>
-            <span class="font-headline-sm text-headline-sm">22 min · 9.7 km</span>
-          </div>
-        </div>
-        <div class="flex items-center justify-between p-space-sm rounded-lg bg-surface-container gap-2">
-          <div class="flex items-center gap-space-sm min-w-0">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-on-tertiary-container to-tertiary-fixed flex items-center justify-center font-label-lg text-label-lg text-on-tertiary-fixed shrink-0">JM</div>
-            <div class="flex flex-col min-w-0">
-              <span class="font-label-lg text-label-lg truncate">Jean-Marc D.</span>
-              <span class="flex items-center gap-1"><span class="material-symbols-outlined fill text-[13px] text-primary-fixed">star</span><span class="font-label-sm text-label-sm">4.9</span><span class="font-body-sm text-body-sm text-on-surface-variant">· 142 courses</span></span>
-            </div>
-          </div>
-          <span class="flex items-center gap-space-xs px-2.5 py-1 rounded-full bg-surface-container-highest font-label-sm text-label-sm shrink-0"><span class="material-symbols-outlined text-[14px] text-primary-fixed">verified</span>Client VIP</span>
-        </div>
-        <div class="p-space-md rounded-xl bg-surface-container flex flex-col gap-space-md">
-          <div class="flex items-start gap-space-md">
-            <div class="flex flex-col items-center pt-1">
-              <div class="w-3.5 h-3.5 rounded-full bg-primary-fixed flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-on-primary"></div></div>
-              <div class="w-0.5 h-10 bg-surface-variant my-1"></div>
-            </div>
-            <div class="flex-1 min-w-0 flex flex-col">
-              <div class="flex items-center justify-between gap-2"><span class="font-label-sm text-label-sm text-primary-fixed uppercase tracking-wider">Prise en charge</span><span class="font-label-sm text-label-sm text-on-surface-variant">1.2 km · 4 min</span></div>
-              <span class="font-label-lg text-label-lg truncate">Plateau, Rue du Commerce</span>
-              <span class="font-body-sm text-body-sm text-on-surface-variant truncate">Immeuble Postel 2001 · Près de la BCEAO</span>
-            </div>
-          </div>
-          <div class="flex items-start gap-space-md">
-            <div class="pt-0.5"><div class="w-3.5 h-3.5 rounded-full bg-tertiary-fixed"></div></div>
-            <div class="flex-1 min-w-0 flex flex-col">
-              <div class="flex items-center justify-between gap-2"><span class="font-label-sm text-label-sm text-tertiary-fixed uppercase tracking-wider">Destination</span><span class="font-label-sm text-label-sm text-on-surface-variant">8.5 km · 18 min</span></div>
-              <span class="font-label-lg text-label-lg truncate">Marcory Zone 4, Rue du 7 Décembre</span>
-              <span class="font-body-sm text-body-sm text-on-surface-variant truncate">En face du supermarché Hayat</span>
-            </div>
-          </div>
-        </div>
-        <div class="p-space-md rounded-xl bg-tertiary-container/10 flex items-start gap-space-md">
-          <div class="w-9 h-9 rounded-full bg-tertiary-fixed/20 flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-[20px] text-tertiary-fixed">account_balance_wallet</span></div>
-          <div class="flex-1 min-w-0 flex flex-col">
-            <div class="flex items-center justify-between gap-2"><span class="font-label-md text-label-md text-tertiary-fixed">Paiement Vela Monnaie</span><span class="font-label-sm text-label-sm text-tertiary-fixed uppercase">3 200 VM</span></div>
-            <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Versement instantané sur votre portefeuille chauffeur. Aucune manipulation d'espèces ni risque d'impayé.</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-space-sm">
-          <button id="taxiDecline" class="w-28 h-14 rounded-xl bg-surface-container-high active:bg-surface-variant flex items-center justify-center font-label-lg text-label-lg text-on-surface-variant">Passer</button>
-          <button id="taxiAccept" class="flex-1 h-14 rounded-xl bg-primary-fixed shadow-[0_4px_20px_rgba(198,243,56,0.3)] flex items-center justify-center gap-space-xs font-label-lg text-label-lg text-on-primary-fixed uppercase tracking-wide">
-            <span class="material-symbols-outlined text-[20px]">check_circle</span><span>Accepter la course</span>
-          </button>
-        </div>
-        <a id="driveLink" href="https://claude.ai/artifact/Kw7soPvwwRuzFqygxgmnAg" target="_blank" rel="noopener"
-           class="w-full h-12 rounded-xl bg-on-tertiary-container flex items-center justify-center gap-2 font-label-lg text-label-lg text-primary" hidden>
-          <span class="material-symbols-outlined text-[20px]">navigation</span>Ouvrir le mode conduite
-        </a>
-      </div>
-    </section>
-  </main>
-
-  <!-- ===== Barre de navigation ===== -->
-  <nav class="bar bottom-bar bg-surface-container-low/95 backdrop-blur-xl shadow-[0_-4px_20px_rgba(0,0,0,0.5)]" aria-label="Navigation principale">
-    <div class="h-16 px-gutter-mobile flex items-center justify-around">
-      <button class="tab flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-space-xs" data-go="accueil"><span class="material-symbols-outlined text-[24px]">dashboard</span><span class="font-label-sm text-label-sm tracking-wider uppercase">Accueil</span></button>
-      <button class="tab flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-space-xs" data-go="offre-city"><span class="material-symbols-outlined text-[24px]">local_shipping</span><span class="font-label-sm text-label-sm tracking-wider uppercase">Missions</span></button>
-      <button class="tab flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-space-xs" data-go="offre-taxi"><span class="material-symbols-outlined text-[24px]">local_taxi</span><span class="font-label-sm text-label-sm tracking-wider uppercase">Courses</span></button>
-      <button class="tab flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-space-xs" data-go="livraison"><span class="material-symbols-outlined text-[24px]">pin_drop</span><span class="font-label-sm text-label-sm tracking-wider uppercase">En cours</span></button>
-    </div>
-  </nav>
-
-  <div id="toast" class="toast fixed left-1/2 top-0 z-[60] max-w-[92%] px-4 py-2.5 rounded-full bg-primary text-surface font-label-lg text-label-lg shadow-2xl text-center" role="status" aria-live="polite"></div>
+    </header>
+    <main id="view" aria-live="polite"></main>
+  </div>
 </div>
 
+<nav class="tabbar" aria-label="Navigation principale"><div class="tabbar-in" id="tabNav"></div></nav>
+
+<div id="obanner" class="obanner" hidden></div>
+<section id="drive" class="drive" hidden aria-label="Mode conduite"></section>
+<div id="scrim" class="scrim" data-action="close-sheet"></div>
+<div id="sheet" class="sheet" role="dialog" aria-modal="true" aria-label="Panneau"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
 <script>
-  (function () {
-    const $ = (id) => document.getElementById(id);
-    const fmt = (n) => n.toLocaleString('fr-FR').replace(/ | /g, ' ');
-    const state = { earnings: 18500, vm: 42300, city: 8, vela: 4, pending: 2, online: true, history: [] };
+(function () {
+  'use strict';
 
-    // ---------- Toast ----------
-    let toastT;
-    function toast(msg) {
-      const t = $('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      clearTimeout(toastT);
-      toastT = setTimeout(() => t.classList.remove('show'), 2600);
-    }
-    document.addEventListener('click', (e) => {
-      const b = e.target.closest('[data-toast]');
-      if (b) toast(b.dataset.toast);
-    });
+  /* =========================================================
+     Icônes (SVG inline, aucune dépendance)
+     ========================================================= */
+  const P = {
+    home: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+    list: '<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/>',
+    wallet: '<rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18"/><path d="M16 15h2"/><path d="M6 6l9-3 1 3"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+    bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/>',
+    back: '<path d="M15 5l-7 7 7 7"/>',
+    bag: '<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+    taxi: '<path d="M5 16V11l2-5h10l2 5v5"/><path d="M3 16h18v3H3z"/><circle cx="7.5" cy="16" r="1.5"/><circle cx="16.5" cy="16" r="1.5"/><path d="M10 3h4"/>',
+    radar: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/>',
+    nav: '<path d="M12 2l7 19-7-4-7 4z"/>',
+    pin: '<path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+    flag: '<path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/>',
+    check: '<path d="M5 12l5 5 9-10"/>',
+    checkc: '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+    phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+    msg: '<path d="M4 5h16v11H9l-5 4z"/>',
+    star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+    lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+    shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
+    sos: '<circle cx="12" cy="12" r="9"/><path d="M12 7v6"/><path d="M12 16.5v.5"/>',
+    warn: '<path d="M12 3L2 20h20z"/><path d="M12 10v4"/><path d="M12 17v.5"/>',
+    vol: '<path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>',
+    mute: '<path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 9l5 6M21 9l-5 6"/>',
+    fork: '<path d="M6 3v6a6 6 0 0 0 6 6h0a6 6 0 0 1 6 6"/><path d="M18 3v6a6 6 0 0 1-3 5.2"/><path d="M15 6l3-3 3 3"/>',
+    cube: '<path d="M12 2L3 7v10l9 5 9-5V7z"/><path d="M3 7l9 5 9-5"/><path d="M12 12v10"/>',
+    traffic: '<rect x="8" y="2" width="8" height="20" rx="3"/><circle cx="12" cy="7" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="12" cy="17" r="1.3"/>',
+    target: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/>',
+    minimize: '<path d="M4 14h6v6"/><path d="M20 10h-6V4"/><path d="M14 10l7-7"/><path d="M3 21l7-7"/>',
+    x: '<path d="M6 6l12 12M18 6L6 18"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    trash: '<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/>',
+    copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+    swap: '<path d="M4 8h14l-3-3"/><path d="M20 16H6l3 3"/>',
+    trend: '<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    bolt: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+    share: '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>',
+    right: '<path d="M6 20v-8a4 4 0 0 1 4-4h9"/><path d="M15 4l4 4-4 4"/>',
+    left: '<path d="M18 20v-8a4 4 0 0 0-4-4H5"/><path d="M9 4L5 8l4 4"/>',
+    up: '<path d="M12 20V5"/><path d="M6 11l6-6 6 6"/>',
+    arrow: '<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
+    power: '<path d="M12 3v8"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/>',
+    box: '<path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4"/><path d="M12 11v10"/>',
+    store: '<path d="M4 9l1-5h14l1 5"/><path d="M4 9a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5 11v9h14v-9"/>',
+    car: '<path d="M5 13l2-5h10l2 5"/><rect x="3" y="13" width="18" height="5" rx="2"/><circle cx="7" cy="18" r="1.5"/><circle cx="17" cy="18" r="1.5"/>',
+    refresh: '<path d="M20 11a8 8 0 0 0-14.9-3"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.9 3"/><path d="M20 20v-4h-4"/>',
+    park: '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>',
+    send: '<path d="M21 3L3 11l7 3 3 7z"/><path d="M10 14l11-11"/>',
+    map: '<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
+    fire: '<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/>'
+  };
+  function ic(name, size, extra) {
+    size = size || 20;
+    return '<svg class="ic" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (extra || '') + '>' + P[name] + '</svg>';
+  }
+  const icFill = (name, size) => ic(name, size, ' style="fill:currentColor"');
 
-    // ---------- Navigation ----------
-    let current = 'accueil';
-    const timers = {};
-    function show(name, push = true) {
-      if (name === current) return;
-      if (push) state.history.push(current);
-      document.querySelectorAll('[data-screen]').forEach((s) => { s.hidden = s.dataset.screen !== name; });
-      const screen = document.querySelector('[data-screen="' + name + '"]');
-      $('pageTitle').textContent = screen.dataset.title;
-      $('backBtn').hidden = name === 'accueil';
-      $('liveDot').hidden = name !== 'accueil';
-      document.querySelectorAll('.tab').forEach((t) => {
-        const on = t.dataset.go === name;
-        t.classList.toggle('text-primary-container', on);
-        t.classList.toggle('text-on-surface-variant', !on);
-        if (on) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current');
-      });
-      stopTimers();
-      current = name;
-      window.scrollTo(0, 0);
-      if (name === 'offre-city') startCountdown('city', 28);
-      if (name === 'offre-taxi') startCountdown('taxi', 22);
-    }
-    document.addEventListener('click', (e) => {
-      const g = e.target.closest('[data-go]');
-      if (g) show(g.dataset.go);
-    });
-    $('backBtn').addEventListener('click', () => show(state.history.pop() || 'accueil', false));
+  /* =========================================================
+     Géographie d'Abidjan (carte stylisée, 1 unité = 25 m)
+     ========================================================= */
+  const M_PER_UNIT = 25;
+  const PLACES = [
+    { id: 'riviera2', name: 'Cocody, Riviera 2', short: 'Riviera 2', detail: 'Carrefour Riviera 2', x: 322, y: 188 },
+    { id: 'angre', name: 'Cocody Angré', short: 'Angré', detail: 'Angle Bd Latrille, Station Total', x: 300, y: 92 },
+    { id: 'ambassades', name: 'Cocody Ambassades', short: 'Ambassades', detail: 'Rue des Ambassades, Villa 7', x: 252, y: 214 },
+    { id: 'riviera3', name: 'Riviera 3, Rue des Jardins', short: 'Riviera 3', detail: 'Villa 42 · Portail blanc, interphone B', x: 352, y: 146 },
+    { id: 'plateau', name: 'Plateau, Rue du Commerce', short: 'Plateau', detail: 'Immeuble Postel 2001 · Près de la BCEAO', x: 208, y: 268 },
+    { id: 'ccia', name: 'Plateau CCIA', short: 'CCIA', detail: 'Tour CCIA, Bd de la République', x: 186, y: 246 },
+    { id: 'adjame', name: 'Adjamé Liberté', short: 'Adjamé', detail: 'Gare routière Nord', x: 138, y: 168 },
+    { id: 'yopougon', name: 'Yopougon Siporex', short: 'Yopougon', detail: 'Carrefour Siporex', x: 48, y: 232 },
+    { id: 'treichville', name: 'Treichville, Avenue 21', short: 'Treichville', detail: 'Marché de Treichville', x: 192, y: 414 },
+    { id: 'marcory', name: 'Marcory Zone 4', short: 'Zone 4', detail: 'Rue du 7 Décembre · Face supermarché Hayat', x: 288, y: 432 },
+    { id: 'koumassi', name: 'Koumassi Remblais', short: 'Koumassi', detail: 'Carrefour Soweto', x: 346, y: 474 },
+    { id: 'portbouet', name: 'Aéroport FHB, Port-Bouët', short: 'Aéroport', detail: 'Terminal départs, porte 3', x: 300, y: 556 }
+  ];
+  const placeById = (id) => PLACES.find((p) => p.id === id);
+  const BRIDGES = {
+    hkb: { id: 'hkb', name: 'Pont HKB', x: 300, n: 292, s: 374, toll: 500 },
+    dg: { id: 'dg', name: 'Pont De Gaulle', x: 200, n: 300, s: 372, toll: 0 }
+  };
+  const side = (p) => (p.y < 335 ? 'N' : 'S');
+  const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  const polyLen = (pts) => pts.reduce((s, p, i) => (i ? s + dist(pts[i - 1], p) : 0), 0);
 
-    // ---------- Compte à rebours des offres ----------
-    function stopTimers() { Object.values(timers).forEach(clearInterval); }
-    function startCountdown(kind, total) {
-      resetOffer(kind);
-      let left = total;
-      const label = $(kind + 'Count');
-      const ring = $(kind + 'Ring');
-      const draw = () => {
-        label.textContent = left + 's';
-        if (kind === 'city') ring.style.strokeDashoffset = (94.25 - 94.25 * (left / total)).toFixed(2);
-        else ring.setAttribute('stroke-dasharray', Math.round((left / total) * 100) + ' 100');
-      };
-      draw();
-      timers[kind] = setInterval(() => {
-        left--;
-        draw();
-        if (left <= 0) {
-          clearInterval(timers[kind]);
-          toast('Offre expirée · proposée à un autre chauffeur');
-          setTimeout(() => { if (current !== 'accueil') show('accueil'); }, 1200);
-        }
-      }, 1000);
-    }
-
-    function resetOffer(kind) {
-      const acc = $(kind + 'Accept'), dec = $(kind + 'Decline');
-      acc.disabled = false; dec.disabled = false; dec.classList.remove('opacity-40');
-      if (kind === 'city') {
-        acc.innerHTML = '<span class="material-symbols-outlined text-[22px]">flash_on</span><span>Accepter la livraison</span>';
-        dec.textContent = 'Refuser';
+  function buildRoute(a, b, avoidToll) {
+    const start = { x: a.x, y: a.y, label: a.short || 'Départ' };
+    const end = { x: b.x, y: b.y, label: b.short || b.name, final: true };
+    const make = (bridge) => {
+      const pts = [start];
+      if (bridge) {
+        const n = { x: bridge.x, y: bridge.n }, s = { x: bridge.x, y: bridge.s };
+        const first = side(a) === 'N' ? n : s, second = side(a) === 'N' ? s : n;
+        pts.push({ x: first.x, y: a.y, label: 'Direction ' + bridge.name });
+        pts.push({ x: first.x, y: first.y, label: bridge.name, bridge: bridge.id });
+        pts.push({ x: second.x, y: second.y, label: 'Sortie ' + bridge.name });
       } else {
-        acc.innerHTML = '<span class="material-symbols-outlined text-[20px]">check_circle</span><span>Accepter la course</span>';
-        dec.textContent = 'Passer';
-        $('driveLink').hidden = true;
+        pts.push({ x: b.x, y: a.y, label: 'Direction ' + (b.short || b.name) });
+      }
+      pts.push(end);
+      // nettoyage des points trop proches
+      const clean = [pts[0]];
+      for (let i = 1; i < pts.length; i++) {
+        if (dist(clean[clean.length - 1], pts[i]) > 6 || i === pts.length - 1) clean.push(pts[i]);
+      }
+      return { pts: clean, bridge: bridge ? bridge.id : null, toll: bridge ? bridge.toll : 0, len: polyLen(clean) };
+    };
+    if (side(a) === side(b)) return finish(make(null));
+    const options = (avoidToll ? [BRIDGES.dg] : [BRIDGES.hkb, BRIDGES.dg]).map(make);
+    options.sort((r1, r2) => r1.len - r2.len);
+    return finish(options[0]);
+    function finish(r) { r.km = +(r.len * M_PER_UNIT / 1000).toFixed(1); r.min = Math.max(2, Math.round(r.km / 27 * 60)); return r; }
+  }
+
+  function pointAt(pts, d) {
+    let acc = 0;
+    for (let i = 1; i < pts.length; i++) {
+      const seg = dist(pts[i - 1], pts[i]);
+      if (acc + seg >= d) {
+        const t = seg ? (d - acc) / seg : 0;
+        return { x: pts[i - 1].x + (pts[i].x - pts[i - 1].x) * t, y: pts[i - 1].y + (pts[i].y - pts[i - 1].y) * t, seg: i, angle: Math.atan2(pts[i].y - pts[i - 1].y, pts[i].x - pts[i - 1].x) };
+      }
+      acc += seg;
+    }
+    const n = pts.length;
+    return { x: pts[n - 1].x, y: pts[n - 1].y, seg: n - 1, angle: Math.atan2(pts[n - 1].y - pts[n - 2].y, pts[n - 1].x - pts[n - 2].x) };
+  }
+  function turnAt(pts, i) {
+    if (i >= pts.length - 1) return 'flag';
+    const a = pts[i - 1], b = pts[i], c = pts[i + 1];
+    const v1x = b.x - a.x, v1y = b.y - a.y, v2x = c.x - b.x, v2y = c.y - b.y;
+    const cross = v1x * v2y - v1y * v2x;
+    const ang = Math.abs(Math.atan2(cross, v1x * v2x + v1y * v2y)) * 180 / Math.PI;
+    if (ang < 25) return 'up';
+    return cross > 0 ? 'right' : 'left';
+  }
+
+  function mapSVG(o) {
+    o = o || {};
+    const id = o.id || 'm';
+    const vb = o.viewBox || '0 0 400 600';
+    let s = '<svg viewBox="' + vb + '" preserveAspectRatio="xMidYMid ' + (o.fit ? 'meet' : 'slice') + '" role="img" aria-label="Carte d\'Abidjan"' + (o.svgId ? ' id="' + o.svgId + '"' : '') + '>';
+    s += '<defs><filter id="' + id + 'glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>' +
+      '<filter id="' + id + 'heat"><feGaussianBlur stdDeviation="16"/></filter></defs>';
+    s += '<rect x="-400" y="-400" width="1200" height="1400" fill="#0d0f16"/>';
+    s += '<path d="M-400 588 L800 588 L800 1000 L-400 1000Z" fill="#0b1a33"/>';
+    s += '<path d="M-400 296 C0 296 60 290 120 312 C170 302 200 296 240 318 C280 290 330 300 360 296 C400 292 500 300 800 296 L800 376 C500 380 420 372 360 382 C310 366 270 380 240 372 C200 388 150 366 100 380 C60 388 0 372 -400 378 Z" fill="#0f2140"/>';
+    s += '<path d="M40 340 q30 -8 60 0 M250 345 q30 -8 60 0 M130 355 q30 -8 60 0" stroke="#1a3563" stroke-width="2" fill="none"/>';
+    s += '<g stroke="#232734" stroke-width="7" fill="none" stroke-linecap="round">' +
+      '<path d="M300 20 L300 292"/><path d="M-60 176 L160 176 L208 262"/><path d="M186 246 L400 190 L520 170"/><path d="M130 40 L140 300"/>' +
+      '<path d="M200 372 L200 480 L300 556"/><path d="M-60 420 L420 440"/><path d="M300 374 L346 474 L420 520"/><path d="M40 232 L186 246"/>' +
+      '</g>';
+    s += '<g stroke="#161a24" stroke-width="3" fill="none"><path d="M220 60 L400 110"/><path d="M60 110 L260 130"/><path d="M240 470 L380 400"/><path d="M100 480 L260 520"/></g>';
+    s += '<path d="M200 300 L200 372" stroke="#343a52" stroke-width="10"/><path d="M300 292 L300 374" stroke="#343a52" stroke-width="12"/>';
+    if (o.traffic) {
+      s += '<path d="M300 292 L300 374" stroke="#3ddc84" stroke-width="4" opacity=".85"/>';
+      s += '<path d="M-60 176 L160 176" stroke="#ff5a52" stroke-width="4" opacity=".85"/><path d="M130 60 L138 170" stroke="#ffb020" stroke-width="4" opacity=".8"/>';
+      s += '<path d="M200 300 L200 372" stroke="#ffb020" stroke-width="4" opacity=".85"/>';
+    }
+    if (o.heat) {
+      s += '<g filter="url(#' + id + 'heat)"><circle cx="286" cy="120" r="38" fill="#c6f338" opacity=".5"/><circle cx="215" cy="250" r="34" fill="#ffb1c5" opacity=".45"/><circle cx="286" cy="430" r="26" fill="#6050d1" opacity=".6"/></g>';
+    }
+    s += '<g font-family="DM Sans, system-ui, sans-serif" font-size="11" font-weight="700" fill="#5d6488" letter-spacing="2">' +
+      '<text x="250" y="60">COCODY</text><text x="160" y="226">PLATEAU</text><text x="90" y="150">ADJAMÉ</text><text x="10" y="262">YOPOUGON</text>' +
+      '<text x="140" y="440">TREICHVILLE</text><text x="270" y="466">MARCORY</text><text x="320" y="505">KOUMASSI</text><text x="236" y="580">PORT-BOUËT</text>' +
+      '<text x="30" y="344" fill="#2e4d80" font-size="10">LAGUNE ÉBRIÉ</text><text x="308" y="336" fill="#8aa43a" font-size="9" letter-spacing="1">PONT HKB</text>' +
+      '<text x="140" y="336" fill="#56608a" font-size="9" letter-spacing="1">DE GAULLE</text></g>';
+    if (o.route2) {
+      s += '<polyline points="' + o.route2.map((p) => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ') + '" fill="none" stroke="#c7bfff" stroke-width="3" stroke-dasharray="5 6" stroke-linejoin="round" stroke-linecap="round" opacity=".75"/>';
+    }
+    if (o.route) {
+      const pts = o.route.map((p) => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+      s += '<polyline points="' + pts + '" fill="none" stroke="#6050d1" stroke-width="9" stroke-linejoin="round" stroke-linecap="round" opacity=".4"/>';
+      s += '<polyline' + (o.routeId ? ' id="' + o.routeId + '"' : '') + ' points="' + pts + '" fill="none" stroke="#c6f338" stroke-width="4" stroke-linejoin="round" stroke-linecap="round" filter="url(#' + id + 'glow)"/>';
+    }
+    (o.markers || []).forEach((m) => {
+      const col = m.kind === 'pickup' ? '#ffb1c5' : m.kind === 'drop' ? '#c7bfff' : '#c6f338';
+      s += '<g transform="translate(' + m.x + ' ' + m.y + ')"><circle r="13" fill="' + col + '" opacity=".18"/><circle r="7" fill="' + col + '" stroke="#0d0f16" stroke-width="3"/></g>';
+      if (m.label) s += '<text x="' + (m.x + 12) + '" y="' + (m.y - 10) + '" font-family="DM Sans, system-ui, sans-serif" font-size="11" font-weight="700" fill="' + col + '">' + esc(m.label) + '</text>';
+    });
+    (o.incidents || []).forEach((m) => {
+      s += '<g transform="translate(' + m.x + ' ' + m.y + ')"><path d="M0 -10 L9 6 L-9 6Z" fill="#ffb020" stroke="#0d0f16" stroke-width="2"/></g>';
+    });
+    if (o.car) {
+      s += '<g id="' + (o.carId || 'car') + '" transform="translate(' + o.car.x + ' ' + o.car.y + ') rotate(' + (o.car.deg || 0) + ')">' +
+        (o.beam ? '<path d="M0 0 L60 -26 L60 26Z" fill="#ffe14d" opacity=".18"/>' : '') +
+        '<circle r="15" fill="#c6f338" opacity=".16"/><path d="M11 0 L-8 9 L-4 0 L-8 -9Z" fill="#c6f338" stroke="#161f00" stroke-width="2" stroke-linejoin="round"/></g>';
+    }
+    return s + '</svg>';
+  }
+
+  /* =========================================================
+     Données de démonstration
+     ========================================================= */
+  const CUSTOMERS_TAXI = [
+    { name: 'Jean-Marc D.', rating: 4.9, rides: 142, phone: '+225 07 48 12 33 90', vip: true },
+    { name: 'Mariam S.', rating: 4.8, rides: 57, phone: '+225 05 66 21 09 14', vip: false },
+    { name: 'Serge K.', rating: 4.7, rides: 23, phone: '+225 01 02 77 45 18', vip: false },
+    { name: 'Fatou B.', rating: 5.0, rides: 311, phone: '+225 07 90 55 13 02', vip: true }
+  ];
+  const CUSTOMERS_CITY = [
+    { name: 'Aya K.', rating: 4.95, rides: 88, phone: '+225 07 00 45 18 27', vip: true, order: 'Mode Luxe City+', items: '2 articles prêt-à-porter', weight: 'Léger < 2 kg', shop: 'Boutique N°14 · Angré 8e Tranche' },
+    { name: 'Nadia O.', rating: 4.8, rides: 34, phone: '+225 05 12 98 44 61', vip: false, order: 'Beauté & Parfums', items: '3 flacons, 1 coffret', weight: 'Léger < 1 kg', shop: 'City+ Beauty · Plateau' },
+    { name: 'Ibrahim T.', rating: 4.6, rides: 12, phone: '+225 01 73 20 11 58', vip: false, order: 'Électronique', items: '1 smartphone emballé', weight: 'Fragile < 1 kg', shop: 'City+ Tech · Marcory' }
+  ];
+  const initials = (n) => n.split(/\s+/).map((w) => w[0]).join('').replace(/[^A-Za-zÀ-ÿ]/g, '').slice(0, 2).toUpperCase();
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const round50 = (n) => Math.round(n / 50) * 50;
+  const fmt = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const uid = () => Math.random().toString(36).slice(2, 10);
+  const hm = (t) => { const d = new Date(t); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const isToday = (t) => new Date(t).toDateString() === new Date().toDateString();
+  const mmss = (s) => String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+
+  function priceOffer(type, approach, trip, surge) {
+    if (type === 'taxi') {
+      const fare = round50((600 + 320 * trip.km) * surge) + trip.toll;
+      const net = round50((fare - trip.toll) * 0.85) + trip.toll;
+      return { fare, net, toll: trip.toll };
+    }
+    const net = round50(700 + 190 * (approach.km + trip.km));
+    return { fare: net, net, toll: trip.toll };
+  }
+
+  function seed() {
+    const now = Date.now();
+    const H = 3600e3;
+    const past = [
+      { type: 'city', from: 'angre', to: 'riviera3', net: 1500, t: now - 7.2 * H },
+      { type: 'taxi', from: 'plateau', to: 'marcory', net: 3200, t: now - 6.1 * H },
+      { type: 'city', from: 'ambassades', to: 'riviera2', net: 1200, t: now - 5 * H },
+      { type: 'city', from: 'plateau', to: 'treichville', net: 2100, t: now - 4.2 * H },
+      { type: 'taxi', from: 'riviera2', to: 'ccia', net: 2600, t: now - 3.1 * H },
+      { type: 'city', from: 'angre', to: 'ambassades', net: 1400, t: now - 2 * H },
+      { type: 'taxi', from: 'adjame', to: 'plateau', net: 0, t: now - 1.4 * H, status: 'declined' },
+      { type: 'taxi', from: 'ccia', to: 'portbouet', net: 4500, t: now - 0.8 * H }
+    ];
+    const history = past.map((p) => ({ id: uid(), type: p.type, from: placeById(p.from).short, to: placeById(p.to).short, amount: p.net, status: p.status || 'done', t: p.t }));
+    const tx = history.filter((h) => h.status === 'done').map((h) => ({ id: uid(), label: (h.type === 'taxi' ? 'Course Vela · ' : 'Livraison City+ · ') + h.from + ' → ' + h.to, amount: h.amount, unit: 'VM', t: h.t }));
+    tx.push({ id: uid(), label: 'Retrait Wave · 07 •• •• 12', amount: -15000, unit: 'F', t: now - 26 * H });
+    tx.push({ id: uid(), label: 'Conversion VM → FCFA', amount: 20000, unit: 'F', t: now - 27 * H });
+    tx.push({ id: uid(), label: 'Conversion VM → FCFA', amount: -20000, unit: 'VM', t: now - 27 * H });
+    tx.sort((a, b) => b.t - a.t);
+    return {
+      v: 2,
+      driver: { name: 'Koffi Traoré', first: 'Koffi', vehicle: 'Toyota Yaris blanche', plate: '4521 HJ 01', rating: 4.92 },
+      online: true,
+      services: { city: true, taxi: true },
+      voice: true,
+      sim: 2,
+      pos: { x: 322, y: 188 },
+      vm: 42300,
+      fcfa: 5000,
+      history,
+      tx,
+      contacts: [
+        { id: 'c1', name: 'Aminata K.', rel: 'Mère', phone: '+225 07 11 22 33 44' },
+        { id: 'c2', name: 'Yao B.', rel: 'Frère', phone: '+225 05 55 66 77 88' }
+      ],
+      share: { active: false, token: '', startedAt: 0, with: ['c1'] },
+      sos: false,
+      offer: null,
+      mission: null,
+      notifs: [
+        { id: uid(), t: now - 0.8 * H, text: '+4 500 VM crédités · Course CCIA → Aéroport', read: true },
+        { id: uid(), t: now - 20 * 60e3, text: 'Forte demande à Cocody Ambassades & Plateau (x1.3)', read: false }
+      ]
+    };
+  }
+
+  const KEY = 'vela-chauffeur-v2';
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const s = JSON.parse(raw);
+      return s && s.v === 2 ? s : null;
+    } catch (e) { return null; }
+  }
+  let S = load() || seed();
+  let saveT = 0;
+  function save(now) {
+    clearTimeout(saveT);
+    const run = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* stockage indisponible */ } };
+    if (now) run(); else saveT = setTimeout(run, 250);
+  }
+  // Une offre sauvegardée a forcément expiré entre deux visites
+  if (S.offer) { S.offer = null; }
+
+  /* =========================================================
+     État d'interface (non sauvegardé)
+     ========================================================= */
+  const ui = { view: 'home', stack: [], filter: 'all', walletTab: 'convert', sheet: null, sheetData: null, nextOfferAt: Date.now() + 7000, searching: null, driving: false, pinTries: 0, resetArmed: false, errors: {} };
+  const $ = (id) => document.getElementById(id);
+
+  /* ---------- Toast ---------- */
+  let toastT;
+  function toast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+  function notify(text) {
+    S.notifs.unshift({ id: uid(), t: Date.now(), text, read: false });
+    S.notifs = S.notifs.slice(0, 30);
+  }
+
+  /* ---------- Voix ---------- */
+  function speak(text) {
+    if (!S.voice) return;
+    try {
+      if (!('speechSynthesis' in window)) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'fr-FR';
+      u.rate = 1.02;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    } catch (e) { /* voix indisponible */ }
+  }
+
+  /* =========================================================
+     Données dérivées
+     ========================================================= */
+  function todayStats() {
+    const today = S.history.filter((h) => isToday(h.t));
+    const done = today.filter((h) => h.status === 'done');
+    const answered = today.filter((h) => h.status === 'done' || h.status === 'declined' || h.status === 'expired' || h.status === 'cancelled');
+    return {
+      earn: done.reduce((s, h) => s + h.amount, 0),
+      city: done.filter((h) => h.type === 'city').length,
+      taxi: done.filter((h) => h.type === 'taxi').length,
+      rate: answered.length ? Math.round(done.length / answered.length * 100) : 100,
+      count: done.length
+    };
+  }
+  const unread = () => S.notifs.filter((n) => !n.read).length;
+
+  /* =========================================================
+     Offres
+     ========================================================= */
+  function makeOffer(type) {
+    const here = S.pos;
+    const near = PLACES.filter((p) => dist(p, here) > 30).sort((a, b) => dist(a, here) - dist(b, here)).slice(0, 4);
+    const pickup = pick(near);
+    const far = PLACES.filter((p) => p.id !== pickup.id && dist(p, pickup) > 90);
+    const drop = pick(far);
+    const approach = buildRoute(here, pickup, false);
+    const trip = buildRoute(pickup, drop, false);
+    const surge = type === 'taxi' && ['ambassades', 'plateau', 'ccia', 'riviera2'].includes(pickup.id) ? 1.3 : 1;
+    const price = priceOffer(type, approach, trip, surge);
+    const cust = Object.assign({}, pick(type === 'taxi' ? CUSTOMERS_TAXI : CUSTOMERS_CITY));
+    return {
+      id: 'CP-' + (20400 + Math.floor(Math.random() * 600)),
+      type, pickupId: pickup.id, dropId: drop.id, surge,
+      approachKm: approach.km, approachMin: approach.min, tripKm: trip.km, tripMin: trip.min, bridge: trip.bridge,
+      fare: price.fare, net: price.net, toll: price.toll,
+      customer: cust,
+      code: String(1000 + Math.floor(Math.random() * 9000)),
+      createdAt: Date.now(), ttl: type === 'taxi' ? 25 : 30
+    };
+  }
+  function enabledTypes() { return ['city', 'taxi'].filter((t) => S.services[t]); }
+  function canReceive() { return S.online && !S.mission && !S.offer && enabledTypes().length > 0; }
+
+  function pushOffer(type) {
+    if (!canReceive()) return false;
+    type = type && S.services[type] ? type : pick(enabledTypes());
+    S.offer = makeOffer(type);
+    notify((type === 'taxi' ? 'Nouvelle course Vela · ' : 'Nouvelle livraison City+ · ') + placeById(S.offer.pickupId).short + ' → ' + placeById(S.offer.dropId).short);
+    speak(type === 'taxi' ? 'Nouvelle course disponible' : 'Nouvelle livraison City+ disponible');
+    save();
+    renderChrome();
+    if (ui.view === 'home' || ui.view === 'missions') render();
+    return true;
+  }
+
+  function requestOffer(type) {
+    if (S.mission) { go('mission'); return; }
+    if (S.offer) { if (!type || S.offer.type === type) { go('offer'); return; } }
+    if (!S.online) { toast('Passez en ligne pour recevoir des offres'); return; }
+    if (!S.services[type]) { toast('Activez « ' + (type === 'taxi' ? 'Courses Vela Taxi' : 'Livraisons City+') + ' » dans votre profil'); return; }
+    if (S.offer) { toast('Répondez d\'abord à l\'offre en cours'); go('offer'); return; }
+    ui.searching = type;
+    render();
+    setTimeout(() => {
+      ui.searching = null;
+      if (pushOffer(type)) go('offer'); else render();
+    }, 1400);
+  }
+
+  function closeOffer(status) {
+    const o = S.offer;
+    if (!o) return;
+    S.history.unshift({ id: uid(), type: o.type, from: placeById(o.pickupId).short, to: placeById(o.dropId).short, amount: 0, status, t: Date.now() });
+    S.offer = null;
+    ui.nextOfferAt = Date.now() + 12000 + Math.random() * 8000;
+    save();
+  }
+
+  /* =========================================================
+     Missions
+     ========================================================= */
+  const PHASES = ['to_pickup', 'at_pickup', 'to_drop', 'at_drop', 'done'];
+  function acceptOffer() {
+    const o = S.offer;
+    if (!o) return;
+    const pickup = placeById(o.pickupId);
+    S.mission = Object.assign({}, o, { phase: 'to_pickup', acceptedAt: Date.now(), avoidToll: false, leg: null, traveled: 0, events: [{ t: Date.now(), label: 'Mission acceptée' }], waitStart: 0, incidents: [] });
+    S.mission.leg = buildRoute(S.pos, pickup, false);
+    S.offer = null;
+    notify((o.type === 'taxi' ? 'Course ' : 'Livraison ') + o.id + ' acceptée');
+    save();
+    toast(o.type === 'taxi' ? 'Course acceptée · ' + o.customer.name + ' vous attend' : 'Livraison ' + o.id + ' assignée');
+    speak('Mission acceptée. Direction ' + pickup.short);
+    ui.stack = ['home'];
+    go('mission', true);
+  }
+
+  function missionTarget(m) { return placeById(m.phase === 'to_pickup' || m.phase === 'at_pickup' ? m.pickupId : m.dropId); }
+
+  function advance() {
+    const m = S.mission;
+    if (!m) return;
+    if (m.phase === 'at_pickup') {
+      m.phase = 'to_drop';
+      m.traveled = 0;
+      m.leg = buildRoute(placeById(m.pickupId), placeById(m.dropId), m.avoidToll);
+      m.events.push({ t: Date.now(), label: m.type === 'taxi' ? 'Passager à bord' : 'Colis récupéré' });
+      toast(m.type === 'taxi' ? 'Bonne route avec ' + m.customer.name : 'Colis récupéré · direction ' + placeById(m.dropId).short);
+      save();
+      render();
+    }
+  }
+
+  function arrive() {
+    const m = S.mission;
+    if (!m) return;
+    const target = missionTarget(m);
+    S.pos = { x: target.x, y: target.y };
+    if (m.phase === 'to_pickup') {
+      m.phase = 'at_pickup';
+      m.waitStart = Date.now();
+      m.events.push({ t: Date.now(), label: 'Arrivé à ' + target.short });
+      speak('Vous êtes arrivé. ' + (m.type === 'taxi' ? 'Votre passager vous attend.' : 'Récupérez le colis.'));
+    } else if (m.phase === 'to_drop') {
+      m.phase = 'at_drop';
+      m.events.push({ t: Date.now(), label: 'Arrivé à destination' });
+      speak('Vous êtes arrivé à destination.');
+    }
+    notify('Arrivé à ' + target.short);
+    save();
+  }
+
+  function complete() {
+    const m = S.mission;
+    if (!m) return;
+    m.phase = 'done';
+    m.doneAt = Date.now();
+    m.events.push({ t: Date.now(), label: m.type === 'taxi' ? 'Course terminée' : 'Colis remis' });
+    const from = placeById(m.pickupId).short, to = placeById(m.dropId).short;
+    S.history.unshift({ id: uid(), type: m.type, from, to, amount: m.net, status: 'done', t: Date.now() });
+    S.vm += m.net;
+    S.tx.unshift({ id: uid(), label: (m.type === 'taxi' ? 'Course Vela · ' : 'Livraison City+ · ') + from + ' → ' + to, amount: m.net, unit: 'VM', t: Date.now() });
+    notify('+' + fmt(m.net) + ' VM crédités · ' + from + ' → ' + to);
+    if (S.share.active) stopShare(true);
+    if (S.sos) S.sos = false;
+    speak('Mission terminée. ' + fmt(m.net) + ' Vela Monnaie crédités.');
+    save();
+  }
+
+  function finishMission() {
+    S.mission = null;
+    ui.nextOfferAt = Date.now() + 9000;
+    ui.pinTries = 0;
+    save();
+    ui.stack = [];
+    go('home', true);
+  }
+
+  function cancelMission(reason) {
+    const m = S.mission;
+    if (!m) return;
+    S.history.unshift({ id: uid(), type: m.type, from: placeById(m.pickupId).short, to: placeById(m.dropId).short, amount: 0, status: 'cancelled', reason, t: Date.now() });
+    notify('Mission ' + m.id + ' annulée · ' + reason);
+    if (S.share.active) stopShare(true);
+    S.sos = false;
+    S.mission = null;
+    ui.nextOfferAt = Date.now() + 15000;
+    save();
+    closeSheet();
+    exitDrive(true);
+    toast('Mission annulée');
+    ui.stack = [];
+    go('home', true);
+  }
+
+  /* =========================================================
+     Partage de trajet
+     ========================================================= */
+  const shareUrl = () => 'https://vela.ci/suivi/' + S.share.token;
+  function shareMessage() {
+    const m = S.mission;
+    const dest = m ? missionTarget(m).name : 'ma destination';
+    return 'Je suis en route vers ' + dest + ' avec Vela (' + S.driver.vehicle + ', ' + S.driver.plate + '). Suis ma position en direct : ' + shareUrl();
+  }
+  function startShare() {
+    const ids = S.share.with.filter((id) => S.contacts.some((c) => c.id === id));
+    if (!ids.length) { toast('Choisissez au moins un proche'); return false; }
+    const was = S.share.active;
+    S.share.with = ids;
+    if (!S.share.token) S.share.token = uid() + uid().slice(0, 4);
+    if (!was) S.share.startedAt = Date.now();
+    S.share.active = true;
+    notify('Partage de trajet actif avec ' + shareNames());
+    save();
+    toast(was ? 'Destinataires mis à jour' : 'Trajet partagé avec ' + shareNames());
+    return true;
+  }
+  function stopShare(auto) {
+    S.share.active = false;
+    S.share.token = '';
+    S.share.startedAt = 0;
+    save();
+    if (!auto) toast('Partage arrêté · lien désactivé');
+    else notify('Partage de trajet terminé automatiquement à l\'arrivée');
+  }
+  function shareNames() {
+    const list = S.contacts.filter((c) => S.share.with.includes(c.id));
+    if (!list.length) return '—';
+    const first = list[0].name + ' (' + list[0].rel + ')';
+    return list.length > 1 ? first + ' +' + (list.length - 1) : first;
+  }
+  function waLink() {
+    const c = S.contacts.find((x) => S.share.with.includes(x.id));
+    const phone = c ? c.phone.replace(/\D/g, '') : '';
+    return 'https://wa.me/' + phone + '?text=' + encodeURIComponent(shareMessage());
+  }
+
+  /* =========================================================
+     Navigation entre écrans
+     ========================================================= */
+  const TITLES = { home: 'Accueil', offer: 'Nouvelle offre', mission: 'Mission en cours', missions: 'Missions', wallet: 'Portefeuille', profile: 'Profil' };
+  const ROOTS = ['home', 'missions', 'wallet', 'profile'];
+  function go(view, replace) {
+    if (view === 'offer' && !S.offer) view = 'home';
+    if (view === 'mission' && !S.mission) view = 'home';
+    if (!replace && view !== ui.view) {
+      if (ROOTS.includes(view)) ui.stack = [];
+      else ui.stack.push(ui.view);
+    }
+    ui.view = view;
+    ui.errors = {};
+    render();
+    window.scrollTo(0, 0);
+  }
+  function back() {
+    const prev = ui.stack.pop() || 'home';
+    go(prev, true);
+  }
+
+  /* =========================================================
+     Rendu : chrome (en-tête, navigation)
+     ========================================================= */
+  const NAV = [
+    { v: 'home', label: 'Accueil', icon: 'home' },
+    { v: 'missions', label: 'Missions', icon: 'list' },
+    { v: 'wallet', label: 'Portefeuille', icon: 'wallet' },
+    { v: 'profile', label: 'Profil', icon: 'user' }
+  ];
+  function renderChrome() {
+    const root = ROOTS.includes(ui.view) ? ui.view : (ui.stack.find((v) => ROOTS.includes(v)) || 'home');
+    const pending = (S.offer ? 1 : 0) + (S.mission ? 1 : 0);
+    $('tabNav').innerHTML = NAV.map((n) => '<button class="tab' + (n.v === root ? ' on' : '') + '" data-action="go" data-view="' + n.v + '"' + (n.v === root ? ' aria-current="page"' : '') + '>' + ic(n.icon, 22) + n.label + (n.v === 'missions' && pending ? '<span class="badge-dot">' + pending + '</span>' : '') + '</button>').join('');
+    $('sideNav').innerHTML = NAV.map((n) => '<button class="side-link' + (n.v === root ? ' on' : '') + '" data-action="go" data-view="' + n.v + '">' + ic(n.icon, 20) + n.label + (n.v === 'missions' && pending ? '<span class="badge-dot">' + pending + '</span>' : '') + '</button>').join('');
+    const st = todayStats();
+    $('sideFoot').innerHTML = '<div class="between"><span class="row"><span class="status-dot' + (S.online ? ' on' : '') + '"></span><b>' + (S.online ? 'En ligne' : 'Hors ligne') + '</b></span><button class="switch" role="switch" aria-label="Disponibilité" aria-checked="' + S.online + '" data-action="toggle-online"></button></div><div class="small muted">Aujourd\'hui : <b style="color:var(--fg)">' + fmt(st.earn) + ' FCFA</b></div>';
+    $('title').textContent = TITLES[ui.view];
+    const sub = !ROOTS.includes(ui.view);
+    $('backBtn').hidden = !sub;
+    $('backBtn').innerHTML = ic('back', 22);
+    $('topDot').hidden = sub;
+    $('topDot').className = 'status-dot' + (S.online ? ' on' : '');
+    const u = unread();
+    $('bellBtn').innerHTML = ic('bell', 22) + (u ? '<span class="badge-dot">' + u + '</span>' : '');
+    renderBanner();
+  }
+
+  function offerLeft() { return S.offer ? Math.max(0, Math.ceil(S.offer.ttl - (Date.now() - S.offer.createdAt) / 1000)) : 0; }
+
+  function renderBanner() {
+    const b = $('obanner');
+    if (!S.offer || ui.view === 'offer' || ui.driving) { b.hidden = true; return; }
+    const o = S.offer;
+    b.hidden = false;
+    b.innerHTML = '<span class="tile-ic ' + (o.type === 'taxi' ? 't-violet' : 't-pink') + '">' + ic(o.type === 'taxi' ? 'taxi' : 'bag', 18) + '</span>' +
+      '<div class="grow"><b class="trunc" style="display:block">' + (o.type === 'taxi' ? 'Nouvelle course' : 'Nouvelle livraison') + ' · +' + fmt(o.net) + ' F</b><span class="small muted trunc" style="display:block">' + esc(placeById(o.pickupId).short) + ' → ' + esc(placeById(o.dropId).short) + ' · <span data-offer-left>' + offerLeft() + '</span> s</span></div>' +
+      '<button class="btn btn-lime btn-sm" data-action="go" data-view="offer">Voir</button>';
+  }
+
+  /* =========================================================
+     Rendu : écrans
+     ========================================================= */
+  function render() {
+    renderChrome();
+    const v = ui.view;
+    const html = v === 'home' ? viewHome() : v === 'offer' ? viewOffer() : v === 'mission' ? viewMission() : v === 'missions' ? viewMissions() : v === 'wallet' ? viewWallet() : viewProfile();
+    $('view').innerHTML = html;
+    if (v === 'mission' && S.mission && S.mission.phase === 'at_drop' && S.mission.type === 'city') {
+      const first = document.querySelector('.pins input:not([value])') || document.querySelector('.pins input');
+      if (first && window.innerWidth >= 720) first.focus();
+    }
+  }
+
+  function statusCard() {
+    const lockNote = S.mission ? 'Mission en cours · statut verrouillé' : S.online ? (enabledTypes().length ? 'Prêt pour nouvelles courses' : 'Aucun service activé dans le profil') : 'Vous ne recevez plus d\'offres';
+    return '<div class="card" style="padding:10px 12px"><div class="between">' +
+      '<div class="row grow"><button class="switch" role="switch" aria-label="Disponibilité" aria-checked="' + S.online + '" data-action="toggle-online"></button>' +
+      '<div class="grow"><b>' + (S.online ? 'En ligne' : 'Hors ligne') + '</b><div class="tiny muted trunc">' + lockNote + '</div></div></div>' +
+      '<span class="chip">' + ic('pin', 14) + esc(nearestPlace().short) + '</span></div></div>';
+  }
+  function nearestPlace() { return PLACES.slice().sort((a, b) => dist(a, S.pos) - dist(b, S.pos))[0]; }
+
+  function missionStrip() {
+    const m = S.mission;
+    if (!m) return '';
+    const t = missionTarget(m);
+    const labels = { to_pickup: 'En route vers ' + (m.type === 'taxi' ? 'la prise en charge' : 'la collecte'), at_pickup: m.type === 'taxi' ? 'Sur place · passager attendu' : 'Sur place · récupérez le colis', to_drop: 'En route vers ' + (m.type === 'taxi' ? 'la destination' : 'la cliente'), at_drop: m.type === 'taxi' ? 'Arrivé · terminez la course' : 'Arrivé · code de remise', done: 'Terminée' };
+    return '<div class="card mission-strip span-3 span-2"><div class="between">' +
+      '<div class="row grow"><span class="tile-ic t-violet">' + ic(m.type === 'taxi' ? 'taxi' : 'bag', 18) + '</span><div class="grow"><div class="label" style="color:var(--violet-soft)">Mission ' + m.id + '</div><b class="trunc" style="display:block">' + labels[m.phase] + '</b><span class="small muted trunc" style="display:block">' + esc(t.name) + '</span></div></div>' +
+      '<button class="btn btn-lime btn-sm" data-action="go" data-view="mission">Reprendre</button></div></div>';
+  }
+
+  function viewHome() {
+    const st = todayStats();
+    const o = S.offer;
+    const searching = ui.searching;
+    const cityBtn = searching === 'city' ? '<button class="btn btn-block" disabled>' + ic('refresh', 16) + 'Recherche de missions…</button>' :
+      '<button class="btn btn-block" data-action="request" data-type="city">' + (o && o.type === 'city' ? 'Voir l\'offre en attente' : S.mission && S.mission.type === 'city' ? 'Voir la mission en cours' : 'Voir les missions') + ic('arrow', 16, ' style="color:var(--pink)"') + '</button>';
+    const taxiBtn = searching === 'taxi' ? '<button class="btn btn-block" disabled>' + ic('radar', 16) + 'Balayage du radar…</button>' :
+      '<button class="btn btn-block" data-action="request" data-type="taxi">' + (o && o.type === 'taxi' ? 'Voir l\'offre en attente' : S.mission && S.mission.type === 'taxi' ? 'Voir la course en cours' : 'Ouvrir le radar des courses') + ic('radar', 16, ' style="color:var(--lime)"') + '</button>';
+    return '<div class="stack">' +
+      '<div class="between hello"><div class="row" style="min-width:0"><div style="position:relative"><div class="avatar av-driver" style="width:48px;height:48px;font-size:16px">KT</div></div>' +
+      '<div style="min-width:0"><h2 class="trunc">' + greeting() + ', ' + esc(S.driver.first) + '</h2><p class="small muted trunc">City Drive · Chauffeur-livreur · ' + icFill('star', 12).replace('class="ic"', 'class="ic" style="display:inline;vertical-align:-1px;color:var(--lime)"') + ' ' + S.driver.rating + '</p></div></div></div>' +
+      '<div class="home-grid">' +
+        missionStrip() +
+        '<div class="span-3 span-2" style="grid-column:1/-1">' + statusCard() + '</div>' +
+        '<div class="card earn"><div class="glow" style="right:-30px;bottom:-30px;width:130px;height:130px;background:rgba(85,109,0,.25)"></div>' +
+          '<div class="between"><span class="label" style="color:#3b4d00">Gains aujourd\'hui</span><span class="chip">' + ic('trend', 14) + st.rate + '% d\'acceptation</span></div>' +
+          '<div class="row" style="align-items:baseline;gap:6px"><span class="big">' + fmt(st.earn) + '</span><b>FCFA</b></div>' +
+          '<div class="sub"><span class="row" style="gap:6px">' + ic('bag', 16) + st.city + ' livraisons City+</span><span class="row" style="gap:6px">' + ic('taxi', 16) + st.taxi + ' courses Vela</span></div></div>' +
+        '<div class="card"><div class="glow" style="right:-40px;top:-40px;width:160px;height:160px;background:rgba(96,80,209,.2)"></div>' +
+          '<div class="between"><span class="chip chip-violet">' + ic('swap', 14) + 'Compte Vela lié</span><button class="link" data-action="go" data-view="wallet" style="color:var(--violet-soft)">Convertir' + ic('arrow', 14) + '</button></div>' +
+          '<div><span class="small muted">Solde disponible</span><div class="row" style="align-items:baseline;gap:8px"><span class="num" style="font-size:28px">' + fmt(S.vm) + '</span><b style="color:var(--violet-soft)">VM</b></div></div>' +
+          '<div class="inset row small muted">' + ic('wallet', 18, ' style="color:var(--violet-soft)"') + '1 VM = 1 FCFA · conversion sans frais vers Mobile Money</div></div>' +
+        '<div class="card"><div class="between"><div class="row"><span class="tile-ic t-pink">' + ic('bag', 18) + '</span><div><h3 style="font-size:16px">Livraisons City+</h3><span class="small muted">Mode &amp; colis express</span></div></div>' +
+          (o && o.type === 'city' ? '<span class="chip chip-pink">1 en attente</span>' : S.services.city ? '<span class="chip">Actif</span>' : '<span class="chip">Désactivé</span>') + '</div>' +
+          '<div class="inset row">' + ic('store', 18, ' style="color:var(--pink)"') + '<div class="grow"><div class="label">Point relais assigné</div><b class="small trunc" style="display:block">Angré 8e Tranche · Boutique N°14</b></div></div>' + cityBtn + '</div>' +
+        '<div class="card"><div class="between"><div class="row"><span class="tile-ic t-violet">' + ic('taxi', 18) + '</span><div><h3 style="font-size:16px">Courses taxi Vela</h3><span class="small muted">Forte demande active</span></div></div><span class="chip chip-lime">x1.3 Surge</span></div>' +
+          '<div class="inset between"><div class="row grow">' + ic('fire', 18, ' style="color:var(--lime)"') + '<div class="grow"><div class="label">Hotspots identifiés</div><b class="small trunc" style="display:block">Cocody Ambassades &amp; Plateau</b></div></div><span class="small" style="color:var(--lime);font-weight:700">x1.3 tarif</span></div>' + taxiBtn + '</div>' +
+        '<div class="card span-2"><div class="between"><div class="row">' + ic('map', 20, ' style="color:var(--mut)"') + '<h3 style="font-size:16px">Zones à forte affluence</h3></div><span class="tiny muted">Mis à jour ' + hm(Date.now()) + '</span></div>' +
+          '<div class="mapbox" style="height:220px">' + mapSVG({ id: 'home', heat: true, viewBox: '60 40 320 300', car: { x: S.pos.x, y: S.pos.y, deg: -90 }, carId: 'homecar', traffic: true }) +
+          '<div class="map-over" style="bottom:10px"><span class="pill-glass"><span class="status-dot on" style="width:8px;height:8px"></span>Affluence max : Bd Latrille (Angré)</span><span class="pill-glass">' + ic('pin', 14) + 'Vous · ' + esc(nearestPlace().short) + '</span></div></div></div>' +
+      '</div></div>';
+  }
+  function greeting() { const h = new Date().getHours(); return h < 5 ? 'Bonne nuit' : h < 18 ? 'Bonjour' : 'Bonsoir'; }
+
+  function offerMap(o, legPts, pts2) {
+    const pickup = placeById(o.pickupId), drop = placeById(o.dropId);
+    const all = (legPts || []).concat(pts2 || []);
+    const xs = all.map((p) => p.x), ys = all.map((p) => p.y);
+    const minX = Math.min.apply(null, xs) - 70, maxX = Math.max.apply(null, xs) + 70, minY = Math.min.apply(null, ys) - 60, maxY = Math.max.apply(null, ys) + 60;
+    let w = maxX - minX, h = maxY - minY;
+    const vb = minX + ' ' + minY + ' ' + w + ' ' + h;
+    return mapSVG({ id: 'of', fit: true, viewBox: vb, route: pts2, route2: legPts, markers: [{ x: pickup.x, y: pickup.y, kind: 'pickup', label: pickup.short }, { x: drop.x, y: drop.y, kind: 'drop', label: drop.short }], car: { x: S.pos.x, y: S.pos.y, deg: -90 }, carId: 'ofcar', traffic: true });
+  }
+
+  function viewOffer() {
+    const o = S.offer;
+    if (!o) return viewHome();
+    const pickup = placeById(o.pickupId), drop = placeById(o.dropId);
+    const trip = buildRoute(pickup, drop, false);
+    const approach = buildRoute(S.pos, pickup, false);
+    const left = offerLeft();
+    const c = o.customer;
+    const isTaxi = o.type === 'taxi';
+    return '<div class="split">' +
+      '<div class="mapbox split-map">' + offerMap(o, approach.pts, trip.pts) +
+        '<div class="map-over" style="top:12px"><span class="pill-glass"><span class="status-dot on" style="width:8px;height:8px"></span>' + (trip.bridge === 'hkb' ? 'Trafic fluide Pont HKB' : trip.bridge === 'dg' ? 'Pont De Gaulle · ralenti' : 'Trafic fluide') + '</span><span class="pill-glass">' + esc(pickup.short) + ' · ' + o.approachMin + ' min</span></div></div>' +
+      '<div class="split-body"><div class="handle"></div>' +
+        '<div class="between"><span class="chip ' + (isTaxi ? 'chip-violet' : 'chip-pink') + '">' + ic(isTaxi ? 'taxi' : 'bag', 14) + (isTaxi ? 'Nouvelle course · Vela Taxi' : 'Nouvelle livraison · City+') + '</span>' +
+          '<div class="timer" aria-label="Temps restant"><svg viewBox="0 0 36 36" width="48" height="48"><circle cx="18" cy="18" r="15" fill="none" stroke="#2a2a30" stroke-width="3"/><circle data-offer-ring cx="18" cy="18" r="15" fill="none" stroke="#c6f338" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="' + (left / o.ttl * 100).toFixed(1) + ' 100"/></svg><span data-offer-left-s>' + left + 's</span></div></div>' +
+        '<div class="between" style="align-items:flex-end"><div><div class="label">' + (isTaxi ? 'Vous recevez' : 'Rémunération nette') + '</div><div class="money" style="color:var(--lime)">+' + fmt(o.net) + ' <span style="font-size:16px">FCFA</span></div>' +
+          (isTaxi ? '<div class="tiny muted">Tarif client ' + fmt(o.fare) + ' F' + (o.surge > 1 ? ' · surge x' + o.surge : '') + (o.toll ? ' · péage ' + o.toll + ' F remboursé' : '') + '</div>' : '<div class="tiny muted">Commande déjà réglée sur City+</div>') + '</div>' +
+          '<div style="text-align:right"><div class="label">Estimation</div><b>' + (o.approachMin + o.tripMin) + ' min · ' + (o.approachKm + o.tripKm).toFixed(1) + ' km</b></div></div>' +
+        '<div class="inset between"><div class="row grow"><div class="avatar" style="width:42px;height:42px;background:' + (isTaxi ? 'linear-gradient(135deg,#6050d1,#c7bfff);color:#170065' : 'linear-gradient(135deg,#ffb1c5,#8e1347);color:#fff') + '">' + initials(c.name) + '</div>' +
+          '<div class="grow"><b class="trunc" style="display:block">' + esc(c.name) + '</b><span class="small muted">' + icFill('star', 12).replace('class="ic"', 'class="ic" style="display:inline;vertical-align:-1px;color:var(--lime)"') + ' ' + c.rating + ' · ' + c.rides + (isTaxi ? ' courses' : ' commandes') + '</span></div></div>' +
+          (c.vip ? '<span class="chip">' + ic('shield', 14, ' style="color:var(--lime)"') + 'Client VIP</span>' : '') + '</div>' +
+        '<div class="inset legs" style="padding:14px">' +
+          legRow('var(--lime)', isTaxi ? 'Prise en charge' : 'Collecte magasin', o.approachKm + ' km · ' + o.approachMin + ' min', pickup.name, isTaxi ? pickup.detail : (c.shop || pickup.detail), true) +
+          legRow('var(--violet-soft)', isTaxi ? 'Destination' : 'Livraison client', o.tripKm + ' km · ' + o.tripMin + ' min', drop.name, drop.detail, false) + '</div>' +
+        (isTaxi ? '<div class="inset row">' + ic('wallet', 20, ' style="color:var(--violet-soft)"') + '<div class="grow small"><b>Paiement Vela Monnaie</b><div class="muted">Versement instantané sur votre portefeuille. Aucune manipulation d\'espèces.</div></div></div>'
+          : '<div class="grid-2"><div class="inset kv"><span class="label">Contenu</span><b class="trunc">' + esc(c.items) + '</b></div><div class="inset kv"><span class="label">Charge</span><b class="trunc">' + esc(c.weight) + '</b></div></div>') +
+        '<div class="row"><button class="btn btn-lg" style="width:120px" data-action="decline">' + (isTaxi ? 'Passer' : 'Refuser') + '</button><button class="btn btn-lime btn-lg grow" data-action="accept">' + ic(isTaxi ? 'checkc' : 'bolt', 20) + (isTaxi ? 'Accepter la course' : 'Accepter la livraison') + '</button></div>' +
+      '</div></div>';
+  }
+  function legRow(color, label, meta, title, sub, line) {
+    return '<div class="leg"><div class="leg-rail"><span class="leg-dot" style="background:' + color + '"></span>' + (line ? '<span class="leg-line"></span>' : '') + '</div>' +
+      '<div class="leg-body"><div class="between"><span class="label" style="color:' + color + '">' + label + '</span><span class="tiny muted">' + meta + '</span></div><b class="trunc" style="display:block">' + esc(title) + '</b><span class="small muted trunc" style="display:block">' + esc(sub) + '</span></div></div>';
+  }
+
+  function viewMission() {
+    const m = S.mission;
+    if (!m) return viewHome();
+    const isTaxi = m.type === 'taxi';
+    const pickup = placeById(m.pickupId), drop = placeById(m.dropId);
+    const c = m.customer;
+    if (m.phase === 'done') {
+      return '<div class="stack" style="max-width:560px;margin:0 auto"><div class="card summary-hero"><div class="check-big">' + ic('check', 34) + '</div>' +
+        '<h2>' + (isTaxi ? 'Course terminée' : 'Livraison confirmée') + '</h2><p class="muted" style="margin-top:4px">' + esc(pickup.short) + ' → ' + esc(drop.short) + ' · ' + m.tripKm + ' km</p>' +
+        '<div class="money" style="margin-top:14px">+' + fmt(m.net) + ' VM</div><p class="small muted">Crédités instantanément sur votre portefeuille Vela</p></div>' +
+        '<div class="card"><div class="between"><span class="muted">Nouveau solde</span><b>' + fmt(S.vm) + ' VM</b></div><div class="between"><span class="muted">Gains du jour</span><b>' + fmt(todayStats().earn) + ' FCFA</b></div>' +
+        (m.toll ? '<div class="between"><span class="muted">Péage HKB remboursé</span><b>' + m.toll + ' F</b></div>' : '') + '</div>' +
+        '<button class="btn btn-lime btn-lg btn-block" data-action="finish">' + ic('home', 20) + 'Retour à l\'accueil</button></div>';
+    }
+    const target = missionTarget(m);
+    const leg = m.leg;
+    const phaseIdx = PHASES.indexOf(m.phase);
+    const remain = leg ? Math.max(0, (leg.len - m.traveled) * M_PER_UNIT / 1000) : 0;
+    const remainMin = Math.max(1, Math.round(remain / 27 * 60));
+    const steps = [
+      [isTaxi ? 'En route vers la prise en charge' : 'En route vers la collecte', pickup.name],
+      [isTaxi ? 'Passager à bord' : 'Colis récupéré', isTaxi ? c.name : (c.shop || pickup.detail)],
+      [isTaxi ? 'En route vers la destination' : 'En route vers la cliente', drop.name],
+      [isTaxi ? 'Arrivée et paiement' : 'Remise avec code de sécurité', isTaxi ? 'Paiement Vela Monnaie' : 'Signature numérique City+']
+    ];
+    const stepState = (i) => {
+      const map = { to_pickup: 0, at_pickup: 1, to_drop: 2, at_drop: 3 };
+      const cur = map[m.phase];
+      return i < cur ? 'done' : i === cur ? 'now' : '';
+    };
+    const evt = (label) => { const e = m.events.find((x) => x.label.indexOf(label) === 0); return e ? hm(e.t) : ''; };
+    const stepTimes = [evt('Mission acceptée'), evt(isTaxi ? 'Passager' : 'Colis récupéré'), '', ''];
+
+    let action = '';
+    if (m.phase === 'to_pickup' || m.phase === 'to_drop') {
+      const started = m.traveled > 0;
+      action = '<button class="btn btn-lime btn-lg btn-block" data-action="drive">' + ic('nav', 20) + (started ? 'Reprendre la navigation' : 'Lancer la navigation vers ' + esc(target.short)) + '</button>';
+    } else if (m.phase === 'at_pickup') {
+      const waited = Math.floor((Date.now() - m.waitStart) / 1000);
+      action = '<div class="inset between small"><span class="row">' + ic('clock', 16) + 'Attente sur place</span><b data-wait>' + mmss(waited) + '</b></div>' +
+        '<div class="tiny muted">' + (isTaxi ? 'Attente gratuite 3 min, puis 50 F/min facturés au client.' : 'Présentez le code de mission ' + m.id + ' au comptoir.') + '</div>' +
+        '<button class="btn btn-lime btn-lg btn-block" data-action="advance">' + ic('checkc', 20) + (isTaxi ? esc(c.name) + ' est à bord' : 'Colis récupéré') + '</button>';
+    } else if (m.phase === 'at_drop') {
+      if (isTaxi) {
+        action = '<div class="inset"><div class="between"><span class="muted">Tarif client</span><b>' + fmt(m.fare) + ' F</b></div>' + (m.toll ? '<div class="between small"><span class="muted">dont péage HKB</span><span>' + m.toll + ' F</span></div>' : '') + '<div class="between"><span class="muted">Commission Vela (15 %)</span><span>−' + fmt(m.fare - m.net) + ' F</span></div><div class="between" style="margin-top:6px"><b>Vous recevez</b><b style="color:var(--lime)">' + fmt(m.net) + ' VM</b></div></div>' +
+          '<button class="btn btn-lime btn-lg btn-block" data-action="complete">' + ic('checkc', 20) + 'Terminer la course</button>';
+      } else {
+        action = '<div class="card" style="background:var(--s2)"><div class="row">' + ic('lock', 20, ' style="color:var(--pink)"') + '<h3 style="font-size:16px">Code de confirmation client</h3></div>' +
+          '<p class="small muted">Demandez le code à 4 chiffres reçu par ' + esc(c.name) + ' dans son application City+.</p>' +
+          '<div class="inset small row" style="background:var(--bg)">' + ic('msg', 16, ' style="color:var(--violet-soft)"') + '<span>Démo : la cliente vous lit le code <b style="color:var(--fg);letter-spacing:.15em">' + m.code + '</b></span></div>' +
+          '<div class="pins' + (ui.errors.pin ? ' bad' : '') + '" id="pins">' + [0, 1, 2, 3].map((i) => '<input id="pin' + i + '" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" aria-label="Chiffre ' + (i + 1) + '">').join('') + '</div>' +
+          (ui.errors.pin ? '<p class="err-msg">' + ui.errors.pin + '</p>' : '') +
+          '<div class="between tiny muted"><span class="row" style="gap:4px">' + ic('shield', 14, ' style="color:var(--lime)"') + 'Garantie anti-fraude active</span><button class="link" style="color:var(--pink)" data-action="code-help">Problème de code ?</button></div></div>' +
+          '<button class="btn btn-lime btn-lg btn-block" id="confirmPin" data-action="check-pin" disabled>' + ic('checkc', 20) + 'Confirmer la livraison</button>' +
+          '<p class="tiny muted" style="text-align:center">Crédit instantané de ' + fmt(m.net) + ' VM sur votre portefeuille Vela</p>';
       }
     }
 
-    // Offre City+
-    $('cityAccept').addEventListener('click', () => {
-      clearInterval(timers.city);
-      const b = $('cityAccept');
-      b.disabled = true;
-      b.innerHTML = '<span class="material-symbols-outlined text-[22px] animate-spin">sync</span><span>Assignation…</span>';
-      setTimeout(() => { toast('Livraison #CP-20417 assignée'); show('livraison'); $('pin4').focus(); }, 900);
-    });
-    $('cityDecline').addEventListener('click', () => {
-      clearInterval(timers.city);
-      $('cityDecline').classList.add('opacity-40');
-      toast('Livraison refusée');
-      setTimeout(() => show('accueil'), 700);
-    });
+    const mapPts = leg ? leg.pts : [];
+    const car = leg ? pointAt(leg.pts, m.traveled) : S.pos;
+    const markers = [{ x: pickup.x, y: pickup.y, kind: 'pickup', label: pickup.short }, { x: drop.x, y: drop.y, kind: 'drop', label: drop.short }];
+    const allPts = mapPts.concat([pickup, drop]);
+    const xs = allPts.map((p) => p.x), ys = allPts.map((p) => p.y);
+    const vb = (Math.min.apply(null, xs) - 70) + ' ' + (Math.min.apply(null, ys) - 60) + ' ' + (Math.max.apply(null, xs) - Math.min.apply(null, xs) + 140) + ' ' + (Math.max.apply(null, ys) - Math.min.apply(null, ys) + 120);
 
-    // Offre Taxi
-    $('taxiAccept').addEventListener('click', () => {
-      clearInterval(timers.taxi);
-      const b = $('taxiAccept');
-      b.disabled = true; $('taxiDecline').disabled = true;
-      b.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">progress_activity</span><span>Acceptation…</span>';
-      setTimeout(() => {
-        b.innerHTML = '<span class="material-symbols-outlined text-[20px]">navigation</span><span>Itinéraire lancé</span>';
-        $('driveLink').hidden = false;
-        state.vela++; state.earnings += 3200; state.vm += 3200;
-        renderStats();
-        toast('Course acceptée · Jean-Marc D. vous attend');
-      }, 700);
-    });
-    $('taxiDecline').addEventListener('click', () => {
-      clearInterval(timers.taxi);
-      $('taxiDecline').classList.add('opacity-40');
-      $('taxiDecline').textContent = 'Recherche…';
-      setTimeout(() => show('accueil'), 800);
-    });
+    return '<div class="split">' +
+      '<div class="mapbox split-map">' + mapSVG({ id: 'mi', fit: true, viewBox: vb, route: (m.phase === 'to_pickup' || m.phase === 'to_drop') ? mapPts : null, markers, car: { x: car.x, y: car.y, deg: (car.angle || -Math.PI / 2) * 180 / Math.PI }, carId: 'micar', incidents: m.incidents, traffic: true }) +
+        '<div class="map-over" style="top:12px"><span class="pill-glass">' + ic('nav', 16, ' style="color:var(--lime)"') + (m.phase === 'to_pickup' || m.phase === 'to_drop' ? remain.toFixed(1) + ' km · ' + remainMin + ' min' : 'Sur place') + '</span>' +
+        (S.share.active ? '<span class="pill-glass" style="color:var(--green)"><span class="live"></span>Trajet partagé</span>' : '') + '</div></div>' +
+      '<div class="stack">' +
+        '<div class="between wrap"><div class="row wrap"><span class="chip chip-pink">#' + m.id + '</span><span class="chip">' + (isTaxi ? 'Vela Taxi' : 'City+ Mode Express') + '</span></div>' +
+          '<div class="row"><button class="icon-btn" style="background:var(--s2);color:var(--fg)" data-action="call" aria-label="Appeler">' + ic('phone', 20) + '</button><button class="icon-btn" style="background:var(--s2);color:var(--fg)" data-action="sms" aria-label="Message">' + ic('msg', 20) + '</button><button class="icon-btn" style="background:' + (S.share.active ? 'rgba(61,220,132,.15);color:var(--green)' : 'var(--s2);color:var(--fg)') + '" data-action="open-share" aria-label="Partager le trajet">' + ic('share', 20) + '</button></div></div>' +
+        '<div class="card"><div class="between"><div class="row grow"><div class="avatar" style="width:44px;height:44px;background:' + (isTaxi ? 'linear-gradient(135deg,#6050d1,#c7bfff);color:#170065' : 'linear-gradient(135deg,#ffb1c5,#8e1347);color:#fff') + '">' + initials(c.name) + '</div>' +
+          '<div class="grow"><b class="trunc" style="display:block">' + esc(c.name) + '</b><span class="small trunc" style="display:block;color:var(--pink)">' + (isTaxi ? (c.vip ? 'Client VIP · ' : '') + c.rides + ' courses' : 'Commande ' + esc(c.order)) + '</span></div></div>' +
+          '<span class="chip">' + icFill('star', 13).replace('class="ic"', 'class="ic" style="color:var(--lime)"') + c.rating + '</span></div>' +
+          '<div class="inset row" style="align-items:flex-start">' + ic('pin', 20, ' style="color:var(--pink);margin-top:2px"') + '<div class="grow"><div class="label">' + (m.phase === 'to_pickup' || m.phase === 'at_pickup' ? (isTaxi ? 'Prise en charge' : 'Collecte') : (isTaxi ? 'Destination' : 'Adresse de livraison')) + '</div><b class="trunc" style="display:block">' + esc(target.name) + '</b><span class="small muted trunc" style="display:block">' + esc(target.detail) + '</span></div></div></div>' +
+        '<div class="card"><span class="label">Statut de l\'acheminement</span><ol class="steps">' +
+          steps.map((s, i) => '<li class="step ' + stepState(i) + '"><span class="step-dot">' + (stepState(i) === 'done' ? ic('check', 15) : '<span style="width:8px;height:8px;border-radius:50%;background:currentColor;display:block"></span>') + '</span><div class="grow between" style="align-items:flex-start"><div><div class="step-t">' + s[0] + '</div><div class="small muted">' + esc(s[1]) + '</div></div><span class="tiny muted">' + (stepState(i) === 'done' ? stepTimes[i] : stepState(i) === 'now' ? 'En cours' : 'Étape ' + (i + 1)) + '</span></div></li>').join('') +
+        '</ol></div>' +
+        action +
+        (m.phase !== 'at_drop' ? '<button class="btn btn-ghost btn-block" data-action="cancel-mission">Annuler la mission</button>' : '') +
+      '</div></div>';
+  }
 
-    // ---------- Code de remise ----------
-    const pins = [1, 2, 3, 4].map((i) => $('pin' + i));
-    function pinValue() { return pins.map((p) => p.value).join(''); }
-    function checkPin() {
-      $('confirmDelivery').disabled = !/^\d{4}$/.test(pinValue());
-      $('pinMsg').hidden = true;
-    }
-    pins.forEach((p, i) => {
-      p.addEventListener('input', () => {
-        p.value = p.value.replace(/\D/g, '').slice(-1);
-        if (p.value && pins[i + 1]) pins[i + 1].focus();
-        checkPin();
-      });
-      p.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && !p.value && pins[i - 1]) pins[i - 1].focus();
-      });
-    });
+  function viewMissions() {
+    const st = todayStats();
+    const f = ui.filter;
+    const list = S.history.filter((h) => f === 'all' || (f === 'done' ? h.status === 'done' : h.type === f));
+    const statusChip = (h) => h.status === 'done' ? '<span class="chip chip-green">Terminée</span>' : h.status === 'declined' ? '<span class="chip">Refusée</span>' : h.status === 'expired' ? '<span class="chip chip-amber">Expirée</span>' : '<span class="chip chip-red">Annulée</span>';
+    let current = '';
+    if (S.mission) current = missionStrip();
+    else if (S.offer) current = '<div class="card mission-strip"><div class="between"><div class="row grow"><span class="tile-ic t-lime">' + ic('bolt', 18) + '</span><div class="grow"><div class="label" style="color:var(--lime)">Offre en attente · <span data-offer-left>' + offerLeft() + '</span> s</div><b class="trunc" style="display:block">' + esc(placeById(S.offer.pickupId).short) + ' → ' + esc(placeById(S.offer.dropId).short) + ' · +' + fmt(S.offer.net) + ' F</b></div></div><button class="btn btn-lime btn-sm" data-action="go" data-view="offer">Voir</button></div></div>';
+    else current = '<div class="card"><div class="empty">' + ic('radar', 32) + '<b style="color:var(--fg)">' + (S.online ? 'En attente de nouvelles offres' : 'Vous êtes hors ligne') + '</b><span class="small">' + (S.online ? 'Les offres arrivent automatiquement. Vous pouvez aussi lancer une recherche.' : 'Passez en ligne pour recevoir des offres.') + '</span>' +
+      (S.online ? '<div class="row wrap" style="justify-content:center"><button class="btn btn-sm" data-action="request" data-type="city">' + ic('bag', 16) + 'Livraison City+</button><button class="btn btn-sm" data-action="request" data-type="taxi">' + ic('taxi', 16) + 'Course Vela</button></div>' : '<button class="btn btn-lime btn-sm" data-action="toggle-online">Passer en ligne</button>') + '</div></div>';
+    return '<div class="stack" style="max-width:820px">' + current +
+      '<div class="stats"><div class="stat"><span class="label">Gains du jour</span><b>' + fmt(st.earn) + '</b><span class="tiny muted">FCFA</span></div><div class="stat"><span class="label">Terminées</span><b>' + st.count + '</b><span class="tiny muted">' + st.city + ' City+ · ' + st.taxi + ' Vela</span></div><div class="stat"><span class="label">Acceptation</span><b>' + st.rate + '%</b><span class="tiny muted">aujourd\'hui</span></div></div>' +
+      '<div class="filters" role="tablist">' + [['all', 'Tout'], ['done', 'Terminées'], ['city', 'City+'], ['taxi', 'Vela Taxi']].map((x) => '<button role="tab" aria-selected="' + (f === x[0]) + '" class="' + (f === x[0] ? 'on' : '') + '" data-action="filter" data-f="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' +
+      '<div class="card" style="padding:4px 16px">' + (list.length ? '<div class="list">' + list.map((h) => '<div class="li"><span class="tile-ic ' + (h.type === 'taxi' ? 't-violet' : 't-pink') + '">' + ic(h.type === 'taxi' ? 'taxi' : 'bag', 18) + '</span><div class="grow"><b class="trunc" style="display:block">' + esc(h.from) + ' → ' + esc(h.to) + '</b><span class="tiny muted">' + (isToday(h.t) ? 'Aujourd\'hui' : new Date(h.t).toLocaleDateString('fr-FR')) + ' · ' + hm(h.t) + (h.reason ? ' · ' + esc(h.reason) : '') + '</span></div><div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px">' + (h.amount ? '<b style="color:var(--lime)">+' + fmt(h.amount) + '</b>' : '') + statusChip(h) + '</div></div>').join('') + '</div>' : '<div class="empty">Aucune mission pour ce filtre.</div>') + '</div>' +
+      '</div>';
+  }
 
-    let delivered = false;
-    $('confirmDelivery').addEventListener('click', () => {
-      if (delivered) { show('accueil'); return; }
-      const b = $('confirmDelivery');
-      b.disabled = true;
-      b.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">progress_activity</span><span>Vérification du code…</span>';
-      setTimeout(() => {
-        if (pinValue() !== '8421') {
-          b.innerHTML = '<span class="material-symbols-outlined text-[22px]">check_circle</span><span>Confirmer la livraison</span>';
-          $('pinMsg').hidden = false;
-          pins[3].value = ''; pins[3].focus();
-          return;
+  function viewWallet() {
+    const t = ui.walletTab;
+    const e = ui.errors;
+    const form = t === 'convert'
+      ? '<div class="field"><label for="convAmt">Montant à convertir (VM)</label><input class="input' + (e.conv ? ' err' : '') + '" id="convAmt" inputmode="numeric" placeholder="Ex. 10 000" value="' + (ui.convVal || '') + '"></div>' +
+        (e.conv ? '<p class="err-msg">' + e.conv + '</p>' : '') +
+        '<div class="row wrap">' + [5000, 10000, 20000].map((v) => '<button class="btn btn-sm" data-action="preset" data-field="convAmt" data-v="' + v + '">' + fmt(v) + '</button>').join('') + '<button class="btn btn-sm" data-action="preset" data-field="convAmt" data-v="' + S.vm + '">Tout</button></div>' +
+        '<div class="inset small between"><span class="muted">Taux</span><b>1 VM = 1 FCFA · 0 frais</b></div>' +
+        '<button class="btn btn-lime btn-lg btn-block" data-action="convert">' + ic('swap', 20) + 'Convertir en FCFA</button>'
+      : '<div class="field"><label for="wdAmt">Montant à retirer (FCFA)</label><input class="input' + (e.wd ? ' err' : '') + '" id="wdAmt" inputmode="numeric" placeholder="Minimum 1 000" value="' + (ui.wdVal || '') + '"></div>' +
+        '<div class="field"><label for="wdOp">Opérateur</label><select class="input" id="wdOp">' + ['Wave', 'Orange Money', 'MTN MoMo', 'Moov Money'].map((o) => '<option' + (ui.wdOp === o ? ' selected' : '') + '>' + o + '</option>').join('') + '</select></div>' +
+        '<div class="field"><label for="wdNum">Numéro Mobile Money</label><input class="input' + (e.wdNum ? ' err' : '') + '" id="wdNum" inputmode="tel" placeholder="07 12 34 56 78" value="' + (ui.wdNum || '07 48 21 90 12') + '"></div>' +
+        (e.wd ? '<p class="err-msg">' + e.wd + '</p>' : '') + (e.wdNum ? '<p class="err-msg">' + e.wdNum + '</p>' : '') +
+        '<button class="btn btn-lime btn-lg btn-block" data-action="withdraw">' + ic('send', 20) + 'Retirer vers Mobile Money</button>';
+    return '<div class="stack" style="max-width:820px"><div class="home-grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">' +
+      '<div class="card"><div class="glow" style="right:-40px;top:-40px;width:160px;height:160px;background:rgba(96,80,209,.25)"></div><span class="label">Vela Monnaie</span><div class="row" style="align-items:baseline;gap:8px"><span class="num" style="font-size:32px">' + fmt(S.vm) + '</span><b style="color:var(--violet-soft)">VM</b></div><span class="small muted">Gains des courses et livraisons</span></div>' +
+      '<div class="card"><span class="label">Solde FCFA</span><div class="row" style="align-items:baseline;gap:8px"><span class="num" style="font-size:32px">' + fmt(S.fcfa) + '</span><b style="color:var(--lime)">F</b></div><span class="small muted">Disponible pour retrait Mobile Money</span></div></div>' +
+      '<div class="card"><div class="seg" role="tablist"><button role="tab" class="' + (t === 'convert' ? 'on' : '') + '" data-action="wtab" data-t="convert">Convertir</button><button role="tab" class="' + (t === 'withdraw' ? 'on' : '') + '" data-action="wtab" data-t="withdraw">Retirer</button></div>' + form + '</div>' +
+      '<div class="card" style="padding:14px 16px 4px"><span class="label">Transactions</span><div class="list">' + S.tx.slice(0, 20).map((x) => '<div class="li"><span class="tile-ic ' + (x.amount > 0 ? 't-lime' : 't-grey') + '">' + ic(x.amount > 0 ? 'plus' : 'send', 16) + '</span><div class="grow"><b class="small trunc" style="display:block">' + esc(x.label) + '</b><span class="tiny muted">' + (isToday(x.t) ? 'Aujourd\'hui' : new Date(x.t).toLocaleDateString('fr-FR')) + ' · ' + hm(x.t) + '</span></div><b style="color:' + (x.amount > 0 ? 'var(--lime)' : 'var(--mut)') + '">' + (x.amount > 0 ? '+' : '−') + fmt(Math.abs(x.amount)) + ' ' + x.unit + '</b></div>').join('') + '</div></div></div>';
+  }
+
+  function viewProfile() {
+    const e = ui.errors;
+    return '<div class="stack" style="max-width:820px"><div class="home-grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">' +
+      '<div class="card"><div class="row"><div class="avatar av-driver" style="width:56px;height:56px;font-size:19px">KT</div><div class="grow"><h2 style="font-size:19px">' + esc(S.driver.name) + '</h2><span class="small muted">' + icFill('star', 12).replace('class="ic"', 'class="ic" style="display:inline;vertical-align:-1px;color:var(--lime)"') + ' ' + S.driver.rating + ' · Chauffeur-livreur vérifié</span></div></div>' +
+        '<div class="grid-2"><div class="inset kv"><span class="label">Véhicule</span><b class="trunc">' + esc(S.driver.vehicle) + '</b></div><div class="inset kv"><span class="label">Immatriculation</span><b>' + esc(S.driver.plate) + '</b></div></div></div>' +
+      '<div class="card"><span class="label">Services</span>' +
+        settingRow('bag', 't-pink', 'Livraisons City+', 'Mode & colis express', 'svc-city', S.services.city) +
+        settingRow('taxi', 't-violet', 'Courses Vela Taxi', 'Passagers, paiement VM', 'svc-taxi', S.services.taxi) +
+        settingRow('vol', 't-lime', 'Guidage vocal', 'Annonces en français', 'voice', S.voice) +
+        '<div class="between"><div class="row">' + '<span class="tile-ic t-grey">' + ic('bolt', 18) + '</span><div><b>Vitesse de simulation</b><div class="tiny muted">Démo : accélère la conduite</div></div></div><div class="seg" style="width:150px">' + [1, 2, 4].map((v) => '<button class="' + (S.sim === v ? 'on' : '') + '" data-action="sim" data-v="' + v + '">×' + v + '</button>').join('') + '</div></div></div>' +
+      '<div class="card"><div class="between"><span class="label">Proches de confiance</span><span class="tiny muted">Partage de trajet &amp; SOS</span></div>' +
+        (S.contacts.length ? '<div class="list">' + S.contacts.map((c) => '<div class="li"><div class="avatar" style="background:var(--s3)">' + initials(c.name) + '</div><div class="grow"><b class="trunc" style="display:block">' + esc(c.name) + ' <span class="muted" style="font-weight:500">(' + esc(c.rel) + ')</span></b><span class="tiny muted">' + esc(c.phone) + '</span></div><button class="icon-btn" data-action="del-contact" data-id="' + c.id + '" aria-label="Supprimer ' + esc(c.name) + '">' + ic('trash', 18) + '</button></div>').join('') + '</div>' : '<p class="small muted">Aucun proche enregistré. Ajoutez-en un pour partager vos trajets.</p>') +
+        '<div class="grid-2"><div class="field"><label for="cName">Nom</label><input class="input' + (e.cName ? ' err' : '') + '" id="cName" placeholder="Awa D." value="' + esc(ui.cName || '') + '"></div><div class="field"><label for="cRel">Lien</label><input class="input" id="cRel" placeholder="Sœur" value="' + esc(ui.cRel || '') + '"></div></div>' +
+        '<div class="field"><label for="cPhone">Téléphone</label><input class="input' + (e.cPhone ? ' err' : '') + '" id="cPhone" inputmode="tel" placeholder="+225 07 00 00 00 00" value="' + esc(ui.cPhone || '') + '"></div>' +
+        (e.cName ? '<p class="err-msg">' + e.cName + '</p>' : '') + (e.cPhone ? '<p class="err-msg">' + e.cPhone + '</p>' : '') +
+        '<button class="btn btn-block" data-action="add-contact">' + ic('plus', 18) + 'Ajouter ce proche</button></div>' +
+      '<div class="card"><span class="label">Démo</span><p class="small muted">Les données sont enregistrées dans ce navigateur. Réinitialiser remet la journée d\'exemple.</p><button class="btn ' + (ui.resetArmed ? 'btn-red' : 'btn-ghost') + ' btn-block" data-action="reset">' + ic('refresh', 18) + (ui.resetArmed ? 'Confirmer la réinitialisation' : 'Réinitialiser la démo') + '</button></div>' +
+      '</div></div>';
+  }
+  function settingRow(icon, tone, title, sub, action, on) {
+    return '<div class="between"><div class="row"><span class="tile-ic ' + tone + '">' + ic(icon, 18) + '</span><div><b>' + title + '</b><div class="tiny muted">' + sub + '</div></div></div><button class="switch" role="switch" aria-label="' + title + '" aria-checked="' + on + '" data-action="' + action + '"></button></div>';
+  }
+
+  /* =========================================================
+     Panneaux (sheets)
+     ========================================================= */
+  function openSheet(name, data) {
+    ui.sheet = name;
+    ui.sheetData = data || null;
+    renderSheet();
+    $('scrim').classList.add('open');
+    $('sheet').classList.add('open');
+    setTimeout(() => { const f = $('sheet').querySelector('button, input'); if (f) f.focus({ preventScroll: true }); }, 50);
+  }
+  function closeSheet() {
+    ui.sheet = null;
+    $('scrim').classList.remove('open');
+    $('sheet').classList.remove('open');
+  }
+  function renderSheet() {
+    const n = ui.sheet;
+    if (!n) return;
+    const head = (t, sub) => '<div class="between"><h2>' + t + '</h2><button class="icon-btn" data-action="close-sheet" aria-label="Fermer">' + ic('x', 20) + '</button></div>' + (sub ? '<p class="small muted" style="margin-top:-8px">' + sub + '</p>' : '');
+    let h = '';
+    const m = S.mission;
+    if (n === 'share') {
+      const dest = m ? missionTarget(m).name : 'votre destination';
+      h = head('Partager mon trajet en direct', 'Vos proches suivent votre position jusqu\'à ' + esc(dest) + '. Le lien expire automatiquement à la fin de la mission.');
+      if (!S.contacts.length) {
+        h += '<div class="empty">' + ic('user', 30) + '<span>Aucun proche enregistré.</span><button class="btn btn-lime btn-sm" data-action="goto-profile">Ajouter un proche</button></div>';
+      } else {
+        h += '<div class="stack" style="gap:8px">' + S.contacts.map((c) => {
+          const sel = S.share.with.includes(c.id);
+          return '<button class="opt-row' + (sel ? ' sel' : '') + '" data-action="share-toggle" data-id="' + c.id + '" aria-pressed="' + sel + '"><div class="avatar" style="background:var(--s3)">' + initials(c.name) + '</div><div class="grow"><b style="display:block">' + esc(c.name) + ' (' + esc(c.rel) + ')</b><span class="tiny muted">' + esc(c.phone) + '</span></div><span class="tick">' + ic('check', 13) + '</span></button>';
+        }).join('') + '</div>';
+        if (S.share.active) {
+          h += '<div class="linkbox">' + ic('share', 14) + '<code id="shareLink">' + shareUrl() + '</code><button class="link" data-action="copy-link">Copier</button></div>';
+          h += '<a class="btn btn-wa btn-block" href="' + waLink() + '" target="_blank" rel="noopener">' + ic('msg', 18) + 'Envoyer par WhatsApp</a>';
+          h += '<div class="row"><button class="btn btn-lime grow" data-action="share-start">Mettre à jour</button><button class="btn" style="background:rgba(255,90,82,.14);color:var(--red)" data-action="share-stop">Arrêter</button></div>';
+        } else {
+          h += '<button class="btn btn-lime btn-lg btn-block" data-action="share-start"' + (S.share.with.length ? '' : ' disabled') + '>' + ic('pin', 20) + 'Démarrer le partage</button>';
         }
-        delivered = true;
-        pins.forEach((p) => { p.disabled = true; });
-        b.disabled = false;
-        b.classList.replace('bg-primary-container', 'bg-primary-fixed-dim');
-        b.innerHTML = '<span class="material-symbols-outlined text-[20px]">task_alt</span><span>Livraison confirmée · Retour accueil</span>';
-        $('step2Icon').className = 'w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0';
-        $('step2Icon').innerHTML = '<span class="material-symbols-outlined text-[16px]">check</span>';
-        $('step3Icon').className = 'w-7 h-7 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shrink-0';
-        $('step3Icon').innerHTML = '<span class="material-symbols-outlined text-[16px]">check</span>';
-        $('step3Title').className = 'font-headline-sm text-headline-sm text-on-surface';
-        $('step3Time').textContent = '14:31';
-        $('step3Time').className = 'font-label-md text-label-md text-primary-fixed';
-        state.city++; state.earnings += 2800; state.vm += 2800; state.pending = Math.max(0, state.pending - 1);
-        renderStats();
-        toast('+2 800 FCFA crédités sur votre portefeuille Vela');
-      }, 1100);
-    });
+      }
+    } else if (n === 'sos') {
+      h = head('Alerte SOS Vela', 'Le centre de sécurité Vela et vos proches reçoivent votre position en direct. Utilisez-la uniquement en cas de danger.');
+      if (S.sos) {
+        h += '<div class="sos-live row">' + ic('sos', 20) + '<div class="grow"><b>Alerte active</b><div class="small">Un agent Vela vous rappelle. Restez dans un lieu sûr.</div></div></div><button class="btn btn-ghost btn-block" data-action="sos-cancel">Annuler l\'alerte (fausse alerte)</button>';
+      } else {
+        h += '<div class="inset small">Position envoyée : <b>' + esc(nearestPlace().name) + '</b><br>Véhicule : ' + esc(S.driver.vehicle) + ' · ' + esc(S.driver.plate) + '</div>';
+        h += '<button class="btn btn-red btn-lg btn-block" data-action="sos-confirm">' + ic('sos', 20) + 'Déclencher l\'alerte</button><button class="btn btn-ghost btn-block" data-action="close-sheet">Je suis en sécurité</button>';
+      }
+    } else if (n === 'report') {
+      h = head('Signaler sur l\'itinéraire', 'Les autres chauffeurs Vela seront prévenus.');
+      h += '<div class="grid-2">' + [['Accident', 'warn'], ['Contrôle police', 'shield'], ['Bouchon', 'traffic'], ['Route inondée', 'map']].map((x) => '<button class="opt-row" style="flex-direction:column;align-items:flex-start" data-action="report-pick" data-v="' + x[0] + '"><span class="tile-ic t-lime">' + ic(x[1], 18) + '</span><b>' + x[0] + '</b></button>').join('') + '</div>';
+    } else if (n === 'contact') {
+      const kind = ui.sheetData;
+      const c = m ? m.customer : null;
+      h = head(kind === 'sms' ? 'Message au client' : 'Appeler le client', c ? esc(c.name) : '');
+      if (c) {
+        h += '<div class="linkbox" style="font-size:16px"><code id="custPhone" style="color:var(--fg)">' + esc(c.phone) + '</code><button class="link" data-action="copy-phone">Copier</button></div>';
+        if (kind === 'sms') {
+          h += '<div class="stack" style="gap:8px">' + ['J\'arrive dans ' + Math.max(1, Math.round((m.leg ? (m.leg.len - m.traveled) * 0.025 : 0) / 27 * 60)) + ' min.', 'Je suis sur place, ' + esc(S.driver.vehicle) + '.', 'Je ne trouve pas l\'adresse, pouvez-vous m\'appeler ?'].map((t) => '<button class="opt-row" data-action="sms-send" data-v="' + esc(t) + '">' + ic('msg', 16) + '<span class="grow">' + t + '</span>' + ic('send', 16) + '</button>').join('') + '</div>';
+        } else {
+          h += '<p class="small muted">Appel masqué via Vela : votre numéro reste privé. Composez ce numéro depuis votre téléphone.</p><a class="btn btn-lime btn-block" href="tel:' + c.phone.replace(/\s/g, '') + '">' + ic('phone', 18) + 'Appeler</a>';
+        }
+      }
+    } else if (n === 'cancel') {
+      h = head('Annuler la mission ?', 'Une annulation baisse votre taux d\'acceptation.');
+      h += '<div class="stack" style="gap:8px">' + ['Client injoignable', 'Adresse introuvable', 'Problème avec le véhicule', 'Colis non prêt / passager absent'].map((r) => '<button class="opt-row" data-action="cancel-confirm" data-v="' + r + '">' + ic('x', 16) + '<span class="grow">' + r + '</span></button>').join('') + '</div><button class="btn btn-ghost btn-block" data-action="close-sheet">Continuer la mission</button>';
+    } else if (n === 'notifs') {
+      h = head('Notifications');
+      h += S.notifs.length ? '<div class="list">' + S.notifs.map((x) => '<div class="li">' + '<span class="status-dot' + (x.read ? '' : ' on') + '" style="animation:none"></span><div class="grow small">' + esc(x.text) + '<div class="tiny muted">' + hm(x.t) + '</div></div></div>').join('') + '</div>' : '<div class="empty">Aucune notification.</div>';
+      if (S.offer) h += '<button class="btn btn-lime btn-block" data-action="sheet-go" data-view="offer">Voir l\'offre en attente</button>';
+    } else if (n === 'parking') {
+      const t = m ? missionTarget(m) : nearestPlace();
+      h = head('Parkings près de ' + esc(t.short), 'Places libres en temps réel.');
+      h += '<div class="stack" style="gap:8px">' + [['Parking ' + t.short + ' Centre', '120 m', 14, '300 F/h'], ['Parking souterrain ' + t.short, '350 m', 42, '500 F/h'], ['Dépose-minute Vela', '60 m', 3, 'Gratuit 10 min']].map((p) => '<button class="opt-row" data-action="park-pick" data-v="' + esc(p[0]) + '"><span class="tile-ic t-violet">' + ic('park', 18) + '</span><div class="grow"><b style="display:block">' + esc(p[0]) + '</b><span class="tiny muted">' + p[1] + ' · ' + p[3] + '</span></div><span class="chip chip-green">' + p[2] + ' libres</span></button>').join('') + '</div>';
+    } else if (n === 'code-help') {
+      h = head('Problème de code ?', '');
+      h += '<p class="small muted">Demandez à la cliente d\'ouvrir City+ → Commandes → ' + (m ? m.id : '') + '. Le code s\'affiche en haut de l\'écran.</p><button class="btn btn-block" data-action="resend-code">' + ic('refresh', 18) + 'Renvoyer le code par SMS à la cliente</button>';
+    }
+    $('sheet').innerHTML = h;
+  }
 
-    // ---------- Statut en ligne ----------
-    $('statusToggle').addEventListener('click', () => {
-      state.online = !state.online;
-      const on = state.online;
-      $('statusToggle').setAttribute('aria-checked', on);
-      $('statusToggle').classList.toggle('bg-primary-container', on);
-      $('statusToggle').classList.toggle('bg-surface-container-highest', !on);
-      $('statusKnob').classList.toggle('translate-x-6', on);
-      $('statusKnob').classList.toggle('translate-x-0', !on);
-      $('statusKnob').classList.toggle('bg-on-primary-container', on);
-      $('statusKnob').classList.toggle('bg-outline', !on);
-      $('statusPing').hidden = !on;
-      $('statusDot').classList.toggle('bg-primary-container', on);
-      $('statusDot').classList.toggle('bg-outline', !on);
-      $('avatarDot').classList.toggle('bg-primary-container', on);
-      $('avatarDot').classList.toggle('bg-outline', !on);
-      $('statusLabel').textContent = on ? 'En ligne' : 'Hors ligne';
-      $('statusSub').textContent = on ? 'Prêt pour nouvelles courses' : 'Vous ne recevez plus de courses';
-      toast(on ? 'Vous êtes en ligne' : 'Vous êtes hors ligne');
-    });
+  /* =========================================================
+     Mode conduite
+     ========================================================= */
+  const D = { raf: 0, last: 0, speed: 0, tilt: true, follow: true, traffic: true, lastMan: -1, announced200: -1, saveAcc: 0 };
+  function enterDrive() {
+    const m = S.mission;
+    if (!m || !(m.phase === 'to_pickup' || m.phase === 'to_drop')) return;
+    if (!m.leg) m.leg = buildRoute(S.pos, missionTarget(m), m.avoidToll);
+    ui.driving = true;
+    buildDrive();
+    $('drive').hidden = false;
+    document.body.style.overflow = 'hidden';
+    D.last = performance.now();
+    D.lastMan = -1;
+    renderBanner();
+    const t = missionTarget(m);
+    speak('Navigation vers ' + t.short + '. ' + (m.leg.km) + ' kilomètres.');
+    loop();
+  }
+  function exitDrive(silent) {
+    ui.driving = false;
+    cancelAnimationFrame(D.raf);
+    $('drive').hidden = true;
+    document.body.style.overflow = '';
+    save(true);
+    if (!silent) render();
+  }
 
-    $('notifBtn').addEventListener('click', () => {
-      if (!state.online) { toast('Passez en ligne pour recevoir des offres'); return; }
-      toast('Nouvelle livraison City+ à Cocody Angré');
-      show('offre-city');
-    });
+  function buildDrive() {
+    const m = S.mission;
+    const t = missionTarget(m);
+    const isTaxi = m.type === 'taxi';
+    const nextLabel = m.phase === 'to_pickup' ? (isTaxi ? 'Prise en charge · ' : 'Collecte · ') + t.short : (isTaxi ? 'Destination · ' : 'Livraison · ') + t.short;
+    const markers = [{ x: t.x, y: t.y, kind: m.phase === 'to_pickup' ? 'pickup' : 'drop', label: t.short }];
+    $('drive').innerHTML =
+      '<div class="d-left">' +
+        '<div class="d-map' + (D.tilt ? ' tilt' : '') + '" id="dMap"><div class="d-map-in">' + mapSVG({ id: 'dr', svgId: 'dSvg', route: m.leg.pts, routeId: 'dRoute', markers, car: { x: S.pos.x, y: S.pos.y }, carId: 'dCar', beam: true, traffic: D.traffic, incidents: m.incidents }) + '</div></div>' +
+        '<div class="d-top">' +
+          '<div class="man" aria-live="polite"><div class="man-ic" id="dManIc">' + ic('up', 34) + '</div><div class="grow" style="min-width:0"><div class="row wrap" style="gap:8px"><span class="man-d" id="dManD">—</span><span class="chip chip-lime" id="dLane" hidden>Voie de droite</span></div><div class="man-t trunc" id="dManT">—</div><div class="small muted trunc" id="dManS">' + esc(nextLabel) + '</div></div></div>' +
+          '<div class="d-pills"><button class="pill' + (S.voice ? '' : ' off') + '" data-action="d-voice" id="dVoice"><span class="pdot"></span>' + ic(S.voice ? 'vol' : 'mute', 16) + '<span>' + (S.voice ? 'Guidage vocal actif' : 'Guidage vocal coupé') + '</span></button>' +
+          '<button class="pill" data-action="d-exit">' + ic('minimize', 16) + 'Réduire</button></div>' +
+        '</div>' +
+        '<div class="d-mid">' +
+          '<span class="chip chip-green traffic-chip" id="dTraffic">' + ic('traffic', 14) + '—</span>' +
+          '<div class="speedo"><div class="gauge"><svg viewBox="0 0 100 100" width="100%" height="100%"><circle cx="50" cy="50" r="44" fill="none" stroke="#26262c" stroke-width="6" pathLength="100" stroke-dasharray="75 100" transform="rotate(135 50 50)" stroke-linecap="round"/><circle id="dArc" cx="50" cy="50" r="44" fill="none" stroke="#c6f338" stroke-width="6" pathLength="100" stroke-dasharray="0 100" transform="rotate(135 50 50)" stroke-linecap="round"/></svg><div><b id="dSpeed">0</b><small>KM/H</small></div></div>' +
+          '<div class="limit" id="dLimit">50</div></div>' +
+          '<div class="fabs"><button class="fab' + (D.tilt ? ' on' : '') + '" data-action="d-tilt" aria-label="Vue 3D">' + ic('cube', 20) + '</button><button class="fab' + (D.traffic ? ' on' : '') + '" data-action="d-traffic" aria-label="Couche trafic">' + ic('traffic', 20) + '</button><button class="fab' + (D.follow ? ' on' : '') + '" data-action="d-follow" aria-label="Suivre le véhicule">' + ic('target', 20) + '</button><button class="fab fab-txt" data-action="d-sim" aria-label="Vitesse de simulation" id="dSim">×' + S.sim + '</button></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="cockpit">' +
+        '<div class="metrics"><div><b id="dEta" style="color:var(--lime)">--:--</b><span class="tiny muted">Arrivée</span></div><div><b id="dMin">—</b><span class="tiny muted">Restant</span></div><div><b id="dKm">—</b><span class="tiny muted">Distance</span></div></div>' +
+        '<div><div class="bar"><i id="dBar"></i></div><div class="between tiny muted" style="margin-top:5px"><span class="trunc">' + esc(m.phase === 'to_pickup' ? nearestPlaceTo(m.leg.pts[0]).short : placeById(m.pickupId).short) + '</span><span class="trunc">' + esc(t.short) + '</span></div></div>' +
+        '<div class="chip chip-pink" style="justify-content:space-between;white-space:normal;padding:8px 8px 8px 12px;border-radius:12px" id="dAlert"></div>' +
+        '<div id="dShare"></div>' +
+        '<div id="dSos"></div>' +
+        '<div class="qa-grid">' +
+          '<button class="qa" data-action="report">' + ic('warn', 22, ' style="color:var(--amber)"') + 'Signaler</button>' +
+          '<button class="qa' + (S.voice ? ' on' : '') + '" data-action="d-voice" id="dVoiceQa">' + ic(S.voice ? 'vol' : 'mute', 22) + 'Guidage</button>' +
+          '<button class="qa' + (m.avoidToll ? ' on' : '') + '" data-action="d-avoid" id="dAvoid">' + ic('fork', 22, ' style="color:var(--violet-soft)"') + 'Évitement</button>' +
+          '<button class="qa' + (S.share.active ? ' on' : '') + '" data-action="open-share" id="dShareQa">' + ic('pin', 22, ' style="color:var(--lime)"') + (S.share.active ? 'Partagé' : 'Partager') + '</button>' +
+          '<button class="qa sos" data-action="open-sos">' + ic('sos', 22) + 'SOS Vela</button>' +
+        '</div>' +
+        '<div class="row"><button class="btn btn-violet btn-lg grow" data-action="parking" style="border-radius:16px"><span style="width:26px;height:26px;border-radius:8px;background:#fff;color:var(--violet);display:grid;place-items:center;font-family:var(--display)">P</span><span class="trunc">Trouver parking ' + esc(t.short) + '</span></button>' +
+        '<button class="btn btn-lime btn-lg" style="width:56px;padding:0;border-radius:16px" data-action="call" aria-label="Appeler le client">' + ic('phone', 22) + '</button></div>' +
+      '</div>';
+    updateDriveSide();
+    tick(0);
+  }
+  function nearestPlaceTo(p) { return PLACES.slice().sort((a, b) => dist(a, p) - dist(b, p))[0]; }
 
-    function renderStats() {
-      $('earnings').textContent = fmt(state.earnings);
-      $('vmBalance').textContent = fmt(state.vm);
-      $('countCity').textContent = state.city;
-      $('countVela').textContent = state.vela;
-      $('pendingBadge').textContent = state.pending ? state.pending + ' en attente' : 'À jour';
+  function updateDriveSide() {
+    if (!ui.driving) return;
+    const m = S.mission;
+    const sh = $('dShare');
+    if (sh) sh.innerHTML = S.share.active ? '<div class="share-live"><div class="row small" style="color:var(--green);font-weight:700"><span class="live"></span>Partage de trajet en direct actif<span class="grow"></span><span class="muted" style="font-weight:500" data-share-timer>' + mmss((Date.now() - S.share.startedAt) / 1000) + '</span></div><div class="between small"><span class="trunc">Partagé avec : <b>' + esc(shareNames()) + '</b></span><a class="btn btn-wa btn-sm" href="' + waLink() + '" target="_blank" rel="noopener">' + ic('msg', 14) + 'WhatsApp</a></div><div class="between tiny muted"><span class="row" style="gap:4px">' + ic('lock', 12) + 'Position chiffrée jusqu\'à ' + esc(missionTarget(m).short) + '</span><button class="link" data-action="open-share">Gérer</button></div></div>' : '';
+    const so = $('dSos');
+    if (so) so.innerHTML = S.sos ? '<div class="sos-live between small"><span class="row">' + ic('sos', 18) + '<b>SOS actif · centre Vela alerté</b></span><button class="link" style="color:#ffb4ab" data-action="open-sos">Gérer</button></div>' : '';
+    const q = $('dShareQa');
+    if (q) { q.classList.toggle('on', S.share.active); q.lastChild.textContent = S.share.active ? 'Partagé' : 'Partager'; }
+    const a = $('dAlert');
+    if (a) {
+      const leg = m.leg;
+      if (leg.bridge === 'hkb') a.innerHTML = '<span>Trafic très fluide sur le Pont HKB</span><span class="chip" style="background:#000;color:var(--lime)">−10 min vs Adjamé</span>';
+      else if (leg.bridge === 'dg') a.innerHTML = '<span>' + (m.avoidToll ? 'Itinéraire sans péage via Pont De Gaulle' : 'Pont De Gaulle ralenti') + '</span><span class="chip" style="background:#000;color:var(--amber)">+4 min</span>';
+      else a.innerHTML = '<span>Trafic fluide sur votre itinéraire</span><span class="chip" style="background:#000;color:var(--lime)">À l\'heure</span>';
+    }
+  }
+
+  function loop() {
+    D.raf = requestAnimationFrame((now) => {
+      const dt = Math.min(0.1, (now - D.last) / 1000);
+      D.last = now;
+      if (ui.driving) { tick(dt); loop(); }
+    });
+  }
+
+  function tick(dt) {
+    const m = S.mission;
+    if (!m || !m.leg) return;
+    const leg = m.leg;
+    const pos = pointAt(leg.pts, m.traveled);
+    const onBridge = !!(leg.pts[pos.seg] && leg.pts[pos.seg - 1] && leg.pts[pos.seg - 1].bridge);
+    const limit = onBridge ? 80 : 50;
+    const target = limit - 6 + Math.sin(performance.now() / 1300) * 5;
+    const nearEnd = (leg.len - m.traveled) * M_PER_UNIT < 150;
+    const goal = nearEnd ? 22 : target;
+    D.speed += (goal - D.speed) * Math.min(1, dt * 1.6);
+    // 20 × temps réel × vitesse de simulation
+    const simSec = dt * 20 * S.sim;
+    m.traveled = Math.min(leg.len, m.traveled + (D.speed / 3.6) * simSec / M_PER_UNIT);
+    const p = pointAt(leg.pts, m.traveled);
+    S.pos = { x: p.x, y: p.y };
+
+    const car = $('dCar');
+    if (car) car.setAttribute('transform', 'translate(' + p.x.toFixed(1) + ' ' + p.y.toFixed(1) + ') rotate(' + (p.angle * 180 / Math.PI).toFixed(1) + ')');
+    const svg = $('dSvg');
+    if (svg) svg.setAttribute('viewBox', D.follow ? (p.x - 110) + ' ' + (p.y - 170) + ' 220 300' : '-10 20 420 580');
+    const routeEl = $('dRoute');
+    if (routeEl) {
+      const remain = [{ x: p.x, y: p.y }].concat(leg.pts.slice(p.seg));
+      routeEl.setAttribute('points', remain.map((q) => q.x.toFixed(1) + ',' + q.y.toFixed(1)).join(' '));
     }
 
-    show('accueil', false);
-    document.querySelector('.tab[data-go="accueil"]').classList.add('text-primary-container');
-    document.querySelectorAll('.tab:not([data-go="accueil"])').forEach((t) => t.classList.add('text-on-surface-variant'));
-  })();
+    // Manœuvre suivante
+    let acc = 0, idx = leg.pts.length - 1, cum = 0;
+    for (let i = 1; i < leg.pts.length; i++) {
+      acc += dist(leg.pts[i - 1], leg.pts[i]);
+      if (acc > m.traveled + 0.5) { idx = i; cum = acc; break; }
+    }
+    if (!cum) cum = leg.len;
+    const toNext = Math.max(0, (cum - m.traveled) * M_PER_UNIT);
+    const dir = turnAt(leg.pts, idx);
+    const wp = leg.pts[idx];
+    const verb = dir === 'flag' ? 'Arrivée' : dir === 'right' ? 'Tournez à droite' : dir === 'left' ? 'Tournez à gauche' : 'Continuez tout droit';
+    const title = dir === 'flag' ? wp.label : verb + ' · ' + wp.label;
+    let sub = '';
+    if (idx < leg.pts.length - 1) {
+      const nd = turnAt(leg.pts, idx + 1);
+      const segKm = dist(leg.pts[idx], leg.pts[idx + 1]) * M_PER_UNIT / 1000;
+      sub = 'Puis ' + (nd === 'flag' ? 'arrivée à ' + leg.pts[idx + 1].label : (nd === 'up' ? 'continuer tout droit' : nd === 'right' ? 'à droite' : 'à gauche') + ' sur ' + segKm.toFixed(1) + ' km');
+    } else sub = esc(missionTarget(m).detail);
+    const setTxt = (id, v) => { const el = $(id); if (el && el.textContent !== v) el.textContent = v; };
+    setTxt('dManD', toNext >= 1000 ? (toNext / 1000).toFixed(1) + ' km' : (Math.round(toNext / 10) * 10) + ' m');
+    setTxt('dManT', title);
+    setTxt('dManS', sub);
+    if (D.lastMan !== idx) {
+      const icEl = $('dManIc');
+      if (icEl) icEl.innerHTML = ic(dir === 'flag' ? 'flag' : dir, 34);
+      const lane = $('dLane');
+      if (lane) { lane.hidden = dir !== 'right' && dir !== 'left'; lane.textContent = dir === 'left' ? 'Voie de gauche' : '2 voies de droite'; }
+      if (D.lastMan !== -1) speak(dir === 'flag' ? 'Arrivée à ' + wp.label + ' dans ' + Math.round(toNext / 50) * 50 + ' mètres' : verb + ', ' + wp.label);
+      D.lastMan = idx;
+      D.announced200 = -1;
+    }
+    if (toNext < 220 && toNext > 120 && D.announced200 !== idx && dir !== 'flag') {
+      D.announced200 = idx;
+      speak('Dans 200 mètres, ' + verb.toLowerCase() + ', ' + wp.label);
+    }
+
+    const remKm = (leg.len - m.traveled) * M_PER_UNIT / 1000;
+    const remMin = Math.max(remKm > 0.05 ? 1 : 0, Math.round(remKm / 27 * 60));
+    setTxt('dSpeed', String(Math.round(D.speed)));
+    const arc = $('dArc');
+    if (arc) arc.setAttribute('stroke-dasharray', (Math.min(1, D.speed / 100) * 75).toFixed(1) + ' 100');
+    setTxt('dLimit', String(limit));
+    setTxt('dKm', remKm.toFixed(1) + ' km');
+    setTxt('dMin', remMin + ' min');
+    setTxt('dEta', hm(Date.now() + remMin * 60e3));
+    const bar = $('dBar');
+    if (bar) bar.style.width = (m.traveled / leg.len * 100).toFixed(1) + '%';
+    const tr = $('dTraffic');
+    if (tr) {
+      const txt = onBridge ? (leg.bridge === 'hkb' ? 'Pont HKB fluide' : 'Pont De Gaulle ralenti') : 'Circulation fluide';
+      if (tr.lastChild.textContent !== txt) { tr.innerHTML = ic('traffic', 14) + txt; tr.className = 'chip traffic-chip ' + (onBridge && leg.bridge === 'dg' ? 'chip-amber' : 'chip-green'); }
+    }
+    const st = document.querySelector('[data-share-timer]');
+    if (st) st.textContent = mmss((Date.now() - S.share.startedAt) / 1000);
+
+    D.saveAcc += dt;
+    if (D.saveAcc > 2) { D.saveAcc = 0; save(); }
+
+    if (m.traveled >= leg.len - 0.01 && dt > 0) {
+      arrive();
+      exitDrive(true);
+      toast('Vous êtes arrivé · ' + missionTarget(m).short);
+      go('mission', true);
+    }
+  }
+
+  function toggleAvoid() {
+    const m = S.mission;
+    if (!m) return;
+    const from = pointAt(m.leg.pts, m.traveled);
+    const target = missionTarget(m);
+    const next = !m.avoidToll;
+    const newLeg = buildRoute({ x: from.x, y: from.y, short: 'Position' }, target, next);
+    if (!next && !newLeg.bridge && !m.leg.bridge) { toast('Aucun péage sur cet itinéraire'); return; }
+    if (next && m.leg.bridge !== 'hkb') { toast('Votre itinéraire évite déjà le péage HKB'); m.avoidToll = true; save(); rebuildDrive(); return; }
+    const diffMin = newLeg.min - Math.round((m.leg.len - m.traveled) * M_PER_UNIT / 1000 / 27 * 60);
+    m.avoidToll = next;
+    m.leg = newLeg;
+    m.traveled = 0;
+    save();
+    rebuildDrive();
+    toast(next ? 'Itinéraire sans péage via Pont De Gaulle (' + (diffMin >= 0 ? '+' : '') + diffMin + ' min)' : 'Itinéraire le plus rapide rétabli');
+    speak(next ? 'Nouvel itinéraire sans péage' : 'Itinéraire le plus rapide');
+  }
+  function rebuildDrive() { if (ui.driving) { buildDrive(); } }
+
+  /* =========================================================
+     Actions
+     ========================================================= */
+  const A = {
+    go: (el) => go(el.dataset.view),
+    back: () => back(),
+    'sheet-go': (el) => { closeSheet(); go(el.dataset.view); },
+    'toggle-online': () => {
+      if (S.mission) { toast('Terminez la mission en cours avant de passer hors ligne'); return; }
+      S.online = !S.online;
+      if (!S.online && S.offer) closeOffer('expired');
+      if (S.online) ui.nextOfferAt = Date.now() + 6000;
+      notify(S.online ? 'Vous êtes en ligne' : 'Vous êtes hors ligne');
+      save();
+      toast(S.online ? 'Vous êtes en ligne' : 'Vous êtes hors ligne · aucune offre ne sera proposée');
+      render();
+    },
+    request: (el) => requestOffer(el.dataset.type),
+    accept: () => acceptOffer(),
+    decline: () => { const t = S.offer && S.offer.type; closeOffer('declined'); toast(t === 'taxi' ? 'Course passée' : 'Livraison refusée'); ui.stack = []; go('home', true); },
+    drive: () => enterDrive(),
+    advance: () => advance(),
+    complete: () => { complete(); render(); toast('+' + fmt(S.history[0].amount) + ' VM crédités'); },
+    finish: () => finishMission(),
+    'cancel-mission': () => openSheet('cancel'),
+    'cancel-confirm': (el) => cancelMission(el.dataset.v),
+    'check-pin': () => checkPin(),
+    'code-help': () => openSheet('code-help'),
+    'resend-code': () => { closeSheet(); toast('Code renvoyé par SMS à ' + S.mission.customer.name); },
+    call: () => openSheet('contact', 'call'),
+    sms: () => openSheet('contact', 'sms'),
+    'sms-send': (el) => { closeSheet(); notify('SMS envoyé à ' + S.mission.customer.name + ' : « ' + el.dataset.v + ' »'); save(); renderChrome(); toast('Message envoyé'); },
+    'copy-phone': () => copy($('custPhone')),
+    'copy-link': () => copy($('shareLink')),
+    'open-share': () => openSheet('share'),
+    'share-toggle': (el) => {
+      const id = el.dataset.id;
+      S.share.with = S.share.with.includes(id) ? S.share.with.filter((x) => x !== id) : S.share.with.concat(id);
+      save();
+      renderSheet();
+    },
+    'share-start': () => { if (startShare()) { closeSheet(); afterShareChange(); } },
+    'share-stop': () => { stopShare(); closeSheet(); afterShareChange(); },
+    'goto-profile': () => { closeSheet(); exitDrive(true); go('profile'); },
+    'open-sos': () => openSheet('sos'),
+    'sos-confirm': () => {
+      S.sos = true;
+      notify('SOS déclenché · centre Vela alerté près de ' + nearestPlace().short);
+      if (!S.share.active && S.contacts.length) { if (!S.share.with.length) S.share.with = [S.contacts[0].id]; startShare(); }
+      save();
+      closeSheet();
+      toast('Alerte SOS envoyée · un agent Vela vous rappelle');
+      afterShareChange();
+    },
+    'sos-cancel': () => { S.sos = false; notify('Alerte SOS annulée'); save(); closeSheet(); toast('Alerte SOS annulée'); afterShareChange(); },
+    report: () => openSheet('report'),
+    'report-pick': (el) => {
+      const m = S.mission;
+      if (m) { m.incidents = (m.incidents || []).concat({ x: S.pos.x, y: S.pos.y, type: el.dataset.v }); save(); }
+      notify('Signalement envoyé : ' + el.dataset.v + ' près de ' + nearestPlace().short);
+      closeSheet();
+      toast('Merci ! « ' + el.dataset.v + ' » signalé aux chauffeurs Vela');
+      rebuildDrive();
+      renderChrome();
+    },
+    parking: () => openSheet('parking'),
+    'park-pick': (el) => { closeSheet(); toast(el.dataset.v + ' ajouté comme arrêt final'); notify('Parking choisi : ' + el.dataset.v); save(); },
+    'd-exit': () => { exitDrive(); toast('Navigation en pause'); },
+    'd-voice': () => {
+      S.voice = !S.voice;
+      save();
+      toast(S.voice ? 'Guidage vocal réactivé' : 'Guidage vocal coupé');
+      if (S.voice) speak('Guidage vocal activé');
+      else { try { window.speechSynthesis && window.speechSynthesis.cancel(); } catch (e) { /* rien */ } }
+      rebuildDrive();
+    },
+    'd-avoid': () => toggleAvoid(),
+    'd-tilt': (el) => { D.tilt = !D.tilt; $('dMap').classList.toggle('tilt', D.tilt); el.classList.toggle('on', D.tilt); },
+    'd-traffic': () => { D.traffic = !D.traffic; rebuildDrive(); toast(D.traffic ? 'Couche trafic affichée' : 'Couche trafic masquée'); },
+    'd-follow': (el) => { D.follow = !D.follow; el.classList.toggle('on', D.follow); toast(D.follow ? 'Suivi du véhicule' : 'Vue d\'ensemble de l\'itinéraire'); },
+    'd-sim': (el) => { S.sim = S.sim === 1 ? 2 : S.sim === 2 ? 4 : 1; el.textContent = '×' + S.sim; save(); },
+    notifs: () => { openSheet('notifs'); S.notifs.forEach((n) => { n.read = true; }); save(); renderChrome(); },
+    'close-sheet': () => closeSheet(),
+    filter: (el) => { ui.filter = el.dataset.f; render(); },
+    wtab: (el) => { ui.walletTab = el.dataset.t; ui.errors = {}; render(); },
+    preset: (el) => { const i = $(el.dataset.field); if (i) { i.value = fmt(+el.dataset.v); ui.convVal = i.value; } },
+    convert: () => {
+      const v = parseAmount($('convAmt').value);
+      ui.convVal = $('convAmt').value;
+      if (!v) return fail('conv', 'Saisissez un montant.');
+      if (v < 500) return fail('conv', 'Montant minimum : 500 VM.');
+      if (v > S.vm) return fail('conv', 'Solde insuffisant : ' + fmt(S.vm) + ' VM disponibles.');
+      S.vm -= v; S.fcfa += v;
+      const t = Date.now();
+      S.tx.unshift({ id: uid(), label: 'Conversion VM → FCFA', amount: v, unit: 'F', t }, { id: uid(), label: 'Conversion VM → FCFA', amount: -v, unit: 'VM', t });
+      notify(fmt(v) + ' VM convertis en FCFA');
+      ui.convVal = ''; ui.errors = {};
+      save(); render(); toast(fmt(v) + ' VM convertis · solde FCFA ' + fmt(S.fcfa) + ' F');
+    },
+    withdraw: () => {
+      const v = parseAmount($('wdAmt').value);
+      const num = $('wdNum').value.replace(/\D/g, '').replace(/^225/, '');
+      ui.wdVal = $('wdAmt').value; ui.wdNum = $('wdNum').value; ui.wdOp = $('wdOp').value;
+      ui.errors = {};
+      if (!v || v < 1000) ui.errors.wd = 'Montant minimum de retrait : 1 000 F.';
+      else if (v > S.fcfa) ui.errors.wd = 'Solde FCFA insuffisant (' + fmt(S.fcfa) + ' F). Convertissez d\'abord des VM.';
+      if (!/^(01|05|07)\d{8}$/.test(num)) ui.errors.wdNum = 'Numéro ivoirien à 10 chiffres commençant par 01, 05 ou 07.';
+      if (ui.errors.wd || ui.errors.wdNum) { render(); return; }
+      S.fcfa -= v;
+      S.tx.unshift({ id: uid(), label: 'Retrait ' + ui.wdOp + ' · ' + num.slice(0, 2) + ' •• •• ' + num.slice(-2), amount: -v, unit: 'F', t: Date.now() });
+      notify('Retrait de ' + fmt(v) + ' F vers ' + ui.wdOp + ' effectué');
+      ui.wdVal = '';
+      save(); render(); toast('Retrait envoyé vers ' + ui.wdOp);
+    },
+    'svc-city': () => toggleService('city'),
+    'svc-taxi': () => toggleService('taxi'),
+    voice: () => { S.voice = !S.voice; save(); render(); toast(S.voice ? 'Guidage vocal activé' : 'Guidage vocal désactivé'); },
+    sim: (el) => { S.sim = +el.dataset.v; save(); render(); },
+    'add-contact': () => {
+      const name = $('cName').value.trim(), rel = $('cRel').value.trim() || 'Proche', phone = $('cPhone').value.trim();
+      ui.cName = name; ui.cRel = $('cRel').value; ui.cPhone = phone;
+      ui.errors = {};
+      if (name.length < 2) ui.errors.cName = 'Indiquez le nom du proche.';
+      const digits = phone.replace(/\D/g, '').replace(/^225/, '');
+      if (!/^(01|05|07)\d{8}$/.test(digits)) ui.errors.cPhone = 'Numéro ivoirien à 10 chiffres (01, 05 ou 07).';
+      if (ui.errors.cName || ui.errors.cPhone) { render(); return; }
+      const c = { id: uid(), name, rel, phone: '+225 ' + digits.replace(/(\d{2})(?=\d)/g, '$1 ') };
+      S.contacts.push(c);
+      if (!S.share.with.length) S.share.with = [c.id];
+      ui.cName = ui.cRel = ui.cPhone = '';
+      save(); render(); toast(name + ' ajouté à vos proches');
+    },
+    'del-contact': (el) => {
+      const id = el.dataset.id;
+      S.contacts = S.contacts.filter((c) => c.id !== id);
+      S.share.with = S.share.with.filter((x) => x !== id);
+      if (S.share.active && !S.share.with.length) stopShare();
+      save(); render();
+    },
+    reset: () => {
+      if (!ui.resetArmed) { ui.resetArmed = true; render(); setTimeout(() => { ui.resetArmed = false; if (ui.view === 'profile') render(); }, 4000); return; }
+      exitDrive(true);
+      S = seed();
+      ui.resetArmed = false;
+      ui.nextOfferAt = Date.now() + 7000;
+      save(true);
+      ui.stack = [];
+      go('home', true);
+      toast('Démo réinitialisée');
+    }
+  };
+  function fail(key, msg) { ui.errors = {}; ui.errors[key] = msg; render(); }
+  function parseAmount(s) { return parseInt(String(s).replace(/\D/g, ''), 10) || 0; }
+  function toggleService(t) {
+    S.services[t] = !S.services[t];
+    if (!S.services[t] && S.offer && S.offer.type === t) closeOffer('expired');
+    save(); render();
+    toast((t === 'taxi' ? 'Courses Vela Taxi ' : 'Livraisons City+ ') + (S.services[t] ? 'activées' : 'désactivées'));
+  }
+  function afterShareChange() {
+    if (ui.driving) updateDriveSide();
+    else if (ui.view === 'mission') render();
+  }
+  function copy(el) {
+    if (!el) return;
+    const text = el.textContent;
+    const fallback = () => {
+      const r = document.createRange(); r.selectNodeContents(el);
+      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      toast('Texte sélectionné, copiez-le');
+    };
+    try {
+      navigator.clipboard.writeText(text).then(() => toast('Copié'), fallback);
+    } catch (e) { fallback(); }
+  }
+
+  function checkPin() {
+    const m = S.mission;
+    const val = [0, 1, 2, 3].map((i) => $('pin' + i).value).join('');
+    if (!/^\d{4}$/.test(val)) return;
+    if (val !== m.code) {
+      ui.pinTries++;
+      ui.errors = { pin: ui.pinTries >= 3 ? 'Trois essais incorrects. Utilisez « Problème de code ? » pour renvoyer le code.' : 'Code incorrect. Vérifiez avec la cliente (' + (3 - ui.pinTries) + ' essai' + (3 - ui.pinTries > 1 ? 's' : '') + ' restant' + (3 - ui.pinTries > 1 ? 's' : '') + ').' };
+      if (ui.pinTries >= 3) { m.code = String(1000 + Math.floor(Math.random() * 9000)); ui.pinTries = 0; save(); }
+      render();
+      return;
+    }
+    ui.errors = {};
+    complete();
+    render();
+    toast('+' + fmt(m.net) + ' VM crédités sur votre portefeuille');
+  }
+
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-action]');
+    if (!el || el.disabled) return;
+    const fn = A[el.dataset.action];
+    if (fn) { e.preventDefault(); fn(el); }
+  });
+  document.addEventListener('input', (e) => {
+    const t = e.target;
+    if (t.matches('.pins input')) {
+      t.value = t.value.replace(/\D/g, '').slice(-1);
+      const i = +t.id.slice(3);
+      if (t.value && i < 3) $('pin' + (i + 1)).focus();
+      const full = [0, 1, 2, 3].every((k) => $('pin' + k).value);
+      $('confirmPin').disabled = !full;
+      if (ui.errors.pin) { ui.errors.pin = ''; const p = $('pins'); if (p) p.classList.remove('bad'); const em = p && p.nextElementSibling; if (em && em.classList.contains('err-msg')) em.remove(); }
+      if (full && i === 3) checkPin();
+    }
+    if (t.id === 'convAmt') { const v = parseAmount(t.value); t.value = v ? fmt(v) : ''; ui.convVal = t.value; }
+    if (t.id === 'wdAmt') { const v = parseAmount(t.value); t.value = v ? fmt(v) : ''; ui.wdVal = t.value; }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { if (ui.sheet) closeSheet(); else if (ui.driving) A['d-exit'](); }
+    if (e.key === 'Backspace' && e.target.matches('.pins input') && !e.target.value) {
+      const i = +e.target.id.slice(3);
+      if (i > 0) $('pin' + (i - 1)).focus();
+    }
+    if (e.key === 'Enter' && e.target.id === 'convAmt') A.convert();
+  });
+
+  /* =========================================================
+     Horloge globale (1 s) : offres, comptes à rebours, attente
+     ========================================================= */
+  setInterval(() => {
+    const now = Date.now();
+    if (S.offer) {
+      const left = offerLeft();
+      document.querySelectorAll('[data-offer-left]').forEach((el) => { el.textContent = left; });
+      const s = document.querySelector('[data-offer-left-s]');
+      if (s) s.textContent = left + 's';
+      const ring = document.querySelector('[data-offer-ring]');
+      if (ring) ring.setAttribute('stroke-dasharray', (left / S.offer.ttl * 100).toFixed(1) + ' 100');
+      if (left <= 0) {
+        const wasView = ui.view === 'offer';
+        closeOffer('expired');
+        notify('Offre expirée · proposée à un autre chauffeur');
+        toast('Offre expirée · proposée à un autre chauffeur');
+        if (wasView) { ui.stack = []; go('home', true); } else render();
+      }
+    } else if (canReceive() && !ui.searching && !ui.driving && now > ui.nextOfferAt) {
+      pushOffer();
+    }
+    const w = document.querySelector('[data-wait]');
+    if (w && S.mission && S.mission.waitStart) w.textContent = mmss((now - S.mission.waitStart) / 1000);
+  }, 1000);
+
+  window.addEventListener('beforeunload', () => save(true));
+
+  render();
+})();
 </script>
 </body>
 </html>
