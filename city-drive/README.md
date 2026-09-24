@@ -21,6 +21,7 @@ npm run typecheck
 | `/vehicules` | Choix du véhicule, modèle, moyen de paiement |
 | `/course` | Course active : chauffeur en approche, règlement |
 | `/programmer` | Programmer une course (jour, heure, chauffeur préféré) |
+| `/navigation` | Navigation GPS en mode sombre : guidage virage par virage, vocal, compteur de vitesse, SOS |
 | `/portefeuille`, `/compte` | Provisoires, en attente de maquettes |
 
 ## Organisation

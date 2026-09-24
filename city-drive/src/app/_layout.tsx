@@ -21,6 +21,7 @@ export default function RootLayout() {
         <Stack.Screen name="vehicules" />
         <Stack.Screen name="programmer" options={{ presentation: 'modal' }} />
         <Stack.Screen name="course" />
+        <Stack.Screen name="navigation" options={{ contentStyle: { backgroundColor: '#131316' } }} />
       </Stack>
     </SafeAreaProvider>
   );

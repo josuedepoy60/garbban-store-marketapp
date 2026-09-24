@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CityMap } from '@/components/CityMap';
@@ -17,13 +18,18 @@ const SHORTCUTS: { icon: IconName; label: string; bg: string; fg: string; to: '/
 ];
 
 const ROUTES = [
-  { id: 'hkb', tag: 'Le plus rapide', time: '12 min', via: 'Pont HKB', detail: 'Fluide · Péage 500 F', price: '1 400 F' },
-  { id: 'adj', tag: 'Sans péage · Éco', time: '22 min', via: 'Via Adjamé', detail: 'Ralentissements', price: '900 F', extra: '+10 min' },
+  { id: 'hkb', tag: 'Le plus rapide', time: '12 min', via: 'Pont HKB', detail: 'Fluide · Péage 500 F', price: '1 400 F', jam: false },
+  { id: 'adj', tag: 'Bouchon sévère · +10 min', time: '22 min', via: 'Via Adjamé', detail: 'Trafic saturé', price: '900 F', extra: 'Sans péage', jam: true },
 ];
+
+const JAM_RED = '#DC2626';
+// Tronçon saturé autour du carrefour Adjamé (repère de CityMap).
+const JAM_PATH = 'M 380 150 Q 395 115 330 80 Q 255 82 205 120';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const [route, setRoute] = useState('hkb');
+  const [alertOpen, setAlertOpen] = useState(true);
   const mapTop = insets.top + 72;
 
   return (
@@ -32,7 +38,30 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 110 }} showsVerticalScrollIndicator={false}>
         {/* Carte */}
         <View style={{ height: 470 + mapTop }}>
-          <CityMap userMarker style={StyleSheet.absoluteFill} />
+          <CityMap userMarker style={StyleSheet.absoluteFill}>
+            <Path d={JAM_PATH} stroke={JAM_RED} strokeWidth={12} strokeLinecap="round" fill="none" opacity={0.3} />
+            <Path d={JAM_PATH} stroke="#EF4444" strokeWidth={5} strokeDasharray="6 5" strokeLinecap="round" fill="none" />
+          </CityMap>
+
+          <View style={[styles.jamBadge, { top: mapTop + 46 }]}>
+            <View style={styles.row}>
+              <PingDot color={JAM_RED} />
+              <AppText variant="labelSm" color={JAM_RED}>
+                Bouchon Adjamé (+10 min)
+              </AppText>
+              <Pill background={JAM_RED} style={{ paddingHorizontal: 6, paddingVertical: 1 }}>
+                <AppText variant="labelSm" color="#fff" style={{ fontSize: 8 }}>
+                  SATURÉ
+                </AppText>
+              </Pill>
+            </View>
+            <AppText variant="labelSm" color={colors.onSurfaceVariant} style={{ fontSize: 9, fontFamily: fonts.dm600 }}>
+              Vitesse {'<'} 8 km/h ·{' '}
+              <AppText variant="labelSm" color={JAM_RED} style={{ fontSize: 9 }}>
+                File ininterrompue
+              </AppText>
+            </AppText>
+          </View>
 
           <View style={[styles.mapBar, { top: mapTop }]}>
             <Touchable style={styles.glassPill}>
@@ -130,6 +159,64 @@ export default function HomeScreen() {
             ))}
           </View>
 
+          {/* Alerte trafic en direct */}
+          {alertOpen && (
+            <View style={styles.alert}>
+              <View style={[styles.between, { alignItems: 'flex-start' }]}>
+                <View style={[styles.row, { gap: 8, flex: 1 }]}>
+                  <View style={styles.alertIcon}>
+                    <Icon name="warning" size={16} color="#fff" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <View style={styles.row}>
+                      <AppText variant="labelMd" color="#b91c1c" style={{ fontFamily: fonts.sora600 }}>
+                        Bouchon imminent à 650m
+                      </AppText>
+                      <Pill background={JAM_RED} style={{ paddingHorizontal: 6, paddingVertical: 1 }}>
+                        <AppText variant="labelSm" color="#fff" style={{ fontSize: 8 }}>
+                          DIRECT
+                        </AppText>
+                      </Pill>
+                    </View>
+                    <AppText variant="bodySm" color={colors.onSurfaceVariant} style={{ fontSize: 11, lineHeight: 15 }}>
+                      Carrefour Adjamé saturé (+10 min). Basculez sur Pont HKB.
+                    </AppText>
+                  </View>
+                </View>
+                <Touchable accessibilityLabel="Fermer l'alerte" onPress={() => setAlertOpen(false)} style={styles.alertClose}>
+                  <Icon name="close" size={14} color={colors.outline} />
+                </Touchable>
+              </View>
+              <View style={[styles.between, styles.alertFooter]}>
+                <View style={styles.row}>
+                  <Dot color="#10b981" size={6} />
+                  <AppText variant="labelSm" color="#059669">
+                    Gain estimé : +10 min
+                  </AppText>
+                </View>
+                <View style={styles.row}>
+                  <Touchable onPress={() => setAlertOpen(false)} style={{ paddingHorizontal: 8, paddingVertical: 4 }}>
+                    <AppText variant="labelSm" color={colors.outline}>
+                      Ignorer
+                    </AppText>
+                  </Touchable>
+                  <Touchable
+                    style={styles.alertCta}
+                    onPress={() => {
+                      setRoute('hkb');
+                      setAlertOpen(false);
+                    }}
+                  >
+                    <AppText variant="labelSm" color={colors.onSecondaryFixed} style={{ fontFamily: fonts.sora700 }}>
+                      Prendre Pont HKB
+                    </AppText>
+                    <Icon name="arrow-forward" size={12} color={colors.onSecondaryFixed} />
+                  </Touchable>
+                </View>
+              </View>
+            </View>
+          )}
+
           {/* Comparateur d'itinéraires */}
           <View style={{ gap: 6 }}>
             <View style={styles.between}>
@@ -147,31 +234,38 @@ export default function HomeScreen() {
               {ROUTES.map((r) => {
                 const active = route === r.id;
                 return (
-                  <Touchable key={r.id} onPress={() => setRoute(r.id)} style={[styles.routeCard, active ? styles.routeActive : styles.routeIdle]}>
-                    <View style={styles.between}>
-                      <Pill background={active ? '#10b981' : '#fef3c7'} style={{ paddingHorizontal: 6, paddingVertical: 2 }}>
-                        <AppText variant="labelSm" color={active ? '#fff' : '#92400e'} style={{ fontSize: 8 }}>
+                  <Touchable
+                    key={r.id}
+                    onPress={() => setRoute(r.id)}
+                    style={[styles.routeCard, r.jam ? styles.routeJam : styles.routeIdle, active && styles.routeActive]}
+                  >
+                    <View style={[styles.row, { flexWrap: 'wrap' }]}>
+                      <Pill background={r.jam ? JAM_RED : '#10b981'} style={{ paddingHorizontal: 6, paddingVertical: 2 }}>
+                        {r.jam && <Dot color="#fff" size={5} />}
+                        <AppText variant="labelSm" color="#fff" style={{ fontSize: 8 }}>
                           {r.tag.toUpperCase()}
                         </AppText>
                       </Pill>
                       {active ? (
                         <Dot color={colors.primaryContainer} />
                       ) : (
-                        <AppText variant="labelSm" color="#d97706" style={{ fontSize: 9 }}>
-                          {r.extra}
-                        </AppText>
+                        r.extra && (
+                          <AppText variant="labelSm" color={JAM_RED} style={{ fontSize: 9 }}>
+                            {r.extra}
+                          </AppText>
+                        )
                       )}
                     </View>
                     <View style={[styles.row, { alignItems: 'baseline' }]}>
                       <AppText variant="headlineSm" style={{ fontFamily: fonts.sora700, fontSize: 14 }}>
                         {r.time}
                       </AppText>
-                      <AppText variant="labelSm" color={active ? '#059669' : colors.onSurfaceVariant} style={{ fontSize: 10 }}>
+                      <AppText variant="labelSm" color={r.jam ? JAM_RED : '#059669'} style={{ fontSize: 10 }}>
                         {r.via}
                       </AppText>
                     </View>
                     <View style={styles.between}>
-                      <AppText variant="bodySm" color={colors.onSurfaceVariant} style={{ fontSize: 9, lineHeight: 12 }} numberOfLines={1}>
+                      <AppText variant="bodySm" color={r.jam ? JAM_RED : colors.onSurfaceVariant} style={{ fontSize: 9, lineHeight: 12 }} numberOfLines={1}>
                         {r.detail}
                       </AppText>
                       <AppText variant="labelSm" color={active ? colors.primaryContainer : '#047857'} style={{ fontSize: 9 }}>
@@ -222,11 +316,11 @@ export default function HomeScreen() {
               </View>
             </View>
             <Touchable style={styles.rebookCta} scale={0.98} onPress={() => router.push('/vehicules')}>
-              <AppText variant="headlineSm" color={colors.onPrimary}>
+              <AppText variant="headlineSm" color={colors.onPrimary} numberOfLines={1} style={{ flexShrink: 1, fontSize: 14, letterSpacing: -0.2 }}>
                 Reprendre avec Koffi
               </AppText>
               <View style={styles.rebookPrice}>
-                <AppText variant="labelMd" color={colors.onPrimary}>
+                <AppText variant="labelSm" color={colors.onPrimary}>
                   Dès {favoriteDriver.fromPrice}
                 </AppText>
                 <Icon name="arrow-forward" size={16} color={colors.onPrimary} />
@@ -288,8 +382,26 @@ const styles = StyleSheet.create({
   shortcutLabel: { fontFamily: fonts.dm600, textAlign: 'center', letterSpacing: 0 },
   routeRow: { flexDirection: 'row', gap: 8 },
   routeCard: { flex: 1, borderRadius: 16, padding: 10, gap: 4 },
-  routeActive: { backgroundColor: '#EEF2FF', borderWidth: 2, borderColor: colors.primaryContainer },
-  routeIdle: { backgroundColor: 'rgba(255,255,255,0.8)', borderWidth: 1, borderColor: '#fcd34d' },
+  routeActive: { backgroundColor: '#EEF2FF', borderColor: colors.primaryContainer },
+  routeIdle: { backgroundColor: 'rgba(255,255,255,0.8)', borderWidth: 2, borderColor: colors.outlineVariant },
+  routeJam: { backgroundColor: 'rgba(255,255,255,0.8)', borderWidth: 2, borderColor: '#f87171' },
+  jamBadge: {
+    position: 'absolute',
+    left: 12,
+    gap: 2,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    borderWidth: 2,
+    borderColor: '#DC2626',
+    borderRadius: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    boxShadow: '0px 12px 24px -6px rgba(19,36,68,0.3)',
+  },
+  alert: { borderRadius: 16, padding: 12, gap: 8, backgroundColor: '#fff', borderWidth: 1, borderColor: 'rgba(254,202,202,0.9)', boxShadow: shadows.float },
+  alertIcon: { width: 28, height: 28, borderRadius: 10, backgroundColor: '#DC2626', alignItems: 'center', justifyContent: 'center' },
+  alertClose: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
+  alertFooter: { paddingTop: 6, borderTopWidth: 1, borderTopColor: 'rgba(226,232,240,0.6)', flexWrap: 'wrap', rowGap: 6 },
+  alertCta: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.secondaryContainer, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 12, boxShadow: shadows.lime },
   rebook: { backgroundColor: colors.surfaceLow, borderRadius: 16, padding: 14, gap: 12 },
   onlineDot: {
     position: 'absolute',
@@ -304,12 +416,14 @@ const styles = StyleSheet.create({
   },
   rebookCta: {
     height: 48,
+    gap: 8,
     borderRadius: 999,
     backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingLeft: 18,
+    paddingRight: 8,
     boxShadow: shadows.primary,
   },
   rebookPrice: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
