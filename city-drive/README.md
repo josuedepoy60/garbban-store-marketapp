@@ -30,10 +30,14 @@ npm run typecheck
 | `/evaluation` | Fin de course : note étoilée, compliments, pourboire débité du portefeuille, chauffeur favori, message |
 | `/compte` (onglet) | Profil, Pass Gold Club, solde, lieux favoris (ajout/suppression), préférences, sécurité, assistance, déconnexion |
 
+## Couleurs
+
+Palette « jeune et réaliste » définie dans `src/constants/theme.ts` : orange taxi d'Abidjan (`primary`) pour les actions, jaune soleil (`secondaryContainer`), vert, bleu et rose en accents, sur des fonds blancs et gris neutres. Chaque grande carte a sa couleur : portefeuille noir/jaune, Gold Club bleu, reçu vert.
+
 ## Adaptation aux écrans
 
 - **Téléphones** : plein écran. Sous 360 px de large (`useCompact`), les éléments secondaires sont masqués ou compactés ; les cartes s'adaptent à la hauteur de l'écran.
-- **Tablettes et ordinateurs** (≥ 700 px) : `ResponsiveShell` affiche l'app dans une colonne centrée (600 px sur tablette, 460 px sur ordinateur).
+- L'app cible uniquement les **téléphones Android et iPhone** (portrait, `supportsTablet: false`). Pour l'aperçu web, `ResponsiveShell` affiche l'app dans une colonne centrée sur les grands écrans.
 
 ## Organisation
 

@@ -127,9 +127,9 @@ export default function CallScreen() {
         {/* Scène de l'appel */}
         <View style={styles.stage}>
           <View style={styles.rings}>
-            <Pulse style={[styles.ring, { width: 176, height: 176, backgroundColor: 'rgba(51,16,179,0.1)' }]} />
-            <View style={[styles.ring, { width: 144, height: 144, backgroundColor: 'rgba(198,243,56,0.3)' }]} />
-            <View style={[styles.ring, { width: 112, height: 112, backgroundColor: 'rgba(198,191,255,0.4)' }]} />
+            <Pulse style={[styles.ring, { width: 176, height: 176, backgroundColor: 'rgba(232,89,12,0.1)' }]} />
+            <View style={[styles.ring, { width: 144, height: 144, backgroundColor: 'rgba(255,196,0,0.3)' }]} />
+            <View style={[styles.ring, { width: 112, height: 112, backgroundColor: 'rgba(255,210,170,0.4)' }]} />
             <View style={styles.bigAvatar}>
               <Avatar uri={photos.koffi} size={96} radius={48} />
               <View style={styles.ratingBand}>
@@ -152,7 +152,7 @@ export default function CallScreen() {
           </AppText>
           <View style={styles.eta}>
             <Icon name="near-me" size={18} color={colors.primary} />
-            <AppText variant="labelMd" color="#160066">
+            <AppText variant="labelMd" color="#7A2E00">
               Arrivée estimée dans 4 min
             </AppText>
           </View>
@@ -176,7 +176,7 @@ export default function CallScreen() {
           </View>
           <View style={styles.miniMap}>
             <CityMap style={StyleSheet.absoluteFill} animated={false} />
-            <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(51,16,179,0.1)' }]}>
+            <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(232,89,12,0.1)' }]}>
               <View style={styles.miniCar}>
                 <Icon name="directions-car" size={18} color={colors.onPrimary} />
               </View>
@@ -255,11 +255,11 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  header: { backgroundColor: 'rgba(252,248,255,0.92)', boxShadow: '0px 1px 8px rgba(27,24,49,0.04)', zIndex: 10 },
+  header: { backgroundColor: 'rgba(250,250,251,0.92)', boxShadow: '0px 1px 8px rgba(27,24,49,0.04)', zIndex: 10 },
   headerInner: { height: 64, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 8 },
   back: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#abd611' },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#00A676' },
   content: { paddingHorizontal: 16, paddingTop: 12, gap: 16 },
   privacy: { borderRadius: 32, backgroundColor: colors.surfaceLow, padding: 16, gap: 6, boxShadow: '0px 1px 2px rgba(0,0,0,0.05)' },
   timer: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.secondaryContainer, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   rings: { width: 176, height: 176, alignItems: 'center', justifyContent: 'center' },
   ring: { position: 'absolute', borderRadius: 999 },
   bigAvatar: { width: 96, height: 96, borderRadius: 48, overflow: 'hidden', boxShadow: '0px 10px 15px -3px rgba(0,0,0,0.2)' },
-  ratingBand: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(51,16,179,0.75)' },
+  ratingBand: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(232,89,12,0.75)' },
   eq: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 24, marginVertical: 8 },
   eta: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4, backgroundColor: colors.primaryFixed, paddingHorizontal: 16, paddingVertical: 4, borderRadius: 999 },
   mini: { flexDirection: 'row', alignItems: 'center', gap: 16, borderRadius: 32, backgroundColor: colors.surfaceLowest, padding: 16, boxShadow: '0px 1px 2px rgba(0,0,0,0.05)' },

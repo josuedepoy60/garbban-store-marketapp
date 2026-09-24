@@ -87,8 +87,8 @@ export default function ReceiptScreen() {
           <Icon name="star" size={20} color={colors.tertiaryFixed} style={{ position: 'absolute', bottom: 80, right: 56 }} />
 
           <View style={styles.badgeWrap}>
-            <Pulse style={[StyleSheet.absoluteFill, { borderRadius: 48, backgroundColor: 'rgba(198,243,56,0.4)' }]} />
-            <View style={[StyleSheet.absoluteFill, { borderRadius: 48, backgroundColor: 'rgba(198,243,56,0.4)', transform: [{ scale: 1.1 }] }]} />
+            <Pulse style={[StyleSheet.absoluteFill, { borderRadius: 48, backgroundColor: 'rgba(255,196,0,0.4)' }]} />
+            <View style={[StyleSheet.absoluteFill, { borderRadius: 48, backgroundColor: 'rgba(255,196,0,0.4)', transform: [{ scale: 1.1 }] }]} />
             <View style={styles.badge}>
               <Icon name="check-circle" size={44} color={colors.onSecondaryFixed} />
             </View>
@@ -108,7 +108,7 @@ export default function ReceiptScreen() {
         </View>
 
         {/* Nouveau solde */}
-        <LinearGradient colors={[colors.primary, colors.primaryContainer, '#302d47']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+        <LinearGradient colors={['#006B4C', colors.green, '#1F2937']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
           <View style={styles.heroGlow} />
           <View style={styles.between}>
             <View style={styles.row}>
@@ -299,8 +299,8 @@ const styles = StyleSheet.create({
   badgeWrap: { width: 96, height: 96, alignItems: 'center', justifyContent: 'center', marginVertical: 4 },
   badge: { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center', boxShadow: shadows.lime },
   metaPill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 16, paddingVertical: 4, borderRadius: 999, backgroundColor: colors.surfaceContainer },
-  hero: { borderRadius: 16, padding: 24, paddingBottom: 0, overflow: 'hidden', boxShadow: '0px 20px 25px -5px rgba(51,16,179,0.2)' },
-  heroGlow: { position: 'absolute', right: -32, top: -32, width: 176, height: 176, borderRadius: 88, backgroundColor: 'rgba(198,243,56,0.15)' },
+  hero: { borderRadius: 16, padding: 24, paddingBottom: 0, overflow: 'hidden', boxShadow: '0px 20px 25px -5px rgba(232,89,12,0.2)' },
+  heroGlow: { position: 'absolute', right: -32, top: -32, width: 176, height: 176, borderRadius: 88, backgroundColor: 'rgba(255,196,0,0.15)' },
   bonusTag: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 8, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)' },
   bolt: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center' },
   evolution: {

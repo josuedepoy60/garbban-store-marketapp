@@ -37,7 +37,7 @@ function Building({ x, y, left, right, roof, w = 70 }: { x: number; y: number; l
 function Tree({ x, y, r = 14 }: { x: number; y: number; r?: number }) {
   return (
     <G>
-      <Circle cx={x + 2} cy={y + 4} r={r} fill="#3410B3" opacity={0.08} />
+      <Circle cx={x + 2} cy={y + 4} r={r} fill="#1F2937" opacity={0.08} />
       <Circle cx={x} cy={y} r={r} fill="#69B829" />
       <Circle cx={x - 2} cy={y - 3} r={r * 0.85} fill="#8CE041" />
       <Circle cx={x - 4} cy={y - 5} r={r * 0.42} fill="#BAF777" />
@@ -57,8 +57,8 @@ function MiniTaxi() {
   return (
     <Svg width={26} height={16} viewBox="-8 -8 26 20">
       <Path d="M -6 3 L 10 -5 L 16 -2 L 0 6 Z" fill="#FFFFFF" />
-      <Path d="M 0 6 L 16 -2 L 16 3 L 0 11 Z" fill="#DCD6F7" />
-      <Path d="M -6 3 L 0 6 L 0 11 L -6 8 Z" fill="#EDE8FD" />
+      <Path d="M 0 6 L 16 -2 L 16 3 L 0 11 Z" fill="#D5D9E0" />
+      <Path d="M -6 3 L 0 6 L 0 11 L -6 8 Z" fill="#EEF0F3" />
       <Circle cx={5} cy={0} r={2} fill="#FF7700" />
     </Svg>
   );
@@ -70,8 +70,8 @@ export function CityMap({ children, userMarker = false, animated = true, dimmed 
       <Svg width="100%" height="100%" viewBox={`0 0 ${MAP_W} ${MAP_H}`} preserveAspectRatio="xMidYMid slice">
         <Defs>
           <LinearGradient id="land" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0" stopColor="#F2EEFB" />
-            <Stop offset="1" stopColor="#E8E2FA" />
+            <Stop offset="0" stopColor="#F4F4F0" />
+            <Stop offset="1" stopColor="#ECECE6" />
           </LinearGradient>
           <LinearGradient id="lagoon" x1="0" y1="0" x2="1" y2="1">
             <Stop offset="0" stopColor="#C5E8FF" />
@@ -103,14 +103,14 @@ export function CityMap({ children, userMarker = false, animated = true, dimmed 
 
         {/* Routes : boulevard lagunaire, avenue Riviera, pont HKB */}
         <Path d="M-20 220 L 440 220" stroke="#fff" strokeWidth={32} strokeLinecap="round" />
-        <Path d="M-20 220 L 440 220" stroke="#DCD6F7" strokeWidth={1.5} strokeDasharray="10 12" />
+        <Path d="M-20 220 L 440 220" stroke="#D5D9E0" strokeWidth={1.5} strokeDasharray="10 12" />
         <Path d="M 90 -20 L 350 490" stroke="#fff" strokeWidth={28} strokeLinecap="round" />
-        <Path d="M 90 -20 L 350 490" stroke="#DCD6F7" strokeWidth={1.5} strokeDasharray="8 10" />
+        <Path d="M 90 -20 L 350 490" stroke="#D5D9E0" strokeWidth={1.5} strokeDasharray="8 10" />
         <Path d="M 265 320 L 340 470" stroke="#fff" strokeWidth={24} />
         <Rect x={290} y={380} width={8} height={24} rx={3} fill={colors.primaryContainer} opacity={0.3} />
 
         {/* Immeubles isométriques */}
-        <Building x={160} y={50} left="#8C7AE6" right="#6B52D9" roof="#DCD4FF" />
+        <Building x={160} y={50} left="#6E9BFF" right="#2F6BFF" roof="#DCE7FF" />
         <Building x={260} y={80} left="#F08CAE" right="#D95F87" roof="#FFD3DF" w={65} />
         <Building x={20} y={250} left="#A8D61A" right="#85B300" roof="#E0FA8E" w={75} />
         <Building x={130} y={260} left="#E6D3B3" right="#CCA87C" roof="#FFF4E0" w={54} />
@@ -142,7 +142,7 @@ export function CityMap({ children, userMarker = false, animated = true, dimmed 
         </View>
       )}
 
-      {dimmed && <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(252,248,255,0.25)' }]} pointerEvents="none" />}
+      {dimmed && <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(250,250,251,0.25)' }]} pointerEvents="none" />}
     </View>
   );
 }

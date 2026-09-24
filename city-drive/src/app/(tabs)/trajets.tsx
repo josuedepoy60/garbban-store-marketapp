@@ -236,7 +236,7 @@ export default function TransitScreen() {
 
         {/* Bandeau paiement QR */}
         <View style={styles.px}>
-          <LinearGradient colors={[colors.primaryContainer, colors.primary]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.banner}>
+          <LinearGradient colors={[colors.blue, '#1E3A8A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.banner}>
             <View style={styles.qr}>
               <Icon name="qr-code-scanner" size={26} color={colors.secondaryContainer} />
             </View>
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   px: { paddingHorizontal: 16 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  mapCard: { height: 288, borderRadius: 32, overflow: 'hidden', backgroundColor: colors.surfaceContainer, boxShadow: '0px 12px 32px -8px rgba(75,54,201,0.12)' },
+  mapCard: { height: 288, borderRadius: 32, overflow: 'hidden', backgroundColor: colors.surfaceContainer, boxShadow: '0px 12px 32px -8px rgba(17,24,39,0.12)' },
   approach: { ...glass, position: 'absolute', top: 12, left: 12, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
   nearest: {
     ...glass,
@@ -278,14 +278,14 @@ const styles = StyleSheet.create({
     gap: 8,
     boxShadow: '0px 8px 20px -4px rgba(27,24,49,0.1)',
   },
-  pinIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(51,16,179,0.1)', alignItems: 'center', justifyContent: 'center' },
+  pinIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(232,89,12,0.1)', alignItems: 'center', justifyContent: 'center' },
   itinerary: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surfaceHigh, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 },
   filter: { height: 36, paddingHorizontal: 14, borderRadius: 999, flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.surfaceLowest, boxShadow: '0px 1px 2px rgba(0,0,0,0.06)' },
-  filterActive: { backgroundColor: colors.primary, boxShadow: '0px 4px 12px -2px rgba(75,54,201,0.3)' },
+  filterActive: { backgroundColor: colors.primary, boxShadow: '0px 4px 12px -2px rgba(255,122,26,0.3)' },
   count: { paddingHorizontal: 6, paddingVertical: 1, borderRadius: 999 },
   departure: { padding: 16, borderRadius: 32, backgroundColor: colors.surfaceLowest, gap: 12, boxShadow: shadows.card },
-  departureFull: { backgroundColor: 'rgba(247,241,255,0.7)', opacity: 0.8, boxShadow: undefined },
+  departureFull: { backgroundColor: 'rgba(244,245,247,0.7)', opacity: 0.8, boxShadow: undefined },
   book: { height: 40, paddingHorizontal: 20, borderRadius: 999, justifyContent: 'center', boxShadow: '0px 4px 8px rgba(0,0,0,0.1)' },
-  banner: { borderRadius: 32, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14, boxShadow: '0px 12px 28px -6px rgba(75,54,201,0.28)' },
+  banner: { borderRadius: 32, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 14, boxShadow: '0px 12px 28px -6px rgba(17,24,39,0.28)' },
   qr: { width: 48, height: 48, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
 });

@@ -20,7 +20,7 @@ const FILTERS: { id: Filter; label: string }[] = [
 
 const TX_STYLE: Record<TxKind, { icon: IconName; bg: string; fg: string; tag: string }> = {
   course: { icon: 'local-taxi', bg: colors.surfaceContainer, fg: colors.primary, tag: 'Course' },
-  recharge: { icon: 'add-card', bg: 'rgba(198,243,56,0.3)', fg: colors.secondary, tag: 'Recharge' },
+  recharge: { icon: 'add-card', bg: 'rgba(255,196,0,0.3)', fg: colors.secondary, tag: 'Recharge' },
   peage: { icon: 'toll', bg: colors.surfaceHigh, fg: colors.onSurfaceVariant, tag: 'Péage' },
 };
 
@@ -362,16 +362,16 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  header: { backgroundColor: 'rgba(252,248,255,0.92)', boxShadow: '0px 1px 8px rgba(0,0,0,0.04)', zIndex: 10 },
+  header: { backgroundColor: 'rgba(250,250,251,0.92)', boxShadow: '0px 1px 8px rgba(0,0,0,0.04)', zIndex: 10 },
   headerInner: { height: 64, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   headerIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surfaceContainer, alignItems: 'center', justifyContent: 'center' },
   bell: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   bellDot: { position: 'absolute', top: 10, right: 11, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.secondary },
   avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', marginLeft: 4 },
   content: { paddingHorizontal: 16, paddingTop: 16, gap: 24 },
-  card: { minHeight: 220, borderRadius: 32, backgroundColor: colors.primary, padding: 24, overflow: 'hidden', boxShadow: '0px 20px 25px -5px rgba(51,16,179,0.3)' },
-  glowLime: { position: 'absolute', right: -48, top: -48, width: 192, height: 192, borderRadius: 96, backgroundColor: 'rgba(198,243,56,0.2)' },
-  glowViolet: { position: 'absolute', left: -40, bottom: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(75,54,201,0.8)' },
+  card: { minHeight: 220, borderRadius: 32, backgroundColor: '#16181D', padding: 24, overflow: 'hidden', boxShadow: '0px 20px 25px -5px rgba(17,24,39,0.35)' },
+  glowLime: { position: 'absolute', right: -48, top: -48, width: 192, height: 192, borderRadius: 96, backgroundColor: 'rgba(255,196,0,0.2)' },
+  glowViolet: { position: 'absolute', left: -40, bottom: -40, width: 160, height: 160, borderRadius: 80, backgroundColor: 'rgba(255,122,26,0.35)' },
   cardBtn: {
     flex: 1,
     height: 48,

@@ -19,9 +19,9 @@ const dark = {
   highest: '#353438',
   onSurface: '#e4e1e6',
   onSurfaceVariant: '#c4c9ae',
-  lime: '#c6f338',
+  lime: '#FFC400',
   onLime: '#283500',
-  violet: '#5845d6',
+  violet: '#FF9A3C',
   pink: '#ffb1c5',
   pinkContainer: '#8e1347',
   onPinkContainer: '#ff9bb7',
@@ -40,9 +40,9 @@ function CockpitMap() {
     <Svg width="100%" height="100%" viewBox="0 0 400 620" preserveAspectRatio="xMidYMid slice">
       <Defs>
         <LinearGradient id="lagoon" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor="#4b36c9" stopOpacity={0.35} />
-          <Stop offset="0.5" stopColor="#1b1831" stopOpacity={0.7} />
-          <Stop offset="1" stopColor="#3310b3" stopOpacity={0.4} />
+          <Stop offset="0" stopColor="#FF7A1A" stopOpacity={0.35} />
+          <Stop offset="0.5" stopColor="#14161A" stopOpacity={0.7} />
+          <Stop offset="1" stopColor="#E8590C" stopOpacity={0.4} />
         </LinearGradient>
         <LinearGradient id="gps" x1="0" y1="1" x2="1" y2="0">
           <Stop offset="0" stopColor={dark.lime} />
@@ -56,21 +56,21 @@ function CockpitMap() {
 
       {/* Silhouettes du Plateau */}
       <G opacity={0.35} transform="translate(260, 90)">
-        <Polygon points="50,40 85,25 85,110 50,125" fill="#302d47" />
+        <Polygon points="50,40 85,25 85,110 50,125" fill="#1F2937" />
         <Polygon points="15,25 50,40 50,125 15,110" fill="#474554" />
         <Polygon points="15,25 50,10 85,25 50,40" fill={dark.violet} />
         <Line x1={50} y1={10} x2={50} y2={-12} stroke={dark.lime} strokeWidth={2} />
         <Circle cx={50} cy={-12} r={3} fill={dark.lime} />
       </G>
       <G opacity={0.25} transform="translate(190, 115)">
-        <Polygon points="35,28 60,16 60,80 35,90" fill="#302d47" />
+        <Polygon points="35,28 60,16 60,80 35,90" fill="#1F2937" />
         <Polygon points="10,16 35,28 35,90 10,80" fill="#474554" />
         <Polygon points="10,16 35,5 60,16 35,28" fill="#c8c4d7" />
       </G>
 
       {/* Haubans du pont HKB */}
       <G opacity={0.4} stroke="#c8c4d7" strokeWidth={1.5}>
-        <Line x1={165} y1={230} x2={165} y2={390} stroke="#ebe5ff" strokeWidth={4} />
+        <Line x1={165} y1={230} x2={165} y2={390} stroke="#E8EBEF" strokeWidth={4} />
         {[80, 120, 220, 260].map((x) => (
           <Line key={x} x1={165} y1={230} x2={x} y2={370} strokeDasharray="3 3" />
         ))}
@@ -84,9 +84,9 @@ function CockpitMap() {
 
       {/* Destination : tour CCIA */}
       <G transform="translate(290, 80)">
-        <Circle r={14} fill="#4b36c9" opacity={0.3} />
+        <Circle r={14} fill="#FF7A1A" opacity={0.3} />
         <Circle r={8} fill={dark.lime} />
-        <Circle r={4} fill="#1b1831" />
+        <Circle r={4} fill="#14161A" />
       </G>
 
       {/* Véhicule */}
@@ -95,8 +95,8 @@ function CockpitMap() {
         <Circle r={18} fill={dark.violet} opacity={0.25} />
         <G rotation={-30}>
           <Polygon points="-7,-18 7,-18 16,-44 -16,-44" fill={dark.lime} opacity={0.35} />
-          <Rect x={-10} y={-18} width={20} height={36} rx={7} fill="#1b1831" />
-          <Rect x={-8} y={-12} width={16} height={24} rx={4} fill="#3310b3" />
+          <Rect x={-10} y={-18} width={20} height={36} rx={7} fill="#14161A" />
+          <Rect x={-8} y={-12} width={16} height={24} rx={4} fill="#E8590C" />
           <Line x1={-5} y1={0} x2={5} y2={0} stroke={dark.lime} strokeWidth={3} strokeLinecap="round" />
           <Circle cx={-6} cy={17} r={2} fill="#ba1a1a" />
           <Circle cx={6} cy={17} r={2} fill="#ba1a1a" />
@@ -114,7 +114,7 @@ function Speedometer({ speed }: { speed: number }) {
       <View style={{ width: 80, height: 80 }}>
         <Svg width={80} height={80} viewBox="0 0 72 72">
           <G rotation={-90} origin="36, 36">
-            <Circle cx={36} cy={36} r={30} stroke="#f1ebff" strokeOpacity={0.15} strokeWidth={5} fill="none" />
+            <Circle cx={36} cy={36} r={30} stroke="#EEF0F3" strokeOpacity={0.15} strokeWidth={5} fill="none" />
             <Circle
               cx={36}
               cy={36}
@@ -281,7 +281,7 @@ export default function NavigationScreen() {
             <RoundTool icon="view-in-ar" label="Vue 3D" color={dark.onSurface} bg="rgba(14,14,17,0.9)" />
             <RoundTool icon="traffic" label="Afficher le trafic" color={dark.lime} bg="rgba(14,14,17,0.9)" />
             <View>
-              <Pulse style={[StyleSheet.absoluteFill, { borderRadius: 22, backgroundColor: 'rgba(198,243,56,0.35)' }]} />
+              <Pulse style={[StyleSheet.absoluteFill, { borderRadius: 22, backgroundColor: 'rgba(255,196,0,0.35)' }]} />
               <RoundTool icon="my-location" label="Recentrer le GPS" color={dark.onLime} bg={dark.lime} />
             </View>
           </View>
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   turnIcon: { width: 56, height: 56, borderRadius: 24, backgroundColor: dark.lime, alignItems: 'center', justifyContent: 'center' },
   lanePill: { backgroundColor: dark.pinkContainer, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 999 },
   nextIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: dark.container, alignItems: 'center', justifyContent: 'center' },
-  voiceCard: { ...glass, borderRadius: 20, padding: 10, gap: 4, borderWidth: 1, borderColor: 'rgba(198,243,56,0.15)' },
+  voiceCard: { ...glass, borderRadius: 20, padding: 10, gap: 4, borderWidth: 1, borderColor: 'rgba(255,196,0,0.15)' },
   glassPill: { ...glass, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 },
   speedWrap: { position: 'absolute', left: 12, bottom: 20 },
   speedPod: { ...glass, borderRadius: 32, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 12, boxShadow: '0px 20px 25px -5px rgba(0,0,0,0.4)' },

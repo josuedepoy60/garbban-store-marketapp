@@ -81,5 +81,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
   },
-  itemActive: { backgroundColor: colors.primary, boxShadow: '0px 8px 24px -4px rgba(75,54,201,0.24)' },
+  itemActive: { backgroundColor: colors.primary, boxShadow: '0px 8px 24px -4px rgba(17,24,39,0.24)' },
 });

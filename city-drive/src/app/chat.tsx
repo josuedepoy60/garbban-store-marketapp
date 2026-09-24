@@ -86,7 +86,7 @@ export default function ChatScreen() {
                 {favoriteDriver.fullName}
               </AppText>
               <View style={styles.rating}>
-                <Icon name="star" size={14} color="#abd611" />
+                <Icon name="star" size={14} color="#00A676" />
                 <AppText variant="labelSm">4.9</AppText>
               </View>
             </View>
@@ -240,7 +240,7 @@ export default function ChatScreen() {
           accessibilityLabel="Enregistrer un message vocal"
           onPressIn={() => setRecording(true)}
           onPressOut={() => setRecording(false)}
-          style={[styles.dockBtn, { backgroundColor: colors.secondaryContainer }, recording && { transform: [{ scale: 1.1 }], borderWidth: 4, borderColor: '#abd611' }]}
+          style={[styles.dockBtn, { backgroundColor: colors.secondaryContainer }, recording && { transform: [{ scale: 1.1 }], borderWidth: 4, borderColor: '#00A676' }]}
         >
           <Icon name="mic" size={24} color={colors.onSecondaryFixed} />
         </Touchable>
@@ -255,11 +255,11 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  header: { backgroundColor: 'rgba(252,248,255,0.92)', zIndex: 10 },
+  header: { backgroundColor: 'rgba(250,250,251,0.92)', zIndex: 10 },
   headerInner: { height: 64, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', gap: 8 },
   back: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   avatar: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#abd611' },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#00A676' },
   driver: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     paddingTop: 4,
     paddingBottom: 8,
     backgroundColor: colors.surfaceLow,
-    boxShadow: '0px 4px 16px rgba(75,54,201,0.04)',
+    boxShadow: '0px 4px 16px rgba(17,24,39,0.04)',
   },
   online: {
     position: 'absolute',
@@ -289,8 +289,8 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 8,
     borderRadius: 24,
-    backgroundColor: colors.primaryContainer,
-    boxShadow: '0px 8px 20px -4px rgba(75,54,201,0.25)',
+    backgroundColor: colors.ink,
+    boxShadow: '0px 8px 20px -4px rgba(17,24,39,0.25)',
   },
   bannerIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center' },
   see: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.15)' },
@@ -308,13 +308,13 @@ const styles = StyleSheet.create({
   },
   day: { alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 2, borderRadius: 999, backgroundColor: colors.surfaceContainer },
   bubble: { padding: 16, borderRadius: 16, gap: 6 },
-  mine: { alignSelf: 'flex-end', maxWidth: '82%', backgroundColor: colors.primary, borderBottomRightRadius: 4, boxShadow: '0px 6px 20px rgba(51,16,179,0.18)' },
+  mine: { alignSelf: 'flex-end', maxWidth: '82%', backgroundColor: colors.primary, borderBottomRightRadius: 4, boxShadow: '0px 6px 20px rgba(232,89,12,0.18)' },
   theirs: { flexShrink: 1, backgroundColor: colors.surfaceLowest, borderBottomLeftRadius: 4, boxShadow: '0px 4px 16px rgba(27,24,49,0.06)' },
   player: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: colors.surfaceLow, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 24 },
   play: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   quick: { gap: 6, paddingHorizontal: 16, paddingVertical: 4 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 999, backgroundColor: colors.surfaceHigh },
-  dock: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 16, paddingTop: 4, backgroundColor: 'rgba(252,248,255,0.95)' },
+  dock: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 16, paddingTop: 4, backgroundColor: 'rgba(250,250,251,0.95)' },
   dockBtn: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   input: { flex: 1, minWidth: 0, backgroundColor: colors.surfaceLowest, borderRadius: 999, paddingHorizontal: 16, boxShadow: '0px 2px 12px rgba(27,24,49,0.06)' },
   inputText: { fontFamily: fonts.dm400, fontSize: 15, color: colors.onSurface, paddingVertical: 12 },

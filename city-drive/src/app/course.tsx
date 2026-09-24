@@ -62,7 +62,7 @@ export default function ActiveRideScreen() {
           <CityMap style={StyleSheet.absoluteFill} />
           <LinearGradient
             pointerEvents="none"
-            colors={['rgba(246,244,255,0.4)', 'rgba(246,244,255,0)', 'rgba(246,244,255,0.8)', '#FFFFFF']}
+            colors={['rgba(255,248,242,0.4)', 'rgba(255,248,242,0)', 'rgba(255,248,242,0.8)', '#FFFFFF']}
             locations={[0, 0.4, 0.9, 1]}
             style={StyleSheet.absoluteFill}
           />
@@ -96,7 +96,7 @@ export default function ActiveRideScreen() {
               <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: colors.secondaryContainer }} />
             </View>
             <View>
-              <Pulse style={[StyleSheet.absoluteFill, { borderRadius: 22, backgroundColor: 'rgba(75,54,201,0.35)' }]} />
+              <Pulse style={[StyleSheet.absoluteFill, { borderRadius: 22, backgroundColor: 'rgba(255,122,26,0.35)' }]} />
               <View style={styles.car}>
                 <Icon name="directions-car" size={20} color="#fff" />
               </View>
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: 'rgba(246,244,255,0.95)',
+    backgroundColor: 'rgba(255,248,242,0.95)',
     boxShadow: '0px 1px 2px rgba(0,0,0,0.05)',
     zIndex: 10,
   },
@@ -386,7 +386,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 16,
-    boxShadow: '0px 10px 20px rgba(30,27,75,0.12)',
+    boxShadow: '0px 10px 20px rgba(17,24,39,0.12)',
   },
   locatorIcon: { width: 32, height: 32, borderRadius: 12, backgroundColor: colors.violetSoft, alignItems: 'center', justifyContent: 'center' },
   minutes: { backgroundColor: colors.primaryContainer, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 4,
     borderColor: '#fff',
-    boxShadow: '0px 12px 24px rgba(30,27,75,0.3)',
+    boxShadow: '0px 12px 24px rgba(17,24,39,0.3)',
   },
   sheet: {
     backgroundColor: '#fff',
@@ -410,13 +410,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
     gap: 16,
-    boxShadow: '0px -12px 40px rgba(30,27,75,0.08)',
+    boxShadow: '0px -12px 40px rgba(17,24,39,0.08)',
   },
   countdown: { width: 48, height: 48, borderRadius: 16, backgroundColor: colors.violetMist, alignItems: 'center', justifyContent: 'center' },
   driverCard: { backgroundColor: colors.violetCard, borderRadius: 20, padding: 16, gap: 14 },
   online: { position: 'absolute', right: 4, bottom: 4, width: 12, height: 12, borderRadius: 6, backgroundColor: colors.success, borderWidth: 2, borderColor: '#fff' },
   squareBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', boxShadow: '0px 1px 2px rgba(0,0,0,0.06)' },
-  vehicleRibbon: { paddingTop: 10, paddingHorizontal: 4, borderTopWidth: 1, borderTopColor: 'rgba(228,224,255,0.7)' },
+  vehicleRibbon: { paddingTop: 10, paddingHorizontal: 4, borderTopWidth: 1, borderTopColor: 'rgba(227,230,235,0.7)' },
   plate: { backgroundColor: '#fff', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
   partner: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 12, backgroundColor: colors.violetSoft },
   partnerIcon: { width: 32, height: 32, borderRadius: 8, backgroundColor: colors.primaryContainer, alignItems: 'center', justifyContent: 'center' },
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     backgroundColor: colors.secondaryContainer,
-    boxShadow: '0px 12px 26px -4px rgba(198,243,56,0.45)',
+    boxShadow: '0px 12px 26px -4px rgba(255,196,0,0.45)',
   },
-  cta: { height: 56, borderRadius: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8, boxShadow: '0px 10px 24px rgba(75,54,201,0.3)' },
+  cta: { height: 56, borderRadius: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8, boxShadow: '0px 10px 24px rgba(255,122,26,0.3)' },
 });

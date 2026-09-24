@@ -1,49 +1,56 @@
 import type { TextStyle } from 'react-native';
 
-// Palette extraite des maquettes (tokens Material 3 « light »).
+// Palette « jeune et réaliste » : orange taxi d'Abidjan pour l'action, jaune soleil,
+// vert, bleu et rose en accents, sur des fonds blancs et gris neutres.
 export const colors = {
-  primary: '#3310b3',
-  primaryContainer: '#4b36c9',
-  primaryFixed: '#e4dfff',
+  primary: '#E8590C',
+  primaryContainer: '#FF7A1A',
+  primaryFixed: '#FFE8D6',
   onPrimary: '#ffffff',
-  onPrimaryContainer: '#c5beff',
+  onPrimaryContainer: '#FFE0C7',
 
-  secondary: '#506600',
-  secondaryContainer: '#c6f338',
-  onSecondaryFixed: '#161f00',
-  onSecondaryContainer: '#556d00',
+  secondary: '#00875F',
+  secondaryContainer: '#FFC400',
+  onSecondaryFixed: '#1F1600',
+  onSecondaryContainer: '#5C4200',
 
-  tertiary: '#780039',
-  tertiaryContainer: '#991e50',
-  tertiaryFixed: '#ffd9e1',
+  tertiary: '#D6246E',
+  tertiaryContainer: '#FF4F8B',
+  tertiaryFixed: '#FFE0EC',
 
-  surface: '#fcf8ff',
+  surface: '#FAFAFB',
   surfaceLowest: '#ffffff',
-  surfaceLow: '#f7f1ff',
-  surfaceContainer: '#f1ebff',
-  surfaceHigh: '#ebe5ff',
-  surfaceHighest: '#e5deff',
+  surfaceLow: '#F4F5F7',
+  surfaceContainer: '#EEF0F3',
+  surfaceHigh: '#E8EBEF',
+  surfaceHighest: '#DFE3E8',
 
-  onSurface: '#1b1831',
-  onSurfaceVariant: '#474554',
-  outline: '#787586',
-  outlineVariant: '#c8c4d7',
+  onSurface: '#14161A',
+  onSurfaceVariant: '#5B6170',
+  outline: '#8A909C',
+  outlineVariant: '#D5D9E0',
 
   // Écran « course active »
-  ink: '#1E1B4B',
-  inkSoft: '#312E81',
-  violetSoft: '#EDE9FE',
-  violetMist: '#F6F4FF',
-  violetCard: '#F8F7FF',
-  border: '#E2E0EB',
+  ink: '#14161A',
+  inkSoft: '#3D4350',
+  violetSoft: '#FFF1E6',
+  violetMist: '#FFF8F2',
+  violetCard: '#F7F8FA',
+  border: '#E3E6EB',
 
-  // Accents
+  // Accents multicolores
+  blue: '#2F6BFF',
+  blueSoft: '#E6EEFF',
+  green: '#00A676',
+  greenSoft: '#DDF7EE',
+  pink: '#FF4F8B',
+  pinkSoft: '#FFE0EC',
   transitYellow: '#FFB020',
   transitYellowSoft: '#FFE5B4',
   transitYellowInk: '#7A4B00',
   busSoft: '#FFF1D0',
   busInk: '#8C5E00',
-  star: '#E5A100',
+  star: '#F5A300',
   success: '#22c55e',
 };
 
@@ -75,10 +82,10 @@ export type TypeVariant = keyof typeof type;
 export const spacing = { xs: 4, sm: 8, md: 16, lg: 24, xl: 32, margin: 16 };
 
 export const shadows = {
-  soft: '0px 8px 24px -4px rgba(75, 54, 201, 0.08)',
-  card: '0px 8px 24px -6px rgba(75, 54, 201, 0.10)',
+  soft: '0px 8px 24px -4px rgba(17, 24, 39, 0.08)',
+  card: '0px 8px 24px -6px rgba(17, 24, 39, 0.10)',
   float: '0px 14px 32px -6px rgba(22, 19, 43, 0.14)',
   sheet: '0px -12px 36px rgba(22, 19, 43, 0.08)',
-  primary: '0px 10px 22px -4px rgba(51, 16, 179, 0.35)',
-  lime: '0px 12px 26px -4px rgba(198, 243, 56, 0.45)',
+  primary: '0px 10px 22px -4px rgba(232, 89, 12, 0.35)',
+  lime: '0px 12px 26px -4px rgba(255, 196, 0, 0.45)',
 };

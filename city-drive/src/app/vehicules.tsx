@@ -43,7 +43,7 @@ export default function VehiclesScreen() {
           </CityMap>
           <LinearGradient
             pointerEvents="none"
-            colors={['rgba(252,248,255,0.2)', 'rgba(252,248,255,0)', colors.surface]}
+            colors={['rgba(250,250,251,0.2)', 'rgba(250,250,251,0)', colors.surface]}
             locations={[0, 0.5, 1]}
             style={StyleSheet.absoluteFill}
           />
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  vehicleActive: { borderColor: colors.primary, boxShadow: '0px 4px 12px rgba(51,16,179,0.12)' },
+  vehicleActive: { borderColor: colors.primary, boxShadow: '0px 4px 12px rgba(232,89,12,0.12)' },
   recommended: {
     position: 'absolute',
     top: -11,

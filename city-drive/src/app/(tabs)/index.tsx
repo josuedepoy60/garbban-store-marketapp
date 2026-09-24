@@ -11,10 +11,10 @@ import { colors, fonts, shadows } from '@/constants/theme';
 import { favoriteDriver, photos, quickPlaces, user } from '@/data/mock';
 
 const SHORTCUTS: { icon: IconName; label: string; bg: string; fg: string; to: '/arrets' | '/programmer' | '/trajets' | '/vehicules' }[] = [
-  { icon: 'alt-route', label: 'Plusieurs arrêts', bg: colors.surfaceHighest, fg: colors.primary, to: '/arrets' },
+  { icon: 'alt-route', label: 'Plusieurs arrêts', bg: colors.blueSoft, fg: colors.blue, to: '/arrets' },
   { icon: 'calendar-month', label: 'Plus tard', bg: colors.secondaryContainer, fg: colors.onSecondaryFixed, to: '/programmer' },
-  { icon: 'directions-bus', label: 'Car / Bus', bg: colors.busSoft, fg: colors.busInk, to: '/trajets' },
-  { icon: 'badge', label: 'Chauffeur perso', bg: colors.tertiaryFixed, fg: colors.tertiary, to: '/vehicules' },
+  { icon: 'directions-bus', label: 'Car / Bus', bg: colors.greenSoft, fg: colors.green, to: '/trajets' },
+  { icon: 'badge', label: 'Chauffeur perso', bg: colors.pinkSoft, fg: colors.tertiary, to: '/vehicules' },
 ];
 
 const ROUTES = [
@@ -358,7 +358,7 @@ export default function HomeScreen() {
   );
 }
 
-const glass = { backgroundColor: 'rgba(255,255,255,0.95)', boxShadow: '0px 10px 24px -4px rgba(75,54,201,0.16)' };
+const glass = { backgroundColor: 'rgba(255,255,255,0.95)', boxShadow: '0px 10px 24px -4px rgba(17,24,39,0.16)' };
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
     boxShadow: shadows.sheet,
   },
   search: { height: 56, borderRadius: 999, backgroundColor: colors.surfaceLow, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 10 },
-  searchIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(51,16,179,0.1)', alignItems: 'center', justifyContent: 'center' },
+  searchIcon: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(232,89,12,0.1)', alignItems: 'center', justifyContent: 'center' },
   searchInput: { flex: 1, fontFamily: fonts.sora600, fontSize: 17, color: colors.onSurface, paddingVertical: 0 },
   mic: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(229,222,255,0.8)', alignItems: 'center', justifyContent: 'center' },
   shortcuts: { flexDirection: 'row', justifyContent: 'space-between' },

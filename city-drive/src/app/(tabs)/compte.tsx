@@ -19,7 +19,7 @@ const INITIAL_PLACES: Place[] = [
   { id: 'gym', icon: 'fitness-center', label: 'Entraînement', address: "Sol Béni, Cocody M'Pouto" },
 ];
 
-const cardShadow = '0px 8px 24px -4px rgba(75,54,201,0.06)';
+const cardShadow = '0px 8px 24px -4px rgba(17,24,39,0.06)';
 
 function Toggle({ value, onChange }: { value: boolean; onChange: () => void }) {
   return (
@@ -188,7 +188,7 @@ export default function AccountScreen() {
         </View>
 
         {/* Gold Club */}
-        <LinearGradient colors={[colors.primary, colors.primaryContainer, '#5845d6']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.gold}>
+        <LinearGradient colors={['#1E3A8A', colors.blue, '#6E9BFF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.gold}>
           <View style={styles.goldGlow} />
           <View style={[styles.between, { flexWrap: 'wrap', rowGap: 8 }]}>
             <Pill background={colors.secondaryContainer} style={{ paddingHorizontal: 12, paddingVertical: 4 }}>
@@ -216,8 +216,8 @@ export default function AccountScreen() {
               </AppText>
             </View>
             <View style={styles.row}>
-              <Icon name="percent" size={16} color="#abd611" />
-              <AppText variant="bodySm" color="#abd611" style={{ fontFamily: fonts.dm600 }}>
+              <Icon name="percent" size={16} color={colors.secondaryContainer} />
+              <AppText variant="bodySm" color={colors.secondaryContainer} style={{ fontFamily: fonts.dm600 }}>
                 Cashback 5% actif sur toutes vos courses
               </AppText>
             </View>
@@ -273,7 +273,7 @@ export default function AccountScreen() {
               <View key={p.id}>
                 <Row
                   icon={p.icon}
-                  iconBg="rgba(51,16,179,0.1)"
+                  iconBg="rgba(232,89,12,0.1)"
                   title={p.label}
                   subtitle={p.address}
                   right={
@@ -325,7 +325,7 @@ export default function AccountScreen() {
               </View>
             </View>
           ) : (
-            <Touchable style={[styles.softBtn, { backgroundColor: 'rgba(235,229,255,0.5)' }]} onPress={() => setAdding(true)}>
+            <Touchable style={[styles.softBtn, { backgroundColor: 'rgba(232,235,239,0.5)' }]} onPress={() => setAdding(true)}>
               <Icon name="add-location-alt" size={20} color={colors.primary} />
               <AppText variant="labelLg" color={colors.primary}>
                 Ajouter un lieu fréquent
@@ -423,13 +423,13 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.surface },
   row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  header: { backgroundColor: 'rgba(255,255,255,0.85)', boxShadow: '0px 1px 8px rgba(75,54,201,0.06)', zIndex: 10 },
+  header: { backgroundColor: 'rgba(255,255,255,0.85)', boxShadow: '0px 1px 8px rgba(17,24,39,0.06)', zIndex: 10 },
   headerInner: { height: 64, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   logo: { width: 36, height: 36, borderRadius: 18, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   bell: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   avatarSmall: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
   content: { paddingHorizontal: 16, paddingTop: 16, gap: 24 },
-  card: { borderRadius: 48, backgroundColor: colors.surfaceLowest, padding: 24, boxShadow: '0px 12px 32px -8px rgba(75,54,201,0.08)' },
+  card: { borderRadius: 48, backgroundColor: colors.surfaceLowest, padding: 24, boxShadow: '0px 12px 32px -8px rgba(17,24,39,0.08)' },
   verifiedBadge: {
     position: 'absolute',
     right: -4,
@@ -445,15 +445,15 @@ const styles = StyleSheet.create({
   verifiedPill: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', marginTop: 4, backgroundColor: colors.surfaceContainer, paddingHorizontal: 10, paddingVertical: 2, borderRadius: 999 },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.secondaryContainer },
   softBtn: { height: 44, borderRadius: 999, backgroundColor: colors.surfaceContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
-  gold: { borderRadius: 48, padding: 24, gap: 16, overflow: 'hidden', boxShadow: '0px 16px 36px -6px rgba(75,54,201,0.28)' },
-  goldGlow: { position: 'absolute', right: -48, top: -48, width: 176, height: 176, borderRadius: 88, backgroundColor: 'rgba(198,243,56,0.15)' },
+  gold: { borderRadius: 48, padding: 24, gap: 16, overflow: 'hidden', boxShadow: '0px 16px 36px -6px rgba(17,24,39,0.28)' },
+  goldGlow: { position: 'absolute', right: -48, top: -48, width: 176, height: 176, borderRadius: 88, backgroundColor: 'rgba(255,196,0,0.15)' },
   perks: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8, borderRadius: 32, backgroundColor: 'rgba(255,255,255,0.1)' },
   goldBtn: { height: 48, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.15)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   rowIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: colors.surfaceContainer, alignItems: 'center', justifyContent: 'center' },
   recharge: { height: 56, borderRadius: 999, backgroundColor: colors.secondaryContainer, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, boxShadow: '0px 4px 6px -1px rgba(0,0,0,0.1)' },
   list: { borderRadius: 48, backgroundColor: colors.surfaceLowest, overflow: 'hidden', boxShadow: cardShadow },
   listRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: 16 },
-  divider: { height: 1, marginHorizontal: 16, backgroundColor: 'rgba(235,229,255,0.6)' },
+  divider: { height: 1, marginHorizontal: 16, backgroundColor: 'rgba(232,235,239,0.6)' },
   more: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   menu: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, paddingHorizontal: 16, paddingBottom: 12, marginTop: -4 },
   menuBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, backgroundColor: colors.surfaceContainer },

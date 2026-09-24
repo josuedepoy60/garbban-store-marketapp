@@ -14,7 +14,7 @@ export function ResponsiveShell({ children }: { children: ReactNode }) {
 
   const columnWidth = width >= 1024 ? 460 : 600;
   return (
-    <LinearGradient colors={['#1b1831', colors.primary, '#1b1831']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.backdrop}>
+    <LinearGradient colors={['#14161A', colors.primary, '#14161A']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.backdrop}>
       <View style={[styles.column, { width: columnWidth }]}>{children}</View>
     </LinearGradient>
   );

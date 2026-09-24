@@ -60,9 +60,9 @@ export default function StopsScreen() {
             <Defs>
               <LinearGradient id="route" x1="0" y1="0.1" x2="1" y2="0.9">
                 <Stop offset="0" stopColor="#C8F53A" />
-                <Stop offset="0.35" stopColor="#4B36C9" />
+                <Stop offset="0.35" stopColor="#FF7A1A" />
                 <Stop offset="0.7" stopColor="#991E50" />
-                <Stop offset="1" stopColor="#3310B3" />
+                <Stop offset="1" stopColor="#E8590C" />
               </LinearGradient>
             </Defs>
             <Path d={ROUTE} stroke="url(#route)" strokeWidth={12} strokeLinecap="round" fill="none" opacity={0.3} />
@@ -174,7 +174,7 @@ export default function StopsScreen() {
 
             <View style={[styles.stop, styles.stopFixed]}>
               <View style={styles.stopLeft}>
-                <View style={[styles.node, { backgroundColor: colors.primary, boxShadow: '0px 4px 12px rgba(51,16,179,0.3)' }]}>
+                <View style={[styles.node, { backgroundColor: colors.primary, boxShadow: '0px 4px 12px rgba(232,89,12,0.3)' }]}>
                   <Icon name="flag" size={18} color={colors.onPrimary} />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   pinWrap: { position: 'absolute', alignItems: 'center' },
-  pin: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, boxShadow: '0px 8px 18px rgba(75,54,201,0.3)' },
+  pin: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, boxShadow: '0px 8px 18px rgba(255,122,26,0.3)' },
   pinBadge: { width: 16, height: 16, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   pinTail: { width: 6, height: 8, borderBottomLeftRadius: 3, borderBottomRightRadius: 3, marginTop: -2 },
   eta: {
@@ -316,18 +316,18 @@ const styles = StyleSheet.create({
   stops: { gap: 8, paddingLeft: 8 },
   rail: { position: 'absolute', left: 29, top: 24, bottom: 28, width: 4, borderRadius: 2, backgroundColor: colors.surfaceHighest },
   stop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderRadius: 16 },
-  stopFixed: { backgroundColor: colors.surfaceLow, boxShadow: '0px 4px 16px rgba(75,54,201,0.04)' },
-  stopEditable: { backgroundColor: colors.surfaceLowest, boxShadow: '0px 4px 18px rgba(75,54,201,0.06)' },
+  stopFixed: { backgroundColor: colors.surfaceLow, boxShadow: '0px 4px 16px rgba(17,24,39,0.04)' },
+  stopEditable: { backgroundColor: colors.surfaceLowest, boxShadow: '0px 4px 18px rgba(17,24,39,0.06)' },
   stopLeft: { flexDirection: 'row', alignItems: 'center', gap: 16, flex: 1, paddingRight: 8 },
   node: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   stopAction: { width: 32, height: 32, borderRadius: 16, backgroundColor: colors.surfaceLow, alignItems: 'center', justifyContent: 'center' },
   addStop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, borderRadius: 16, backgroundColor: colors.surfaceLow },
-  carpool: { padding: 16, borderRadius: 16, backgroundColor: colors.surfaceLow, gap: 12, boxShadow: '0px 6px 20px rgba(75,54,201,0.05)' },
+  carpool: { padding: 16, borderRadius: 16, backgroundColor: colors.surfaceLow, gap: 12, boxShadow: '0px 6px 20px rgba(17,24,39,0.05)' },
   check: { width: 24, height: 24, borderRadius: 8, backgroundColor: colors.secondaryContainer, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 2px 8px rgba(200,245,58,0.5)' },
   checkOff: { backgroundColor: colors.surfaceLowest, borderWidth: 2, borderColor: colors.outlineVariant, boxShadow: undefined },
   face: { width: 40, height: 40, borderRadius: 20, marginLeft: -8, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 4px 8px rgba(0,0,0,0.12)' },
-  price: { padding: 16, borderRadius: 16, backgroundColor: colors.primaryContainer, gap: 8, boxShadow: '0px 12px 28px rgba(75,54,201,0.22)' },
-  split: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10, borderRadius: 12, backgroundColor: 'rgba(51,16,179,0.2)' },
+  price: { padding: 16, borderRadius: 16, backgroundColor: colors.ink, gap: 8, boxShadow: '0px 12px 28px rgba(17,24,39,0.22)' },
+  split: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10, borderRadius: 12, backgroundColor: 'rgba(232,89,12,0.2)' },
   cta: {
     height: 56,
     borderRadius: 999,
