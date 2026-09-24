@@ -7,18 +7,9 @@ import { AppText, Dot, Icon, Pill, Touchable, type IconName } from '@/components
 import { brand } from '@/constants/brand';
 import { colors, fonts, shadows } from '@/constants/theme';
 import { formatAmount } from '@/data/mock';
-import { useWallet, type TxKind } from '@/data/wallet';
+import { OPERATORS, bonusOf, useWallet, type TxKind } from '@/data/wallet';
 
-const OPERATORS: { id: string; name: string; label: string; icon: IconName }[] = [
-  { id: 'wave', name: 'Wave Money', label: 'Wave', icon: 'waves' },
-  { id: 'orange', name: 'Orange Money', label: 'Orange', icon: 'phone-iphone' },
-  { id: 'mtn', name: 'MTN MoMo', label: 'MTN MoMo', icon: 'account-balance' },
-  { id: 'moov', name: 'Moov Money', label: 'Moov', icon: 'currency-exchange' },
-];
-
-// Bonus de 5 % crédité en plus de chaque recharge.
 const AMOUNTS = [2000, 5000, 10000, 25000];
-const bonusOf = (amount: number) => Math.round(amount * 0.05);
 
 type Filter = 'all' | 'course' | 'recharge';
 const FILTERS: { id: Filter; label: string }[] = [
@@ -48,24 +39,18 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
 
 export default function WalletScreen() {
   const insets = useSafeAreaInsets();
-  const { balance, transactions, recharge } = useWallet();
+  const { balance, transactions } = useWallet();
   const [operator, setOperator] = useState(OPERATORS[0].id);
   const [amount, setAmount] = useState(25000);
   const [filter, setFilter] = useState<Filter>('all');
   const [showAll, setShowAll] = useState(false);
   const [autoPay, setAutoPay] = useState(true);
-  const [done, setDone] = useState<string | null>(null);
 
   const op = OPERATORS.find((o) => o.id === operator) ?? OPERATORS[0];
   const filtered = transactions.filter((t) => filter === 'all' || t.kind === filter);
   const visible = showAll ? filtered : filtered.slice(0, 4);
 
-  const doRecharge = () => {
-    const bonus = bonusOf(amount);
-    recharge(amount, bonus, op.name);
-    setDone(`+${formatAmount(amount + bonus)} ${brand.walletUnit} crédités via ${op.name}`);
-    setTimeout(() => setDone(null), 3500);
-  };
+  const doRecharge = () => router.push({ pathname: '/recharge', params: { amount: String(amount), operator: op.id } });
 
   return (
     <View style={styles.screen}>
@@ -157,15 +142,6 @@ export default function WalletScreen() {
             </Touchable>
           </View>
         </View>
-
-        {done && (
-          <View style={styles.toast}>
-            <Icon name="check-circle" size={20} color={colors.onSecondaryFixed} />
-            <AppText variant="labelMd" color={colors.onSecondaryFixed} style={{ flex: 1 }}>
-              {done}
-            </AppText>
-          </View>
-        )}
 
         {/* Recharge rapide */}
         <View style={{ gap: 16 }}>
@@ -405,7 +381,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 5,
   },
-  toast: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 16, backgroundColor: colors.secondaryContainer, marginTop: -8 },
   operator: {
     flex: 1,
     alignItems: 'center',

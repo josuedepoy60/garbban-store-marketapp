@@ -1,6 +1,18 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
 
+import type { IconName } from '@/components/ui';
 import { user } from './mock';
+
+export const OPERATORS: { id: string; name: string; label: string; icon: IconName }[] = [
+  { id: 'wave', name: 'Wave Money', label: 'Wave', icon: 'waves' },
+  { id: 'orange', name: 'Orange Money', label: 'Orange', icon: 'phone-iphone' },
+  { id: 'mtn', name: 'MTN MoMo', label: 'MTN MoMo', icon: 'account-balance' },
+  { id: 'moov', name: 'Moov Money', label: 'Moov', icon: 'currency-exchange' },
+];
+
+// Bonus Gold Club de 5 % crédité en plus de chaque recharge.
+export const RECHARGE_BONUS = 0.05;
+export const bonusOf = (amount: number) => Math.round(amount * RECHARGE_BONUS);
 
 export type TxKind = 'course' | 'recharge' | 'peage';
 

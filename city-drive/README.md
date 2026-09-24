@@ -23,6 +23,7 @@ npm run typecheck
 | `/programmer` | Programmer une course (jour, heure, chauffeur préféré) |
 | `/navigation` | Navigation GPS en mode sombre : guidage virage par virage, vocal, compteur de vitesse, SOS |
 | `/portefeuille` (onglet) | Carte Pass, recharge Mobile Money (Wave, Orange, MTN, Moov), pass domicile-travail, historique filtrable, sécurité |
+| `/recharge` | Confirmation de recharge Mobile Money : minuteur, récapitulatif, bonus, redirection opérateur |
 | `/compte` | Provisoire, en attente de maquette |
 
 ## Organisation
